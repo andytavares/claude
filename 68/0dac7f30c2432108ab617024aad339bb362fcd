@@ -1,0 +1,30 @@
+CLAUDE.md
+  h_16ba00fe96244d 1-45
+my-skills/README.md
+  h_16ba00fe96244d 1-64
+my-skills/agents/worker.md
+  h_16ba00fe96244d 1-11
+my-skills/install.sh
+  h_16ba00fe96244d 1-21
+my-skills/skills/brief/SKILL.md
+  h_16ba00fe96244d 1-25
+my-skills/skills/do-work/SKILL.md
+  h_16ba00fe96244d 1-33
+my-skills/skills/explain/SKILL.md
+  h_16ba00fe96244d 1-19
+my-skills/skills/interview/SKILL.md
+  h_16ba00fe96244d 1-30
+my-skills/skills/research/SKILL.md
+  h_16ba00fe96244d 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "680dac7f30c2432108ab617024aad339bb362fcd",
+  "prompts": {},
+  "humans": {
+    "h_16ba00fe96244d": {
+      "author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
