@@ -1,0 +1,25 @@
+hooks/clean-gate/gate.py
+  s_70ae0658d91832::t_0785b8c03a1267 1-386
+rules/clean-code.md
+  s_70ae0658d91832::t_52e7be3a96904e 1-24
+skills/survey/SKILL.md
+  s_70ae0658d91832::t_432b3432fc2b0d 1-18
+tests/test_gate.py
+  s_70ae0658d91832::t_0d4cef16ad58f2 1-225
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "60ae5044a329f6fca092883eae81bbfa179e97c5",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
