@@ -1,0 +1,23 @@
+at/radar/digest.py
+  s_70ae0658d91832::t_f96c0fcd0b700e 48,58,69,84-123,150,153,156,166,207-215
+tests/radar/fixtures/transcripts/friction.jsonl
+  s_70ae0658d91832::t_cf7acb4ec98669 1-5
+tests/radar/test_digest.py
+  s_70ae0658d91832::t_8d33f3b889ede5 144-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "60a691ffbe421c1aa59c59573afbbe71ec0a69c3",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
