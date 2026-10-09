@@ -45,7 +45,7 @@ def read_queue(settings):
 
 
 def write_session(settings, entry):
-    facts = read_transcript(Path(entry["transcript_path"]))
+    facts = read_transcript(Path(entry["transcript_path"]), settings)
     if not facts["started"]:
         return None
     repo = repo_name(facts["cwd"] or entry["cwd"])
@@ -55,6 +55,7 @@ def write_session(settings, entry):
     vault.write_note(note, session_props(facts, repo, session_id))
     note.write_text(replace_body(note, body_lines(facts, settings)))
     ensure_repo_entity(settings, repo)
+    write_friction(settings, {"facts": facts, "note": note, "session_id": session_id})
     return note
 
 
@@ -65,7 +66,7 @@ def replace_body(note, body):
 
 def session_props(facts, repo, session_id):
     prompts = facts["prompts"]
-    return {
+    props = {
         "type": "session",
         "repo": vault.link(f"Repo - {repo}"),
         "branch": facts["branch"],
@@ -80,6 +81,46 @@ def session_props(facts, repo, session_id):
         "radar_only": bool(prompts)
         and all(p.startswith(RADAR_COMMAND) for p in prompts),
     }
+    if facts["friction"]:
+        props["friction"] = facts["friction"]
+    return props
+
+
+def write_friction(settings, ctx):
+    facts = ctx["facts"]
+    for tool, count in facts["friction"].items():
+        tool_link = vault.link(f"Tool - {tool}")
+        name = f"Friction {tool} {ctx['session_id'][:8]}.md"
+        vault.write_note(
+            settings.folder / "Signals" / name,
+            {
+                "type": "signal",
+                "source": "session",
+                "kind": "friction",
+                "about": [tool_link],
+                "theme": None,
+                "observed": facts["started"][:10],
+                "status": "open",
+                "severity": 1,
+                "count": count,
+                "session": vault.link(ctx["note"].stem),
+            },
+        )
+        tool_note = settings.folder / "Entities" / f"Tool - {tool}.md"
+        if not tool_note.exists():
+            vault.write_note(tool_note, {"type": "entity", "kind": "tool"})
+
+
+def friction_counts(settings, results):
+    if not settings.config["sources"]["session_friction"]:
+        return {}
+    text = "\n".join(results)
+    counts = {}
+    for entry in settings.config["friction_patterns"]:
+        found = len(re.findall(entry["pattern"], text))
+        if found:
+            counts[entry["tool"]] = counts.get(entry["tool"], 0) + found
+    return counts
 
 
 def ensure_repo_entity(settings, repo):
@@ -106,12 +147,13 @@ def prompt_line(prompt, mode):
     return prompt.replace("\n", "\n  ")
 
 
-def read_transcript(path):
+def read_transcript(path, settings):
     facts = {"started": None, "ended": None, "cwd": "", "branch": "", "prompts": []}
     facts.update(added=0, removed=0, prs=[], not_done=[])
-    last_reply = ""
+    last_reply, results = "", []
     for record in parse_lines(path):
         take_scalars(facts, record)
+        results += tool_results(record)
         text = prompt_text(record)
         if text:
             facts["prompts"].append(text)
@@ -121,6 +163,7 @@ def read_transcript(path):
                 facts["prs"].append(url)
         last_reply = replies[-1] if replies else last_reply
     facts["not_done"] = not_done_items(last_reply)
+    facts["friction"] = friction_counts(settings, results)
     return facts
 
 
@@ -159,6 +202,15 @@ def prompt_text(record):
     texts = text_blocks(record.get("message", {}).get("content"))
     text = "\n".join(texts).strip()
     return "" if text.startswith("<") else text
+
+
+def tool_results(record):
+    if record.get("type") != "user":
+        return []
+    content = record.get("message", {}).get("content")
+    blocks = content if isinstance(content, list) else []
+    results = [b for b in blocks if b.get("type") == "tool_result"]
+    return [t for b in results for t in text_blocks(b.get("content"))]
 
 
 def assistant_texts(record):
