@@ -1,0 +1,31 @@
+at/radar/checkin.py
+  s_70ae0658d91832::t_3f43c6f70026ec 1-144
+at/radar/detect.py
+  s_70ae0658d91832::t_a68d6c656103ba 1-273
+at/radar/feedback.py
+  s_70ae0658d91832::t_44b9bad5f2be5b 1-41
+at/radar/radar.py
+  s_70ae0658d91832::t_499601bdb8f1c9 66
+tests/radar/test_checkin.py
+  s_70ae0658d91832::t_5b8d43196d058f 1-132
+tests/radar/test_detect.py
+  s_70ae0658d91832::t_df615e322720d0 1-264
+tests/radar/test_feedback.py
+  s_70ae0658d91832::t_9969c5246246fc 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c38184009556ec799f6bf23e324db9696cf4bf6d",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
