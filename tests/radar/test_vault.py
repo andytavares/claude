@@ -93,3 +93,10 @@ def test_state_round_trips_and_starts_empty(home):
     assert vault.load_state(settings) == {}
     vault.save_state(settings, {"nudged_on": "2026-10-09"})
     assert vault.load_state(settings) == {"nudged_on": "2026-10-09"}
+
+
+def test_init_vault_creates_a_missing_folder_as_an_obsidian_vault(tmp_path):
+    vault_dir = tmp_path / "new" / "Notes"
+    vault.init_vault(tmp_path, vault_dir)
+    assert (vault_dir / ".obsidian").is_dir()
+    assert (vault_dir / "Radar Config.md").is_file()

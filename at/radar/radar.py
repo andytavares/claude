@@ -44,7 +44,8 @@ def run_pull(args, settings, home):
 def run_note(args, settings, home):
     import signals
 
-    print(signals.add_note(settings, args.text, args.about, args.theme))
+    meta = {"about": args.about, "theme": args.theme, "source": args.source}
+    print(signals.add_note(settings, args.text, meta))
 
 
 def run_entities(args, settings, home):
@@ -96,6 +97,7 @@ def parse_args():
     note.add_argument("text")
     note.add_argument("--about", action="append", default=[])
     note.add_argument("--theme")
+    note.add_argument("--source", default="note")
     answer = commands.add_parser("answer")
     answer.add_argument("number", type=int)
     answer.add_argument("response", choices=["act", "watch", "known", "out_of_scope"])

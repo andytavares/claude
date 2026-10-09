@@ -73,6 +73,7 @@ def merged(defaults, overrides):
 
 
 def init_vault(home, vault_dir):
+    (Path(vault_dir) / ".obsidian").mkdir(parents=True, exist_ok=True)
     pointer = Path(home) / POINTER
     pointer.parent.mkdir(parents=True, exist_ok=True)
     pointer.write_text(json.dumps({"vault": str(Path(vault_dir).resolve())}) + "\n")
