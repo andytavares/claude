@@ -15,5 +15,3 @@ For a question wide enough that reading would fill this context, use one subagen
 Format: if the argument names one after `as:`, use it. Otherwise match the question: a "how does X work" gets prose with paths, a "what are all the Y" gets a table, a "what calls Z" gets a list, a "how do these fit together" gets a mermaid diagram, and `doc` writes `docs/explain/<slug>.md`.
 
 Lead with the answer in one or two sentences. Evidence after, as file paths and line numbers. Say plainly what you could not determine and where you stopped. No narration of how you searched.
-
-To run this on Fable instead, change `model: opus` to `model: fable` in this file for the session.
