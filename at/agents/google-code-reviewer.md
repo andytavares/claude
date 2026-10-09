@@ -1,6 +1,6 @@
 ---
 name: google-code-reviewer
-description: Reviews a git diff against Google's engineering code review standard (https://google.github.io/eng-practices/review/). Evaluates design, functionality, complexity, tests, naming, comments, style, and documentation. Returns a structured verdict with file:line citations. Use when /google-review is invoked or when the user asks for a Google-style code review.
+description: Reviews a git diff against Google's engineering code review standard (https://google.github.io/eng-practices/review/). Evaluates design, functionality, complexity, tests, naming, comments, style, and documentation. Returns a structured verdict with file:line citations. Use when /at:google-review is invoked or when the user asks for a Google-style code review.
 tools: Read, Bash
 ---
 

@@ -12,9 +12,9 @@ If the argument is a path, read it; it is the brief. Otherwise it is the ask.
 
 The ask is usually a view of part of the problem. Your job is the whole of it. Before asking anything, map the problem space yourself:
 
-1. Run `/explain` on the area the ask touches: what exists, who calls it, what depends on it, what it depends on.
+1. Run `/at:explain` on the area the ask touches: what exists, who calls it, what depends on it, what it depends on.
 2. List every adjacent concern the ask did not mention: other callers, other platforms or entry points, data already stored in the old shape, migrations, permissions, failure and retry paths, concurrency, observability, rollback, docs, and the people who will be affected. Mark each one as covered by the ask, not covered, or unknown.
-3. If the ask depends on something external you do not know, run `/research` on that narrow question first.
+3. If the ask depends on something external you do not know, run `/at:research` on that narrow question first.
 
 Then interview with the AskUserQuestion tool. Only ask what the code and the research could not answer. Prioritise the not-covered and unknown items: those are the blind spots. Give the recommended answer with each question. Keep going until every item on the map is covered or explicitly deferred with a reason. Do not stop early because the original ask looks answered; stop when the problem does.
 

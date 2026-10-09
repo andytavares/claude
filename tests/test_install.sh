@@ -16,69 +16,67 @@ assert_contains() { grep -qF -- "$2" "$1" || fail "$1 lacks '$2'"; }
 
 seed_home() {
   rm -rf "$H"
-  mkdir -p "$C/skills/mine"
+  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/agents" "$C/hooks/clean-gate"
   echo "my own skill" > "$C/skills/mine/SKILL.md"
+  echo "loose copy from an earlier install" > "$C/skills/research/SKILL.md"
+  echo "loose copy from an earlier install" > "$C/agents/worker.md"
+  echo "loose copy from an earlier install" > "$C/hooks/clean-gate/gate.py"
   printf '%s' "$ORIGINAL_CLAUDE_MD" > "$C/CLAUDE.md"
-  cat > "$C/settings.json" <<'JSON'
-{"theme":"dark","hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"git-ai checkpoint"}]}]}}
+  cat > "$C/settings.json" << 'JSON'
+{"theme":"dark","hooks":{
+  "PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"git-ai checkpoint"}]}],
+  "Stop":[{"hooks":[{"type":"command","command":"uv run --script \"$HOME/.claude/hooks/clean-gate/gate.py\" check --hook stop"}]}]}}
 JSON
 }
 
 run_install() { HOME="$H" bash "$ROOT/install.sh"; }
 run_uninstall() { HOME="$H" bash "$ROOT/uninstall.sh"; }
 
-gate_hook_count() {
-  python3 -c '
-import json, sys
-hooks = json.load(open(sys.argv[1])).get("hooks", {}).get(sys.argv[2], [])
-print(sum("clean-gate/gate.py" in h["command"] for e in hooks for h in e["hooks"]))' "$C/settings.json" "$1"
-}
-
-assert_settings_kept() {
+assert_settings_kept_without_old_gate() {
   python3 -c '
 import json, sys
 d = json.load(open(sys.argv[1]))
 assert d["theme"] == "dark"
-assert d["hooks"]["PreToolUse"][0]["hooks"][0]["command"] == "git-ai checkpoint"' "$C/settings.json" \
-    || fail "existing settings lost"
+assert d["hooks"]["PreToolUse"][0]["hooks"][0]["command"] == "git-ai checkpoint"
+assert "Stop" not in d["hooks"], "old clean-gate Stop hook still in settings.json"' "$C/settings.json" \
+    || fail "settings.json not as expected"
 }
 
-assert_repo_installed() {
+assert_plugin_installed() {
   cmp -s "$ROOT/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
-  for skill in "$ROOT"/skills/*/; do assert_exists "$C/skills/$(basename "$skill")/SKILL.md"; done
-  for agent in "$ROOT"/agents/*.md; do assert_exists "$C/agents/$(basename "$agent")"; done
   assert_exists "$C/rules/clean-code.md"
-  [ -x "$C/hooks/clean-gate/gate.py" ] || fail "gate.py not executable"
+  assert_exists "$C/skills/at/.claude-plugin/plugin.json"
+  assert_exists "$C/skills/at/hooks/hooks.json"
+  assert_exists "$C/skills/at/skills/word-salad/SKILL.md"
+  [ -x "$C/skills/at/hooks/clean-gate/gate.py" ] || fail "gate.py not executable"
+}
+
+assert_loose_copies_removed() {
+  assert_gone "$C/skills/research"
+  assert_gone "$C/agents/worker.md"
+  assert_gone "$C/hooks/clean-gate"
 }
 
 test_install() {
   seed_home
   run_install > "$WORK/out.txt"
-  assert_repo_installed
-  assert_eq "$(gate_hook_count PostToolUse)" 1 "PostToolUse gate hooks"
-  assert_eq "$(gate_hook_count Stop)" 1 "Stop gate hooks"
-  # shellcheck disable=SC2016
-  assert_contains "$C/settings.json" '$HOME/.claude/hooks/clean-gate/gate.py'
-  assert_settings_kept
+  assert_plugin_installed
+  assert_loose_copies_removed
+  assert_settings_kept_without_old_gate
   assert_eq "$(cat "$C/skills/mine/SKILL.md")" "my own skill" "unrelated skill"
   assert_contains "$WORK/out.txt" 'Installed.'
 }
 
 test_reinstall_keeps_first_backup() {
   run_install > /dev/null
-  assert_eq "$(gate_hook_count PostToolUse)" 1 "PostToolUse after rerun"
-  assert_eq "$(gate_hook_count Stop)" 1 "Stop after rerun"
+  assert_plugin_installed
   for backup in "$C"/CLAUDE.md.bak-install-*; do assert_contains "$backup" '## Code'; done
 }
 
 test_uninstall() {
   run_uninstall > "$WORK/out.txt"
-  for skill in "$ROOT"/skills/*/; do assert_gone "$C/skills/$(basename "$skill")"; done
-  for agent in "$ROOT"/agents/*.md; do assert_gone "$C/agents/$(basename "$agent")"; done
+  assert_gone "$C/skills/at"
   assert_gone "$C/rules/clean-code.md"
-  assert_gone "$C/hooks/clean-gate"
-  assert_eq "$(gate_hook_count PostToolUse)" 0 "PostToolUse after uninstall"
-  assert_settings_kept
   assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "CLAUDE.md restored"
   assert_eq "$(cat "$C/skills/mine/SKILL.md")" "my own skill" "unrelated skill"
 }

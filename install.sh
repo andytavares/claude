@@ -3,6 +3,7 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE="$HOME/.claude"
+PLUGIN="$CLAUDE/skills/at"
 
 require_tools() {
   local missing=()
@@ -36,37 +37,44 @@ install_path() {
   echo "installed $dest"
 }
 
-install_repo_files() {
-  install_path "$REPO/CLAUDE.md" "$CLAUDE/CLAUDE.md"
-  for rule in "$REPO"/rules/*.md; do install_path "$rule" "$CLAUDE/rules/$(basename "$rule")"; done
-  for skill in "$REPO"/skills/*/; do install_path "$skill" "$CLAUDE/skills/$(basename "$skill")"; done
-  for agent in "$REPO"/agents/*.md; do install_path "$agent" "$CLAUDE/agents/$(basename "$agent")"; done
-  install_path "$REPO/hooks/clean-gate" "$CLAUDE/hooks/clean-gate"
-  chmod +x "$CLAUDE/hooks/clean-gate/gate.py"
+remove_path() {
+  [ -e "$1" ] || return 0
+  rm -rf "$1"
+  echo "removed $1"
 }
 
-merge_gate_hooks() {
+# Earlier installs copied skills, agents and the gate loose into ~/.claude; the plugin replaces them.
+remove_loose_copies() {
+  for skill in "$REPO"/at/skills/*/; do remove_path "$CLAUDE/skills/$(basename "$skill")"; done
+  for agent in "$REPO"/at/agents/*.md; do remove_path "$CLAUDE/agents/$(basename "$agent")"; done
+  remove_path "$CLAUDE/hooks/clean-gate"
+  remove_settings_gate_hooks
+}
+
+remove_settings_gate_hooks() {
   local settings="$CLAUDE/settings.json"
-  [ -f "$settings" ] || echo '{}' > "$settings"
+  [ -f "$settings" ] || return 0
   python3 - "$settings" << 'PY'
 import json, sys
 path = sys.argv[1]
-gate = 'uv run --script "$HOME/.claude/hooks/clean-gate/gate.py" check --hook '
-wanted = {
-    "PostToolUse": {"matcher": "Edit|Write|MultiEdit",
-                    "hooks": [{"type": "command", "command": gate + "post-tool-use"}]},
-    "Stop": {"hooks": [{"type": "command", "command": gate + "stop"}]},
-}
 def is_gate(entry):
     return any("clean-gate/gate.py" in h.get("command", "") for h in entry.get("hooks", []))
 data = json.load(open(path))
-hooks = data.setdefault("hooks", {})
-for event, entry in wanted.items():
-    hooks[event] = [e for e in hooks.get(event, []) if not is_gate(e)] + [entry]
+hooks = data.get("hooks", {})
+for event in list(hooks):
+    hooks[event] = [e for e in hooks[event] if not is_gate(e)]
+    if not hooks[event]:
+        del hooks[event]
 json.dump(data, open(path, "w"), indent=2)
 open(path, "a").write("\n")
 PY
-  echo "merged clean-gate hooks into $settings"
+}
+
+install_repo_files() {
+  install_path "$REPO/CLAUDE.md" "$CLAUDE/CLAUDE.md"
+  for rule in "$REPO"/rules/*.md; do install_path "$rule" "$CLAUDE/rules/$(basename "$rule")"; done
+  install_path "$REPO/at" "$PLUGIN"
+  chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
 }
 
 main() {
@@ -74,9 +82,9 @@ main() {
   mkdir -p "$CLAUDE"
   backup "$CLAUDE/settings.json"
   backup "$CLAUDE/CLAUDE.md"
+  remove_loose_copies
   install_repo_files
-  merge_gate_hooks
-  echo "Installed. Start a new Claude Code session and run /hooks to confirm."
+  echo "Installed. Start a new Claude Code session; skills run as /at:<skill>."
 }
 
 main "$@"
