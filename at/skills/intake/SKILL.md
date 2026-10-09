@@ -27,7 +27,7 @@ Effort is a property of the ask, not the batch. Two asks in the same batch can l
 
 ## For each dispatched ask
 
-1. Write `briefs/<id>.md` in the `/at:brief` format: change, files, out of scope, proof command, dispatch line.
+1. Write `briefs/<id>.md` in the `/at:brief` format, ending with the `size:`, `model:` and `effort:` lines that `/at:dispatch` and `/at:fleet` read.
 2. Launch it:
 
 ```bash
