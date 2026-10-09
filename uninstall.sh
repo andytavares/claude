@@ -24,6 +24,8 @@ restore_claude_md() {
 main() {
   remove_path "$CLAUDE/skills/at"
   for rule in "$REPO"/rules/*.md; do remove_path "$CLAUDE/rules/$(basename "$rule")"; done
+  remove_path "$CLAUDE/at-radar.json"
+  echo "radar vault and its notes left in place"
   restore_claude_md
   echo "Uninstalled."
 }

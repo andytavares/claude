@@ -4,6 +4,34 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE="$HOME/.claude"
 PLUGIN="$CLAUDE/skills/at"
+WITH_RADAR=0
+VAULT=""
+
+parse_args() {
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --radar) WITH_RADAR=1 ;;
+      --vault)
+        [ "$#" -ge 2 ] || { echo "--vault needs a directory" >&2; exit 1; }
+        VAULT="$2"
+        shift
+        ;;
+      *)
+        echo "unknown option: $1" >&2
+        exit 1
+        ;;
+    esac
+    shift
+  done
+  if [ "$WITH_RADAR" = 1 ] && [ -z "$VAULT" ]; then
+    echo "--radar needs --vault <dir>" >&2
+    exit 1
+  fi
+  if [ "$WITH_RADAR" = 0 ] && [ -n "$VAULT" ]; then
+    echo "--vault only works together with --radar" >&2
+    exit 1
+  fi
+}
 
 require_tools() {
   local missing=()
@@ -77,13 +105,45 @@ install_repo_files() {
   chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
 }
 
+strip_radar_hooks() {
+  python3 - "$PLUGIN/hooks/hooks.json" << 'PY'
+import json, sys
+path = sys.argv[1]
+def is_radar(entry):
+    return any("bin/radar" in h.get("command", "") for h in entry.get("hooks", []))
+data = json.load(open(path))
+hooks = data.get("hooks", {})
+for event in list(hooks):
+    hooks[event] = [e for e in hooks[event] if not is_radar(e)]
+    if not hooks[event]:
+        del hooks[event]
+json.dump(data, open(path, "w"), indent=2)
+open(path, "a").write("\n")
+PY
+}
+
+drop_radar() {
+  rm -rf "$PLUGIN/skills/radar" "$PLUGIN/radar" "$PLUGIN/bin/radar"
+  strip_radar_hooks
+  echo "radar: not installed (use --radar --vault <dir>)"
+  if [ -f "$CLAUDE/at-radar.json" ]; then
+    echo "radar: vault kept; $CLAUDE/at-radar.json untouched"
+  fi
+}
+
+setup_radar() {
+  "$PLUGIN/bin/radar" init "$VAULT"
+}
+
 main() {
+  parse_args "$@"
   require_tools
   mkdir -p "$CLAUDE"
   backup "$CLAUDE/settings.json"
   backup "$CLAUDE/CLAUDE.md"
   remove_loose_copies
   install_repo_files
+  if [ "$WITH_RADAR" = 1 ]; then setup_radar; else drop_radar; fi
   echo "Installed. Start a new Claude Code session; skills run as /at:<skill>."
 }
 
