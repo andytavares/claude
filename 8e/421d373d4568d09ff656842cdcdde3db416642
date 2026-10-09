@@ -1,0 +1,25 @@
+at/radar/trends.py
+  s_70ae0658d91832::t_dbe25a4e01fffe 1-135
+at/radar/verify.py
+  s_70ae0658d91832::t_cf932d80e5a0ef 1-64
+tests/radar/test_trends.py
+  s_70ae0658d91832::t_0dbb209bcd65eb 1-179
+tests/radar/test_verify.py
+  s_70ae0658d91832::t_56cd2f53920aaf 1-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e421d373d4568d09ff656842cdcdde3db416642",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
