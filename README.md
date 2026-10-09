@@ -1,6 +1,6 @@
 # claude
 
-My Claude Code setup: global rules, a clean-code standard, and a plugin named `at` that holds the skills, agents and the clean-code gate. Every skill runs as `/at:<skill>`, so none of them collide with other skills.
+My Claude Code setup: global rules, a clean-code standard, and a plugin named `at` that holds the skills, agents and the clean-code gate, plus an optional radar that finds promotion-worthy projects to lead. Every skill runs as `/at:<skill>`, so none of them collide with other skills.
 
 ## Install, update, remove
 
@@ -41,13 +41,14 @@ flowchart TD
   Q -->|"a document to write"| RS["/at:research"]
   Q -->|"an idea to prove"| PC["/at:poc"]
   Q -->|"a library to judge"| TE["/at:tool-eval"]
+  Q -->|"what to lead next"| RD["/at:radar"] --> PT["/at:radar pitch"] --> PC
   BR -->|"size S or M"| IM["/at:implement"]
   BR -->|"size L, or needs a decision"| IV["/at:interview"] --> SP["SPEC.md"] --> IM
   IN --> DP["background sessions"] --> FL["/at:fleet"]
   IM --> PR["draft PR"]
 ```
 
-For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in the current session.
+For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in the current session. A radar pitch's POC goes to `/at:poc`, and once the project is agreed, `/at:interview` turns it into a spec for `/at:implement`.
 
 ## Skills
 
@@ -81,10 +82,22 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 - **Done means the checks ran.** The PR carries each command and its exit code. A summary that says "tests pass" without output isn't done.
 - **Too much to read?** Run `/at:word-salad` with no argument to rewrite the last reply, or pass it text or a file path.
 - **One ask per session.** Start a new session between unrelated tasks, so old context doesn't steer the new one.
+- **Give the radar your ladder first.** Until `Context/Ladder.md` holds your own next-level criteria, every promotion-fit score is provisional.
+- **Feed the radar what you see at work.** Your sessions and status pages only show part of the picture; one line per finding (`/at:radar note "…" --source incident.io`) is how outages, slow builds and repeated asks from other teams get in.
+- **Check in weekly, scan monthly.** `/at:radar` is cheap; `/at:radar-scan` runs about 10 agents, so run it when there's new evidence to read.
+- **Answer every opportunity.** `pursue`, `park`, `reject` or `exists` is what tunes the next scan; an opportunity you never answer keeps coming back unchanged.
 
 ## The radar
 
 The radar finds projects worth leading: months of work across several teams that make developers' lives measurably better, each mapped to the criteria for the level you're going for (staff to principal by default). It doesn't list PRs or to-dos.
+
+### First-time setup
+
+1. `./install.sh --radar --vault ~/Notes/Radar`, then open that folder in Obsidian as a vault.
+2. Replace `Radar/Context/Ladder.md` with your ladder's next-level criteria and set `provisional: false`.
+3. Add what leadership and your manager want focused on to `Radar/Context/Priorities.md`.
+4. In `Radar Config.md`, add the status pages of tools your developers depend on to `status_pages`, and your team's areas to `out_of_scope` or `existing_programs` where someone else already owns them.
+5. Use Claude as usual for a week, adding `/at:radar note` lines for what you notice at work, then run `/at:radar-scan` and `/at:radar`.
 
 Example of what it's for: GitHub's status page logged 50 incidents between 2026-07-30 and 2026-10-07, 11 of them critical, and your own sessions hit `gh: HTTP 502` 30 times in 60 days. The radar turns that into an opportunity ("reduce dependence on github.com") and, when you ask, a pitch: options compared (self-hosting, GitLab, a mirror with CI fallback), a small POC that proves the leading option, milestones, risks and stakeholders.
 

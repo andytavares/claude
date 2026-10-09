@@ -42,7 +42,7 @@ Write `Pitches/<opportunity>.md` with properties `type: pitch`, `opportunity: [[
 - **First two weeks**: what to do before asking anyone for time.
 - **Sources**.
 
-Run `radar verify` on the pitch and fix every failure before finishing. Set the opportunity's `status: pitched`. Reply with the pitch's path and one line on its strongest and weakest point.
+Run `radar verify` on the pitch and fix every failure before finishing. Set the opportunity's `status: pitched`. Reply with the pitch's path and one line on its strongest and weakest point. Suggest `/at:poc` with the POC section as the next step.
 
 ## `note <text>`
 
