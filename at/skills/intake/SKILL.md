@@ -17,9 +17,9 @@ For every ask, size it and route it. Do all of them before dispatching any, so t
 | Size | Signal | Route | Model / effort |
 |---|---|---|---|
 | **trivial** | One file, one obvious edit, describable as a one-line diff | Do it here, now, in this session, then commit and open a PR | this session as-is |
-| **small** | Files you can name, approach obvious, under an hour | `claude --bg` | `sonnet` / `high` |
-| **medium** | Several files or modules, approach clear once the code is read | `claude --bg` | `sonnet` / `xhigh` |
-| **large** | Approach not obvious, root-cause work, cross-cutting | `claude --bg` | `opus` / `xhigh` |
+| **small** | Files you can name, approach obvious, under an hour | `claude --bg` | `sonnet` / `medium` |
+| **medium** | Several files or modules, approach clear once the code is read | `claude --bg` | `sonnet` / `high` |
+| **large** | Approach not obvious, root-cause work, cross-cutting | `claude --bg` | `opus` / `high` |
 | **spec-first** | Cannot write a proof command without deciding the design | Write `briefs/<id>.md` with a note that it needs `/at:interview` first. Do not dispatch. | none |
 | **mechanical fan-out** | The same change across many files | Print an `ultracode` prompt for it instead of dispatching | none |
 
