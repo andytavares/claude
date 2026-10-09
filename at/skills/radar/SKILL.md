@@ -17,10 +17,12 @@ If `sources.linear` is true in the vault's `Radar Config.md` and the Linear tool
 Run `radar checkin`. It digests new sessions, pulls the sources turned on in the settings note, finds blind spots, writes the week's note under `Briefs/`, and prints JSON. Show the user, in this order:
 
 1. What changed because of their feedback, by feedback note.
-2. Commitments.
-3. Blind spots, numbered as in the JSON: title, why it was likely missed, and the evidence as note names.
+2. Commitments: open PRs grouped by repo.
+3. Blind spots: title, why it was likely missed, and the evidence as note names.
 4. What was held back by `out_of_scope`, one line each.
 5. Any source that failed, with its error.
+
+Commitments and blind spots share one numbering, in the order of the JSON's `blind_spots` list, and the user answers either kind by that number.
 
 The list comes from the command. Don't add blind spots of your own or rank them differently. End with one line on how to answer: `/at:radar answer 2 watch`.
 
