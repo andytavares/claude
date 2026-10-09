@@ -67,6 +67,10 @@ def load_world(settings, today):
     )
 
 
+def count(number, noun):
+    return f"{number} {noun}{'' if number == 1 else 's'}"
+
+
 def candidate(detector, title, **details):
     return {"title": title, "detector": detector, **details}
 
@@ -89,19 +93,37 @@ def repo_sessions(world, repo, days):
     return [s for s in world.sessions if s["repo"] == repo and s["day"] >= start]
 
 
+def aging_prs_by_repo(world, limit):
+    groups = {}
+    for signal in world.signals:
+        if signal.get("kind") == "aging_pr" and signal["age_days"] >= limit:
+            repo = ", ".join(signal["repos"])
+            groups.setdefault(repo, []).append(signal)
+    return groups
+
+
+def commitment_title(repo, prs):
+    oldest = prs[0]["age_days"]
+    if len(prs) == 1:
+        return f"PR open {oldest} days: {repo}"
+    return f"{len(prs)} PRs open, oldest {oldest} days: {repo}"
+
+
 def aging_commitments(world):
     limit = world.settings.config["detectors"]["aging_pr_days"]
-    return [
-        candidate(
-            "aging_commitments",
-            f"PR open {signal['age_days']} days: {', '.join(signal['repos'])}",
-            evidence=[signal["stem"]],
-            why_missed="Nothing has touched it since it opened",
-            score=signal["age_days"] / limit,
+    found = []
+    for repo, prs in aging_prs_by_repo(world, limit).items():
+        prs = sorted(prs, key=lambda signal: -signal["age_days"])
+        found.append(
+            candidate(
+                "aging_commitments",
+                commitment_title(repo, prs),
+                evidence=[signal["stem"] for signal in prs],
+                why_missed="No activity since opening",
+                score=prs[0]["age_days"] / limit,
+            )
         )
-        for signal in world.signals
-        if signal.get("kind") == "aging_pr" and signal["age_days"] >= limit
-    ]
+    return found
 
 
 def silence(world):
@@ -115,7 +137,7 @@ def silence(world):
                     "silence",
                     f"{repo}: signals but no sessions in {days} days",
                     evidence=[signal["stem"] for signal in signals],
-                    why_missed=f"{len(signals)} open signals and no session since "
+                    why_missed=f"{count(len(signals), 'open signal')} and no session since "
                     f"{since(world, days)}",
                     score=len(signals),
                 )
@@ -181,7 +203,7 @@ def strong_signal_low_attention(world):
             found.append(
                 candidate(
                     "strong_signal_low_attention",
-                    f"{repo}: {len(signals)} open signals, {len(sessions)} sessions "
+                    f"{repo}: {count(len(signals), 'open signal')}, {count(len(sessions), 'session')} "
                     f"in {days} days",
                     evidence=[signal["stem"] for signal in signals],
                     why_missed="Plenty of signals point here but you have barely "
@@ -261,13 +283,39 @@ def record(settings, found, today):
     vault.write_note(path, props)
 
 
+def merge_same_evidence(candidates):
+    merged = {}
+    for item in candidates:
+        key = tuple(sorted(item["evidence"]))
+        first = merged.get(key)
+        if first is None:
+            merged[key] = item
+            continue
+        detectors = f"{first['detector']}, {item['detector']}"
+        score = max(first["score"], item["score"])
+        merged[key] = {**first, "detector": detectors, "score": score}
+    return list(merged.values())
+
+
+def is_commitment(item):
+    return "aging_commitments" in item["detector"]
+
+
+def rank(settings, candidates):
+    by_score = sorted(candidates, key=lambda item: -item["score"])
+    commitments = [item for item in by_score if is_commitment(item)]
+    others = [item for item in by_score if not is_commitment(item)]
+    return commitments + others[: settings.config["check_in"]["max_blind_spots"]]
+
+
 def detect(settings, today):
     world = load_world(settings, today)
-    found = [item for detector in DETECTORS for item in detector(world)]
+    found = merge_same_evidence(
+        [item for detector in DETECTORS for item in detector(world)]
+    )
     found = [{**item, "note": vault.note_name(item["title"])} for item in found]
     kept, held = split_out_of_scope(settings, found)
-    kept = sorted(drop_answered(settings, kept), key=lambda item: -item["score"])
-    kept = kept[: settings.config["check_in"]["max_blind_spots"]]
+    kept = rank(settings, drop_answered(settings, kept))
     for item in kept:
         record(settings, item, today)
     return {"blind_spots": kept, "suppressed": held}

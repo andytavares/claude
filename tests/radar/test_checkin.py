@@ -53,7 +53,9 @@ def test_checkin_writes_brief_with_sections_in_order(settings, tmp_path):
             "responds_to": "[[Old]]",
         },
     )
-    vault.save_state(settings, {"sources": {"github": "ok"}})
+    vault.save_state(
+        settings, {"sources": {"github": {"ok": True, "count": 1, "error": None}}}
+    )
     result = checkin.checkin(settings, tmp_path, TODAY)
     text = (settings.folder / "Briefs" / "2026-W41.md").read_text()
     assert result["brief"].endswith("2026-W41.md")
@@ -74,7 +76,7 @@ def test_checkin_writes_brief_with_sections_in_order(settings, tmp_path):
     assert "fb-0001" in text.split("## Commitments")[0]
     assert "github" in text.split("## Sources")[1]
     assert result["feedback_applied"] == ["fb-0001"]
-    assert result["sources"] == {"github": "ok"}
+    assert result["sources"]["github"]["ok"] is True
     assert monkey_calls == ["digest", "pull"]
 
 
@@ -84,6 +86,61 @@ def test_checkin_saves_last_checkin_in_order(settings, tmp_path):
     checkin.checkin(settings, tmp_path, TODAY)
     saved = vault.load_state(settings)["last_checkin"]
     assert saved == ["PR open 30 days big", "PR open 7 days small"]
+
+
+def test_numbering_runs_through_commitments_then_blind_spots(settings, tmp_path):
+    add_pr(settings, "claude", 9)
+    for name, count in [("one", 3)]:
+        vault.write_note(
+            settings.folder / "Signals" / f"Correction {name}.md",
+            {
+                "type": "signal",
+                "kind": "correction",
+                "status": "open",
+                "count": count,
+                "about": [],
+                "observed": "2026-10-08",
+            },
+        )
+    checkin.checkin(settings, tmp_path, TODAY)
+    text = (settings.folder / "Briefs" / "2026-W41.md").read_text()
+    commitments = text.split("## Commitments")[1].split("## Blind spots")[0]
+    spots = text.split("## Blind spots")[1].split("## Held back")[0]
+    assert "1. PR open 9 days: claude" in commitments
+    assert "2. Told Claude 3 times: one" in spots
+    assert "PR open" not in spots
+
+
+def test_long_evidence_is_shortened_and_sources_read_plainly(settings, tmp_path):
+    vault.write_note(
+        settings.folder / "Entities" / "Repo - busy.md",
+        {"type": "entity", "kind": "repo"},
+    )
+    for number in range(8):
+        vault.write_note(
+            settings.folder / "Signals" / f"s{number}.md",
+            {
+                "type": "signal",
+                "kind": "note",
+                "status": "open",
+                "about": ["[[Repo - busy]]"],
+                "observed": "2026-10-08",
+            },
+        )
+    vault.save_state(
+        settings,
+        {
+            "sources": {
+                "github": {"ok": True, "count": 79, "error": None},
+                "linear": {"ok": False, "count": 0, "error": "no connector"},
+            }
+        },
+    )
+    checkin.checkin(settings, tmp_path, TODAY)
+    text = (settings.folder / "Briefs" / "2026-W41.md").read_text()
+    assert "and 3 more" in text
+    assert "- github: ok, 79 items" in text
+    assert "- linear: failed: no connector" in text
 
 
 def test_rerunning_the_same_week_rewrites_the_brief(settings, tmp_path):

@@ -68,7 +68,7 @@ def test_aging_pr_fires_at_threshold_and_not_below(settings):
     assert titles(result) == ["PR open 7 days: claude"]
     spot = result["blind_spots"][0]
     assert spot["detector"] == "aging_commitments"
-    assert spot["why_missed"] == "Nothing has touched it since it opened"
+    assert spot["why_missed"] == "No activity since opening"
     assert spot["score"] == 1.0
     assert spot["evidence"] == ["PR claude 7"]
 
@@ -184,14 +184,37 @@ def test_out_of_scope_entry_suppresses_and_reports(settings):
     assert result["suppressed"][0]["matched"] == "CLAUDE"
 
 
-def test_cap_keeps_highest_scores(settings):
+def test_commitments_are_not_capped_and_come_first_by_score(settings):
     settings.config["check_in"]["max_blind_spots"] = 2
     for repo, age in [("a", 7), ("b", 21), ("c", 14)]:
         add_pr(settings, repo, age)
     assert titles(detect.detect(settings, TODAY)) == [
         "PR open 21 days: b",
         "PR open 14 days: c",
+        "PR open 7 days: a",
     ]
+
+
+def test_cap_keeps_highest_scoring_blind_spots_after_commitments(settings):
+    settings.config["check_in"]["max_blind_spots"] = 1
+    add_pr(settings, "a", 7)
+    for name, count in [("one", 3), ("two", 5)]:
+        add_signal(settings, f"Correction {name}", "x", kind="correction", count=count)
+    assert titles(detect.detect(settings, TODAY)) == [
+        "PR open 7 days: a",
+        "Told Claude 5 times: two",
+    ]
+
+
+def test_same_evidence_from_two_detectors_is_one_blind_spot(settings):
+    add_repo(settings, "claude")
+    for number in range(3):
+        add_signal(settings, f"s{number}", "claude")
+    result = detect.detect(settings, TODAY)
+    assert len(result["blind_spots"]) == 1
+    assert result["blind_spots"][0]["detector"] == (
+        "silence, strong_signal_low_attention"
+    )
 
 
 def test_blind_spot_note_written_then_updated_keeping_first_seen(settings):
@@ -262,3 +285,26 @@ def test_watch_resurfaces_only_when_evidence_grew(settings):
     add_signal(settings, "s9", "claude")
     spot = detect.detect(settings, TODAY)["blind_spots"][0]
     assert spot["why_missed"].startswith("Grew since you said watch: ")
+
+
+def test_aging_prs_in_one_repo_are_one_commitment(settings):
+    add_pr(settings, "claude", 9)
+    add_pr(settings, "claude", 30)
+    add_pr(settings, "claude", 3)
+    result = detect.detect(settings, TODAY)
+    assert titles(result) == ["2 PRs open, oldest 30 days: claude"]
+    assert result["blind_spots"][0]["evidence"] == ["PR claude 30", "PR claude 9"]
+
+
+def test_a_commitment_merged_with_silence_stays_a_commitment(settings):
+    add_repo(settings, "quiet")
+    add_pr(settings, "quiet", 9)
+    spot = detect.detect(settings, TODAY)["blind_spots"][0]
+    assert detect.is_commitment(spot)
+
+
+def test_counts_read_as_singular_for_one(settings):
+    add_repo(settings, "claude")
+    add_signal(settings, "s1", "claude")
+    spot = detect.detect(settings, TODAY)["blind_spots"][0]
+    assert spot["why_missed"].startswith("1 open signal and")

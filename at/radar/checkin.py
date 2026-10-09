@@ -33,8 +33,13 @@ def recent_feedback(settings, today):
     ]
 
 
+SHOWN_EVIDENCE = 5
+
+
 def links(names):
-    return ", ".join(vault.link(name) for name in names)
+    shown = ", ".join(vault.link(name) for name in names[:SHOWN_EVIDENCE])
+    hidden = len(names) - SHOWN_EVIDENCE
+    return f"{shown} and {hidden} more" if hidden > 0 else shown
 
 
 def feedback_lines(applied):
@@ -44,17 +49,16 @@ def feedback_lines(applied):
     ]
 
 
-def commitment_lines(spots):
+def commitment_lines(commitments):
     return [
-        f"- {spot['title']} ({links(spot['evidence'])})"
-        for spot in spots
-        if spot["detector"] == "aging_commitments"
+        f"{number}. {spot['title']} ({links(spot['evidence'])})"
+        for number, spot in enumerate(commitments, 1)
     ]
 
 
-def blind_spot_lines(spots):
+def blind_spot_lines(spots, first_number):
     lines = []
-    for number, spot in enumerate(spots, 1):
+    for number, spot in enumerate(spots, first_number):
         lines += [
             f"{number}. {spot['title']}",
             f"   - Detector: {spot['detector']}",
@@ -68,8 +72,14 @@ def held_lines(held):
     return [f"- {spot['title']} (out of scope: {spot['matched']})" for spot in held]
 
 
+def source_line(name, status):
+    if status["ok"]:
+        return f"- {name}: ok, {status['count']} items"
+    return f"- {name}: failed: {status['error']}"
+
+
 def source_lines(health):
-    return [f"- {name}: {status}" for name, status in health.items()]
+    return [source_line(name, status) for name, status in health.items()]
 
 
 def render(week, sections):
@@ -91,10 +101,12 @@ def write_brief(settings, today, sections):
 
 def section_lines(spots, held, applied_and_health):
     applied, health = applied_and_health
+    commitments = [spot for spot in spots if detect.is_commitment(spot)]
+    others = [spot for spot in spots if not detect.is_commitment(spot)]
     return {
         SECTIONS[0]: feedback_lines(applied),
-        SECTIONS[1]: commitment_lines(spots),
-        SECTIONS[2]: blind_spot_lines(spots),
+        SECTIONS[1]: commitment_lines(commitments),
+        SECTIONS[2]: blind_spot_lines(others, len(commitments) + 1),
         SECTIONS[3]: held_lines(held),
         SECTIONS[4]: source_lines(health),
     }
