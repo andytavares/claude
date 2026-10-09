@@ -1,0 +1,7 @@
+{
+  "name": "at",
+  "version": "0.2.0",
+  "description": "Skills, agents and the clean-code gate, namespaced as /at:<skill>",
+  "author": { "name": "Andrew Tavares" },
+  "repository": "https://github.com/andytavares/claude"
+}

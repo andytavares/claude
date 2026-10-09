@@ -1,18 +1,18 @@
 ---
 name: google-review
-description: Run a Google engineering-standard code review on the current diff. Invoked as /google-review [base-ref]. Reviews design, functionality, complexity, tests, naming, comments, style, and documentation. Returns a structured verdict with file:line citations. Available globally in all projects.
+description: Run a Google engineering-standard code review on the current diff. Invoked as /at:google-review [base-ref]. Reviews design, functionality, complexity, tests, naming, comments, style, and documentation. Returns a structured verdict with file:line citations. Available globally in all projects.
 ---
 
 # Google Code Review
 
-Spawns the `google-code-reviewer` subagent to review the current change set.
+Spawns the `at:google-code-reviewer` subagent to review the current change set.
 
 ## Usage
 
 ```
-/google-review           # reviews git diff HEAD (all uncommitted changes)
-/google-review main      # reviews everything on this branch vs main
-/google-review HEAD~3    # reviews the last 3 commits
+/at:google-review           # reviews git diff HEAD (all uncommitted changes)
+/at:google-review main      # reviews everything on this branch vs main
+/at:google-review HEAD~3    # reviews the last 3 commits
 ```
 
 ## What it checks
@@ -36,10 +36,10 @@ Each review ends with **Approve** or **Request Changes**. Issues are tagged:
 
 ## How to invoke
 
-When the user runs `/google-review` with an optional base ref argument:
+When the user runs `/at:google-review` with an optional base ref argument:
 
-1. Pass the base ref (if provided) to the `google-code-reviewer` agent prompt.
-2. Spawn the `google-code-reviewer` agent.
+1. Pass the base ref (if provided) to the `at:google-code-reviewer` agent prompt.
+2. Spawn the `at:google-code-reviewer` agent.
 3. Show its output to the user, then ask which lettered fixes to apply (`A B C`, `all`, or `none`). Edit nothing until they answer.
 
 Spawn the agent now using the args provided (if any) as the base ref.

@@ -20,14 +20,14 @@ For every ask, size it and route it. Do all of them before dispatching any, so t
 | **small** | Files you can name, approach obvious, under an hour | `claude --bg` | `sonnet` / `high` |
 | **medium** | Several files or modules, approach clear once the code is read | `claude --bg` | `sonnet` / `xhigh` |
 | **large** | Approach not obvious, root-cause work, cross-cutting | `claude --bg` | `opus` / `xhigh` |
-| **spec-first** | Cannot write a proof command without deciding the design | Write `briefs/<id>.md` with a note that it needs `/interview` first. Do not dispatch. | none |
+| **spec-first** | Cannot write a proof command without deciding the design | Write `briefs/<id>.md` with a note that it needs `/at:interview` first. Do not dispatch. | none |
 | **mechanical fan-out** | The same change across many files | Print an `ultracode` prompt for it instead of dispatching | none |
 
 Effort is a property of the ask, not the batch. Two asks in the same batch can land on different rungs.
 
 ## For each dispatched ask
 
-1. Write `briefs/<id>.md` in the `/brief` format: change, files, out of scope, proof command, dispatch line.
+1. Write `briefs/<id>.md` in the `/at:brief` format: change, files, out of scope, proof command, dispatch line.
 2. Launch it:
 
 ```bash
@@ -36,4 +36,4 @@ claude --bg --name "<id>" --model <model> --effort <effort> --permission-mode au
 
 ## Finish
 
-Print one table: id, size, model/effort, route, session name or "done here" or "needs /interview". Then run `/fleet --watch` so this session is woken when any of them finishes. Nothing else.
+Print one table: id, size, model/effort, route, session name or "done here" or "needs /at:interview". Then run `/at:fleet --watch` so this session is woken when any of them finishes. Nothing else.

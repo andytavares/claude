@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py\" check --hook post-tool-use"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py\" check --hook stop"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: worker
-description: Builds one unit of a plan from /implement. Sonnet at medium effort. Writes the failing test first, makes it pass, runs the checks it was given, reports the outputs.
+description: Builds one unit of a plan from /at:implement. Sonnet at medium effort. Writes the failing test first, makes it pass, runs the checks it was given, reports the outputs.
 model: sonnet
 effort: medium
 ---
