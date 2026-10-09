@@ -32,7 +32,7 @@ Feature branch, one commit per logical unit in the repo's convention, open a dra
 When finished, lead with the outcome in one sentence, then the evidence. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
 Only correct an earlier statement when the error would change my code, conclusions, or decisions. State it plainly and continue.
 Match written deliverables (especially Markdown files) to what the task needs. No filler sections, no restated summaries, no boilerplate.
-All examples must use actual references from the code NOT letter and numbers. Prefer diagrams over convoluted hard to follow text.
+Examples use real names from the code (files, functions, values), never placeholders such as `foo`, `A` or `X1`. Prefer diagrams over convoluted hard to follow text.
 
 ## Subagents
 
