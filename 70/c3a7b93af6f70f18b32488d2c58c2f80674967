@@ -1,0 +1,21 @@
+README.md
+  s_70ae0658d91832::t_cae9c539dbda58 34
+skills/research/SKILL.md
+  s_70ae0658d91832::t_e42c7c4b18dc5b 3,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "70c3a7b93af6f70f18b32488d2c58c2f80674967",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
