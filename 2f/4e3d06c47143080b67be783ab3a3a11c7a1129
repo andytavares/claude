@@ -1,0 +1,25 @@
+at/radar/checkin.py
+  s_70ae0658d91832::t_f2557ede19c7dc 7-8,13-19,34-39,49-56,59-61,64-69,71-72,75-89,91,94,96-117,121-133,142-143,163-181,183-187,194,196-200,203,205-207,219,221-226
+at/radar/feedback.py
+  s_70ae0658d91832::t_d8a5e1e6a1ee36 3-12,22,25-27,31-69,75-79,84-96
+tests/radar/test_checkin.py
+  s_70ae0658d91832::t_f304e9bbf88cf2 11-15,18-21,25-26,28,32-64,66-77,79-92,94-101,103-121,124-129,132-240,245-247,253-254,256-259,264,268-270,272
+tests/radar/test_feedback.py
+  s_70ae0658d91832::t_257bda849bc7b6 13,15-16,19-21,25-35,37,39-43,46-48,50-57,59-60,62,64-65,68-124,126-128,132-133,135-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2f4e3d06c47143080b67be783ab3a3a11c7a1129",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
