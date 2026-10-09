@@ -31,7 +31,7 @@ Start a new Claude Code session and run `/hooks` to confirm. Re-run `./install.s
 | `/brief` | Turn a Linear key or a quick prompt into a brief sized to the work |
 | `/intake` | Size, brief and dispatch a whole batch of asks at once |
 | `/interview` | Clarify an ask until nothing is ambiguous, then write the spec |
-| `/research` | Write a PRD or design document, published as an artifact |
+| `/research` | Write a one-pager (`--one-pager`), PRD (`--prd`) or design document (`--design`), published as an artifact |
 | `/design-doc` | Draft a design document from a spec and have it gap-reviewed once |
 | `/explain` | Answer a question about the codebase in the format asked for |
 | `/survey` | Map the flow, the code to reuse and the example to copy before writing code |
