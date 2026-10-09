@@ -78,3 +78,11 @@ def test_add_note_records_the_pasted_source(tmp_path):
     props, _ = vault.read_note(path)
     assert props["source"] == "buildkite"
     assert props["kind"] == "note"
+
+
+def test_tool_and_team_entities_keep_their_kind(tmp_path):
+    settings = make_settings(tmp_path)
+    signals.add_note(settings, "t", {"about": ["Tool - GitHub", "Team - Payments"]})
+    entities = settings.folder / "Entities"
+    assert vault.read_note(entities / "Tool - GitHub.md")[0]["kind"] == "tool"
+    assert vault.read_note(entities / "Team - Payments.md")[0]["kind"] == "team"

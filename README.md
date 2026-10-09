@@ -1,6 +1,6 @@
 # claude
 
-My Claude Code setup: global rules, a clean-code standard, and a plugin named `at` that holds the skills, agents and the clean-code gate. Every skill runs as `/at:<skill>`, so none of them collide with other skills.
+My Claude Code setup: global rules, a clean-code standard, and a plugin named `at` that holds the skills, agents and the clean-code gate, plus an optional radar that finds promotion-worthy projects to lead. Every skill runs as `/at:<skill>`, so none of them collide with other skills.
 
 ## Install, update, remove
 
@@ -26,7 +26,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` and `at:google-code-reviewer` agents, and the clean-gate hooks that check every edit |
-| Radar (optional) | `~/.claude/skills/at/radar/` and your vault | Two session hooks; the rest on demand | Records where your sessions go and finds blind spots; see [The radar](#the-radar) |
+| Radar (optional) | `~/.claude/skills/at/radar/` and your vault | Two session hooks; the rest on demand | Finds and pitches promotion-worthy projects from evidence; see [The radar](#the-radar) |
 
 Only `/at:survey` and `/at:google-review` can start on their own when Claude thinks they fit. Every other skill runs only when you type it.
 
@@ -41,13 +41,14 @@ flowchart TD
   Q -->|"a document to write"| RS["/at:research"]
   Q -->|"an idea to prove"| PC["/at:poc"]
   Q -->|"a library to judge"| TE["/at:tool-eval"]
+  Q -->|"what to lead next"| RD["/at:radar"] --> PT["/at:radar pitch"] --> PC
   BR -->|"size S or M"| IM["/at:implement"]
   BR -->|"size L, or needs a decision"| IV["/at:interview"] --> SP["SPEC.md"] --> IM
   IN --> DP["background sessions"] --> FL["/at:fleet"]
   IM --> PR["draft PR"]
 ```
 
-For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in the current session.
+For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in the current session. A radar pitch's POC goes to `/at:poc`, and once the project is agreed, `/at:interview` turns it into a spec for `/at:implement`.
 
 ## Skills
 
@@ -68,7 +69,8 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 | `/at:tool-eval` | You're deciding whether to adopt a library | Session model, high | `evals/<tool>/EVAL.md` with a verdict |
 | `/at:google-review` | You want a review of the current diff | Session model | Findings by `file:line`; you pick which to apply |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
-| `/at:radar` | You want your blind spots, or to note something you saw | Opus, medium | A check-in in chat and in your vault (only with `--radar`) |
+| `/at:radar` | Weekly check-in, a pitch, a note from any tool, or an answer | Opus, high | Ranked opportunities and pitches in your vault (only with `--radar`) |
+| `/at:radar-scan` | Monthly, to find new opportunities in the evidence | Workflow, about 10 agents | `Opportunities/` notes, scored and critic-checked |
 
 ## Getting the best results
 
@@ -80,66 +82,81 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 - **Done means the checks ran.** The PR carries each command and its exit code. A summary that says "tests pass" without output isn't done.
 - **Too much to read?** Run `/at:word-salad` with no argument to rewrite the last reply, or pass it text or a file path.
 - **One ask per session.** Start a new session between unrelated tasks, so old context doesn't steer the new one.
+- **Give the radar your ladder first.** Until `Context/Ladder.md` holds your own next-level criteria, every promotion-fit score is provisional.
+- **Feed the radar what you see at work.** Your sessions and status pages only show part of the picture; one line per finding (`/at:radar note "…" --source incident.io`) is how outages, slow builds and repeated asks from other teams get in.
+- **Check in weekly, scan monthly.** `/at:radar` is cheap; `/at:radar-scan` runs about 10 agents, so run it when there's new evidence to read.
+- **Answer every opportunity.** `pursue`, `park`, `reject` or `exists` is what tunes the next scan; an opportunity you never answer keeps coming back unchanged.
 
 ## The radar
 
-A blind spot is something with strong signal that's getting little of your attention. The radar measures attention from your own Claude sessions and signal from your notes and the sources you turn on, and keeps everything as linked notes in an Obsidian vault.
+The radar finds projects worth leading: months of work across several teams that make developers' lives measurably better, each mapped to the criteria for the level you're going for (staff to principal by default). It doesn't list PRs or to-dos.
+
+### First-time setup
+
+1. `./install.sh --radar --vault ~/Notes/Radar`, then open that folder in Obsidian as a vault.
+2. Replace `Radar/Context/Ladder.md` with your ladder's next-level criteria and set `provisional: false`.
+3. Add what leadership and your manager want focused on to `Radar/Context/Priorities.md`.
+4. In `Radar Config.md`, add the status pages of tools your developers depend on to `status_pages`, and your team's areas to `out_of_scope` or `existing_programs` where someone else already owns them.
+5. Use Claude as usual for a week, adding `/at:radar note` lines for what you notice at work, then run `/at:radar-scan` and `/at:radar`.
+
+Example of what it's for: GitHub's status page logged 50 incidents between 2026-07-30 and 2026-10-07, 11 of them critical, and your own sessions hit `gh: HTTP 502` 30 times in 60 days. The radar turns that into an opportunity ("reduce dependence on github.com") and, when you ask, a pitch: options compared (self-hosting, GitLab, a mirror with CI fallback), a small POC that proves the leading option, milestones, risks and stakeholders.
 
 ```mermaid
 flowchart LR
-  S["A Claude session ends"] -->|"hook queues it"| D["Sessions/ notes<br/>where your time went"]
-  N["/at:radar note …<br/>from anything you saw"] --> G["Signals/ notes"]
-  P["Your open PRs, corrections<br/>you've given Claude more than once"] --> G
-  D --> C{"/at:radar"}
-  G --> C
-  CFG["Radar Config.md"] --> C
-  C --> B["Briefs/ check-in:<br/>commitments, blind spots"]
-  B -->|"/at:radar answer 2 watch"| F["Feedback/ notes"]
-  F --> C
+  subgraph evidence["Evidence: code, no model"]
+    SP["Vendor status pages"] --> SG["Signals/"]
+    FR["Friction in your sessions"] --> SG
+    NT["/at:radar note … --source buildkite"] --> SG
+    SG --> TR["radar trends<br/>weekly counts, slope, breadth"]
+  end
+  TR --> SC["/at:radar-scan<br/>monthly workflow"]
+  LD["Context/Ladder.md<br/>Priorities.md"] --> SC
+  SC --> OP["Opportunities/<br/>scored, gated, critic-checked"]
+  OP --> CK["/at:radar<br/>weekly check-in"]
+  OP --> PI["/at:radar pitch …<br/>Pitches/"]
+  CK -->|"answer 1 pursue"| FB["Feedback/"] --> SC
 ```
 
 | You do | What happens |
 | --- | --- |
-| Nothing | When a session ends, a hook queues it. When the first session of the day starts, one line appears if anything is open. |
-| `/at:radar` | Reads the queued sessions, pulls the sources, finds blind spots, writes this week's note in `Briefs/`, and shows it. |
-| `/at:radar note "p95 build time up 18%" --source buildkite` | Adds what you noticed, from Buildkite, incident.io, a work Linear issue, Slack or anywhere else, linked to the repo or area it's about. |
-| `/at:radar answer 2 watch` | Records your answer: `act`, `watch` (raise it again only if it grows), `known` (quiet until it grows) or `out_of_scope`. |
+| Nothing | Each session's end is queued; tool errors that match `friction_patterns` (GitHub 502s by default) become signals. The first session of the day gets one line when a new opportunity appears. |
+| `/at:radar note "p95 build time up 18% over 4 weeks" --source buildkite` | Adds what you saw at work, from any tool, linked to the tool, team or area it's about. This is how work evidence gets in. |
+| `/at:radar-scan` | Monthly. A background workflow clusters the evidence into project hypotheses, drops anything out of scope, too small or already owned, researches the top three in parallel, scores them against your ladder, and has a separate critic check every number and argue the case against. Survivors become `Opportunities/` notes. It costs real tokens; `/workflows` shows them. |
+| `/at:radar` | Weekly. Records sessions, pulls the sources, updates trends, and shows: what your feedback changed, the ranked opportunities, rising trends, blind spots (strong signal, few of your sessions), and what was held back. |
+| `/at:radar pitch <opportunity>` | Writes the pitch in `Pitches/`: problem and trend, why now, options, POC, milestones by quarter, risks, stakeholders, ladder mapping, first two weeks. Every number must pass `radar verify`. |
+| `/at:radar answer 1 pursue` | Steers the next scan: `pursue`, `park`, `reject`, `correction`, `exists` (adds to `existing_programs`), `out_of_scope`, `direction --until`, `weight --weight impact=0.4`, with `--who manager` for someone else's words. |
 
-Only two steps use a model: linking a note you wrote, and presenting the check-in. Recording sessions, counting and finding blind spots are plain code.
+### What makes something an opportunity
 
-### What it looks for
+Gates, all required: at least `min_weeks` of work (6), at least `min_teams` teams (2), at least `min_ladder_criteria` criteria from `Context/Ladder.md` (2), not out of scope or already owned. Then a rubric, each score backed by evidence: developer impact 0.3, org reach 0.2, technical direction 0.2, promotion fit 0.3 (weights live in the settings note). Confidence is the share of those scores backed by a measured trend rather than a note.
 
-| Finds | Example |
-| --- | --- |
-| Open PRs nobody has touched, grouped by repo | "51 PRs open, oldest 142 days: terminator" |
-| Repos with signals but no sessions lately | "effects-controller: signals but no sessions in 14 days" |
-| Corrections you've given Claude in several projects | "Told Claude 3 times: check-pr-merged-before-pushing" |
-| Work a session reported as not done that no later session picked up | "Left not done: The gate still wrongly reports a test helper that shares a name with a real function" |
-| Lots of signal, few sessions | "foundry-live-check: 23 open signals, 0 sessions in 30 days" |
-| Something you said to watch that has grown since | its title, with "Grew since you said watch" |
+`Context/Ladder.md` starts with published principal-level expectations (GitLab's handbook, Dropbox's postings) and `provisional: true`. Replace it with your own ladder and set `provisional: false`; until then every promotion-fit score is marked provisional.
 
-Open PRs come first, as commitments. After them come at most three blind spots, numbered on from the commitments.
+### No invented numbers
+
+`radar verify <note>` is plain code: every number on a line of an opportunity or pitch must appear in a note linked on that same line. Dates, weeks, quarters, list numbers and durations like "6 weeks" are exempt. The scan and `pitch` both run it and fix what fails.
 
 ### The vault
 
 ```
 <vault>/
-├── Radar Config.md     settings: edit them here
+├── Radar Config.md        settings, explained in the note itself
 └── Radar/
-    ├── Sessions/       one note per Claude session
-    ├── Signals/        your notes, open PRs, repeated corrections
-    ├── Entities/       repos, areas, people and projects the notes link to
-    ├── Themes/         groups of related signals
-    ├── Blind spots/    one note per blind spot, with its evidence and status
-    ├── Feedback/       your answers
-    └── Briefs/         one check-in per week
+    ├── Board.base         table of opportunities (open in Obsidian; click a column to sort)
+    ├── Context/           Ladder.md, Priorities.md
+    ├── Opportunities/     one note per project, scored, with evidence links
+    ├── Pitches/           one pitch per opportunity you asked for
+    ├── Signals/           status incidents, session friction, your notes
+    ├── Entities/          tools, teams, areas, repos, with trend numbers
+    ├── Themes/            groups of related signals, with trend numbers
+    ├── Sessions/          one note per Claude session
+    ├── Feedback/          your answers
+    └── Briefs/            one check-in per week
 ```
 
-Notes link to each other through their properties, so Obsidian's graph view shows how evidence connects to each blind spot. You can add links or text to any note; the radar only updates the properties it writes and keeps your text. The exceptions are session notes and the weekly check-in, which it rewrites.
+The radar updates only the properties it writes and keeps text you add to a note, except session notes and the weekly check-in, which it rewrites. Prompts are kept to their first line and secrets are blanked before anything is written; if your vault syncs to the cloud, add private repos to `capture.skip_paths`.
 
-`Radar Config.md` holds every setting, with an explanation of each in the note itself: how much of each prompt to keep (the first line, by default), repos never to record, which sources to pull, the thresholds above, how many blind spots to show, the session-start reminder, your priorities and topics never to raise. Edit it in Obsidian; the next check-in uses it.
-
-Prompts are kept to their first line, and tokens, keys and passwords are blanked before anything is written. If your vault syncs to the cloud, consider adding private repos to `skip_paths`.
+Status pages are Atlassian Statuspage sites listed in `status_pages` (GitHub by default). Their API returns only the latest 50 incidents, so each pull keeps what it saw and trends grow longer than that.
 
 ## The clean-code gate
 

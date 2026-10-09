@@ -141,3 +141,64 @@ def test_deleted_transcript_is_dropped_from_the_queue(settings, tmp_path):
     digest.digest(settings, tmp_path)
     lines = (settings.folder / ".queue.jsonl").read_text().splitlines()
     assert [json.loads(line)["session_id"] for line in lines] == ["wt123456789"]
+
+
+def friction_note(settings):
+    return settings.folder / "Signals" / "Friction GitHub abcdef12.md"
+
+
+def test_friction_note_counts_tool_result_matches(settings, tmp_path):
+    queue(settings, tmp_path, "friction.jsonl", "abcdef1234567890")
+    (session,) = digest.digest(settings, tmp_path)
+    props = vault.read_note(friction_note(settings))[0]
+    assert props == {
+        "type": "signal",
+        "source": "session",
+        "kind": "friction",
+        "about": ["[[Tool - GitHub]]"],
+        "theme": None,
+        "observed": "2026-10-03",
+        "status": "open",
+        "severity": 1,
+        "count": 2,
+        "session": f"[[{session.stem}]]",
+    }
+    assert vault.read_note(session)[0]["friction"] == {"GitHub": 2}
+    tool = settings.folder / "Entities" / "Tool - GitHub.md"
+    assert vault.read_note(tool)[0] == {"type": "entity", "kind": "tool"}
+
+
+def test_no_friction_note_without_a_match(settings, tmp_path):
+    queue(settings, tmp_path, "normal.jsonl", "abcdef1234567890")
+    (session,) = digest.digest(settings, tmp_path)
+    assert list((settings.folder / "Signals").glob("Friction*")) == []
+    assert "friction" not in vault.read_note(session)[0]
+
+
+def test_disabled_friction_source_writes_nothing(settings, tmp_path):
+    settings.config["sources"]["session_friction"] = False
+    queue(settings, tmp_path, "friction.jsonl", "abcdef1234567890")
+    (session,) = digest.digest(settings, tmp_path)
+    assert not friction_note(settings).exists()
+    assert "friction" not in vault.read_note(session)[0]
+
+
+def test_match_in_a_users_own_prompt_does_not_count(settings, tmp_path):
+    queue(settings, tmp_path, "friction.jsonl", "abcdef1234567890")
+    digest.digest(settings, tmp_path)
+    assert vault.read_note(friction_note(settings))[0]["count"] == 2
+
+
+def test_redigest_updates_the_friction_count(settings, tmp_path):
+    transcript = queue(settings, tmp_path, "friction.jsonl", "abcdef1234567890")
+    digest.digest(settings, tmp_path)
+    extra = {
+        "type": "user",
+        "timestamp": "2026-10-03T11:00:00Z",
+        "message": {"content": [{"type": "tool_result", "content": "gh: HTTP 500: x"}]},
+    }
+    with transcript.open("a") as stream:
+        stream.write(json.dumps(extra) + "\n")
+    digest.digest(settings, tmp_path)
+    assert vault.read_note(friction_note(settings))[0]["count"] == 3
+    assert len(list((settings.folder / "Signals").glob("Friction*"))) == 1

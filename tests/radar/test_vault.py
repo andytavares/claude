@@ -79,7 +79,7 @@ def test_init_vault_creates_folders_and_never_overwrites_the_config_note(tmp_pat
     vault_dir = tmp_path / "Notes"
     vault_dir.mkdir()
     settings = vault.init_vault(tmp_path, vault_dir)
-    assert (settings.folder / "Blind spots").is_dir()
+    assert (settings.folder / "Opportunities").is_dir()
     note = vault_dir / "Radar Config.md"
     note.write_text(
         note.read_text().replace("max_blind_spots: 3", "max_blind_spots: 7")
@@ -100,3 +100,27 @@ def test_init_vault_creates_a_missing_folder_as_an_obsidian_vault(tmp_path):
     vault.init_vault(tmp_path, vault_dir)
     assert (vault_dir / ".obsidian").is_dir()
     assert (vault_dir / "Radar Config.md").is_file()
+
+
+def test_init_vault_seeds_context_notes_and_board_once(tmp_path):
+    vault_dir = tmp_path / "Notes"
+    settings = vault.init_vault(tmp_path, vault_dir)
+    ladder = settings.folder / "Context" / "Ladder.md"
+    props, body = vault.read_note(ladder)
+    assert props["provisional"] is True
+    assert "handbook.gitlab.com" in body
+    assert (settings.folder / "Context" / "Priorities.md").is_file()
+    board = (settings.folder / "Board.base").read_text()
+    assert 'file.inFolder("Radar/Opportunities")' in board
+    ladder.write_text("my ladder\n")
+    vault.init_vault(tmp_path, vault_dir)
+    assert ladder.read_text() == "my ladder\n"
+
+
+def test_defaults_describe_opportunities_not_tasks(tmp_path):
+    settings = vault.init_vault(tmp_path, tmp_path / "Notes")
+    assert settings.config["opportunities"]["min_weeks"] == 6
+    assert settings.config["status_pages"][0]["url"] == "https://www.githubstatus.com"
+    assert "detectors" not in settings.config
+    assert (settings.folder / "Opportunities").is_dir()
+    assert not (settings.folder / "Blind spots").exists()

@@ -1,0 +1,5 @@
+{"type":"user","timestamp":"2026-10-03T10:00:00Z","cwd":"/work/claude","gitBranch":"main","message":{"content":"gh: HTTP 502: Bad Gateway keeps showing up, why?"}}
+{"type":"assistant","timestamp":"2026-10-03T10:01:00Z","message":{"content":[{"type":"text","text":"Retrying."}]}}
+{"type":"user","timestamp":"2026-10-03T10:02:00Z","message":{"content":[{"type":"tool_result","tool_use_id":"t1","content":"gh: HTTP 502: Bad Gateway"}]}}
+{"type":"user","timestamp":"2026-10-03T10:03:00Z","message":{"content":[{"type":"tool_result","tool_use_id":"t2","content":[{"type":"text","text":"gh: HTTP 503: Service Unavailable"}]}]}}
+{"type":"user","timestamp":"2026-10-03T10:04:00Z","message":{"content":[{"type":"tool_result","tool_use_id":"t3","content":"all good"}]}}

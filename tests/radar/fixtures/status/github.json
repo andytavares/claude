@@ -1,0 +1,17 @@
+{
+  "page": {"id": "kctbh9vrtdwd", "name": "GitHub", "url": "https://www.githubstatus.com"},
+  "incidents": [
+    {"id": "aaa111", "name": "Disruption with Actions", "status": "resolved", "impact": "minor",
+     "created_at": "2026-10-06T09:15:00.000Z", "resolved_at": "2026-10-06T10:00:00.000Z",
+     "shortlink": "https://stspg.io/aaa111", "components": [{"name": "Actions"}]},
+    {"id": "bbb222", "name": "Degraded git operations", "status": "postmortem", "impact": "major",
+     "created_at": "2026-10-05T14:00:00.000Z", "resolved_at": "2026-10-05T16:30:00.000Z",
+     "shortlink": "https://stspg.io/bbb222", "components": [{"name": "Git Operations"}, {"name": "API Requests"}]},
+    {"id": "ccc333", "name": "Pull requests unavailable", "status": "investigating", "impact": "critical",
+     "created_at": "2026-10-08T22:40:00.000Z", "resolved_at": null,
+     "shortlink": "https://stspg.io/ccc333", "components": [{"name": "Pull Requests"}]},
+    {"id": "ddd444", "name": "Scheduled maintenance notice", "status": "resolved", "impact": "none",
+     "created_at": "2026-10-01T03:00:00.000Z", "resolved_at": "2026-10-01T03:20:00.000Z",
+     "shortlink": "https://stspg.io/ddd444", "components": []}
+  ]
+}
