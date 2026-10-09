@@ -30,7 +30,9 @@ def without(text, patterns):
 
 
 def claimed_numbers(line):
-    prose = without(line, [LIST_MARKER, LABEL, LINK, DATE_OR_WEEK, DURATION, PERIOD, YEAR])
+    prose = without(
+        line, [LIST_MARKER, LABEL, LINK, DATE_OR_WEEK, DURATION, PERIOD, YEAR]
+    )
     return list(dict.fromkeys(NUMBER.findall(prose)))
 
 
