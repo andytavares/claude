@@ -1,0 +1,23 @@
+README.md
+  s_70ae0658d91832::t_7ab50614bfe1e5 103
+at/radar/checkin.py
+  s_70ae0658d91832::t_733e89eae31d90 155-158
+tests/radar/test_checkin.py
+  s_70ae0658d91832::t_be845631d231d8 165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3640ae9992db0c26217a3c9bb8c71c50aba3e8aa",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
