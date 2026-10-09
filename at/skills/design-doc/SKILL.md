@@ -4,7 +4,7 @@ description: Draft a design or strategy document from a spec, get it gap-reviewe
 disable-model-invocation: true
 argument-hint: "[SPEC.md] [DESIGN.md]"
 model: opus
-effort: xhigh
+effort: high
 ---
 Spec: $0. Output: $1 (default `DESIGN.md`).
 
