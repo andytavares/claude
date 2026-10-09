@@ -1,0 +1,27 @@
+at/radar/seeds.py
+  s_70ae0658d91832::t_7cfba511bff5f8 1-94
+at/radar/radar.py
+  s_70ae0658d91832::t_d6508fac1786c9 14-23,88-101,103-104,120,122,130-134
+at/radar/vault.py
+  s_70ae0658d91832::t_95aa0b50f9a0ec 9,19-21,25,60,64,68-82
+tests/radar/test_vault.py
+  s_70ae0658d91832::t_bb383d52b57d36 82,103-126
+tests/test_install.sh
+  s_70ae0658d91832::t_9b7e72bae6a6d7 131-133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3bb98dc803211d69c1d55f367b5d5d621e82e659",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
