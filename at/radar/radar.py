@@ -5,6 +5,7 @@
 # ///
 import argparse
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -135,14 +136,23 @@ def parse_args():
     return parser.parse_args()
 
 
+HOOK_COMMANDS = ("capture", "nudge")
+
+
+def foundry_agent_hook(command):
+    return command in HOOK_COMMANDS and bool(os.environ.get("FOUNDRY_RUN"))
+
+
 def main():
     args, home = parse_args(), Path.home()
+    if foundry_agent_hook(args.command):
+        return None
     if args.command == "init":
         return run_init(args, home)
     settings = vault.load_settings(home)
     if settings is not None:
         return COMMANDS[args.command](args, settings, home)
-    if args.command not in ("capture", "nudge"):
+    if args.command not in HOOK_COMMANDS:
         sys.exit(NOT_INSTALLED)
 
 
