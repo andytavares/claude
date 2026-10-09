@@ -1,0 +1,8 @@
+{"type": "user", "timestamp": "2026-10-01T09:00:00Z", "cwd": "/x/repos/claude", "gitBranch": "main", "message": {"role": "user", "content": "Fix the login bug\nsecond line"}}
+{"type": "assistant", "timestamp": "2026-10-01T09:01:00Z", "message": {"role": "assistant", "content": [{"type": "text", "text": "Opened https://github.com/acme/widgets/pull/12 and https://github.com/acme/widgets/pull/12 again"}]}}
+{"type": "user", "timestamp": "2026-10-01T09:02:00Z", "cwd": "/x/repos/claude", "gitBranch": "main", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "ok"}]}}
+{"type": "user", "timestamp": "2026-10-01T09:03:00Z", "cwd": "/x/repos/claude", "gitBranch": "main", "message": {"role": "user", "content": "<command-name>/clear</command-name>"}}
+{"type": "user", "timestamp": "2026-10-01T09:03:30Z", "cwd": "/x/repos/claude", "gitBranch": "main", "message": {"role": "user", "content": "meta caveat"}, "isMeta": true}
+this line is not json
+{"type": "user", "timestamp": "2026-10-01T09:04:00Z", "cwd": "/x/repos/claude", "gitBranch": "main", "message": {"role": "user", "content": [{"type": "text", "text": "Now add tests"}]}, "totalLinesAdded": 10, "totalLinesRemoved": 2}
+{"type": "assistant", "timestamp": "2026-10-01T09:30:00Z", "message": {"role": "assistant", "content": [{"type": "text", "text": "Done with the main work.\n\n**Not done:**\n- **Docs** still missing\n* Release notes\n\nNext steps follow."}]}, "totalLinesAdded": 42, "totalLinesRemoved": 7}

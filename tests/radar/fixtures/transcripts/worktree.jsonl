@@ -1,0 +1,2 @@
+{"type": "user", "timestamp": "2026-10-02T10:00:00Z", "cwd": "/x/repos/claude/.worktrees/radar", "gitBranch": "main", "message": {"role": "user", "content": "Build the radar"}}
+{"type": "assistant", "timestamp": "2026-10-02T10:05:00Z", "message": {"role": "assistant", "content": [{"type": "text", "text": "Built."}]}}
