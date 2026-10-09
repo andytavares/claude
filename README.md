@@ -172,9 +172,9 @@ The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 ## Tests
 
 ```sh
-uv run --no-project --with pytest --with lizard==1.24.1 pytest -q tests
+uv run --no-project --with pytest --with pyyaml --with lizard==1.24.1 pytest -q tests
 bash tests/test_install.sh
 uvx ruff check at tests && uvx ruff format --check at tests
 claude plugin validate at
-shellcheck install.sh uninstall.sh tests/test_install.sh
+shellcheck -x install.sh uninstall.sh lib/radar.sh tests/test_install.sh at/bin/radar
 ```
