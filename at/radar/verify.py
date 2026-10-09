@@ -12,6 +12,7 @@ DURATION = re.compile(
 PERIOD = re.compile(r"\b(?:Q[1-4]|H[12])\b")
 YEAR = re.compile(r"(?<![\d.,])(?:19[9]\d|20\d\d)(?![\d,]|\.\d)")
 LIST_MARKER = re.compile(r"^\s*\d+[.)]\s")
+LABEL = re.compile(r"\b(?:milestone|phase|step|option|stage)\s+\d+", re.IGNORECASE)
 
 
 def digits(number):
@@ -29,7 +30,7 @@ def without(text, patterns):
 
 
 def claimed_numbers(line):
-    prose = without(line, [LIST_MARKER, LINK, DATE_OR_WEEK, DURATION, PERIOD, YEAR])
+    prose = without(line, [LIST_MARKER, LABEL, LINK, DATE_OR_WEEK, DURATION, PERIOD, YEAR])
     return list(dict.fromkeys(NUMBER.findall(prose)))
 
 

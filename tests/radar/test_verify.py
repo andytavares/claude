@@ -63,6 +63,8 @@ def test_link_to_a_missing_note_fails(settings):
         "It takes 6 weeks",
         "It takes 6-month effort and 3 days",
         "About 2.5 quarters or 10 hours",
+        "Milestone 2 ships the mirror",
+        "Phase 3, step 1 and option 2",
     ],
 )
 def test_ignored_forms_pass_without_a_link(settings, line):
