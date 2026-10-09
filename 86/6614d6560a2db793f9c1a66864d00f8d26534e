@@ -1,0 +1,29 @@
+install.sh
+  s_70ae0658d91832::t_86bb8396e659a1 146
+  s_70ae0658d91832::t_5da2d73444b244 108-137,139
+  s_70ae0658d91832::t_662446f7006320 7-34
+tests/test_install.sh
+  s_70ae0658d91832::t_f3143fe66a418f 182-188
+  s_70ae0658d91832::t_b3b380f029dc98 32
+  s_70ae0658d91832::t_d5bf36fa938e1d 95-177
+uninstall.sh
+  s_70ae0658d91832::t_29b481da4b7ecf 27-28
+at/hooks/hooks.json
+  s_70ae0658d91832::t_7961e5927e8b5d 23-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "866614d6560a2db793f9c1a66864d00f8d26534e",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
