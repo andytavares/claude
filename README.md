@@ -100,7 +100,7 @@ flowchart LR
 
 | You do | What happens |
 | --- | --- |
-| Nothing | When a session ends, a hook queues it. When the first session of the day starts, one line appears if there's an open blind spot. |
+| Nothing | When a session ends, a hook queues it. When the first session of the day starts, one line appears if anything is open. |
 | `/at:radar` | Reads the queued sessions, pulls the sources, finds blind spots, writes this week's note in `Briefs/`, and shows it. |
 | `/at:radar note "p95 build time up 18%" --source buildkite` | Adds what you noticed, from Buildkite, incident.io, a work Linear issue, Slack or anywhere else, linked to the repo or area it's about. |
 | `/at:radar answer 2 watch` | Records your answer: `act`, `watch` (raise it again only if it grows), `known` (quiet until it grows) or `out_of_scope`. |

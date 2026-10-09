@@ -152,5 +152,7 @@ def nudge(settings, today):
         return None
     state = vault.load_state(settings)
     vault.save_state(settings, {**state, "nudged_on": str(today)})
-    plural = "" if count == 1 else "s"
-    return f"Radar: {count} open blind spot{plural}. Run /at:radar to see them."
+    items, pronoun = (
+        ("1 open item", "it") if count == 1 else (f"{count} open items", "them")
+    )
+    return f"Radar: {items}. Run /at:radar to see {pronoun}."

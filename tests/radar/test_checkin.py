@@ -162,7 +162,7 @@ def open_spot(settings):
 def test_nudge_daily_fires_once_per_day(settings):
     open_spot(settings)
     line = checkin.nudge(settings, TODAY)
-    assert line == "Radar: 1 open blind spot. Run /at:radar to see them."
+    assert line == "Radar: 1 open item. Run /at:radar to see it."
     assert checkin.nudge(settings, TODAY) is None
     assert checkin.nudge(settings, date(2026, 10, 10)) == line
 
