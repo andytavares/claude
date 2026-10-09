@@ -2,7 +2,7 @@ from datetime import datetime
 
 import vault
 
-ENTITY_KINDS = {"repo", "area", "person", "project"}
+ENTITY_KINDS = {"repo", "tool", "team", "area", "person", "project"}
 
 
 def today():
