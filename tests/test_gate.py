@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-GATE = Path(__file__).parent.parent / "hooks/clean-gate/gate.py"
+GATE = Path(__file__).parent.parent / "at/hooks/clean-gate/gate.py"
 
 LANGS = {
     "ts": ("ts", "function {name}(a) {{\n{body}  return a;\n}}\n", "  a += 1;\n"),
