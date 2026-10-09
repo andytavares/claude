@@ -119,7 +119,7 @@ flowchart LR
 
 | You do | What happens |
 | --- | --- |
-| Nothing | Each session's end is queued; tool errors that match `friction_patterns` (GitHub 502s by default) become signals. The first session of the day gets one line when a new opportunity appears. |
+| Nothing | Each session's end is queued; tool errors that match `friction_patterns` (GitHub 502s by default) become signals. The first session of the day gets one line when a new opportunity appears. Agent sessions that Foundry starts (marked `FOUNDRY_RUN=1`) are skipped by both. |
 | `/at:radar note "p95 build time up 18% over 4 weeks" --source buildkite` | Adds what you saw at work, from any tool, linked to the tool, team or area it's about. This is how work evidence gets in. |
 | `/at:radar-scan` | Monthly. A background workflow clusters the evidence into project hypotheses, drops anything out of scope, too small or already owned, researches the top three in parallel, scores them against your ladder, and has a separate critic check every number and argue the case against. Survivors become `Opportunities/` notes. It costs real tokens; `/workflows` shows them. |
 | `/at:radar` | Weekly. Records sessions, pulls the sources, updates trends, and shows: what your feedback changed, the ranked opportunities, rising trends, blind spots (strong signal, few of your sessions), and what was held back. |
@@ -160,7 +160,7 @@ Status pages are Atlassian Statuspage sites listed in `status_pages` (GitHub by 
 
 ## The clean-code gate
 
-The gate runs after every edit and once when Claude finishes a turn. It sends its findings back to Claude, which fixes them before carrying on.
+The gate runs after every edit and once when Claude finishes a turn, including in agent sessions Foundry starts, since those write code too. It sends its findings back to Claude, which fixes them before carrying on.
 
 | Check | Rule |
 | --- | --- |
