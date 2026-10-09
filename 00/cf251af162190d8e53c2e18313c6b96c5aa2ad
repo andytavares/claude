@@ -1,0 +1,25 @@
+at/radar/signals.py
+  s_70ae0658d91832::t_dad78046a58fd1 1-62
+at/radar/sources.py
+  s_70ae0658d91832::t_5e828562cc6492 1-127
+tests/radar/test_signals.py
+  s_70ae0658d91832::t_1954b403625c32 1-80
+tests/radar/test_sources.py
+  s_70ae0658d91832::t_05acbb2c9347e7 1-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "00cf251af162190d8e53c2e18313c6b96c5aa2ad",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
