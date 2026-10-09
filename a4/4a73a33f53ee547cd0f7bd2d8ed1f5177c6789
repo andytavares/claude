@@ -1,0 +1,33 @@
+at/radar/capture.py
+  s_70ae0658d91832::t_5339dcffce7899 1-28
+at/radar/digest.py
+  s_70ae0658d91832::t_8bfec3e6143c86 1-179
+tests/radar/fixtures/transcripts/normal.jsonl
+  s_70ae0658d91832::t_f8314878d17133 1-8
+tests/radar/fixtures/transcripts/radar_only.jsonl
+  s_70ae0658d91832::t_1be5f19682285b 1-3
+tests/radar/fixtures/transcripts/secrets.jsonl
+  s_70ae0658d91832::t_3089f8804d4fd4 1-2
+tests/radar/fixtures/transcripts/worktree.jsonl
+  s_70ae0658d91832::t_ef1c42fba5f896 1-2
+tests/radar/test_capture.py
+  s_70ae0658d91832::t_c62a953a4fbe16 1-66
+tests/radar/test_digest.py
+  s_70ae0658d91832::t_5cd782e282bee8 1-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a44a73a33f53ee547cd0f7bd2d8ed1f5177c6789",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
