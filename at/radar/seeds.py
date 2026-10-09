@@ -11,7 +11,7 @@ DEFAULTS = {
         "min_weeks": 6,
         "min_teams": 2,
         "min_ladder_criteria": 2,
-        "scan_max_candidates": 5,
+        "scan_max_candidates": 3,
     },
     "weights": {"impact": 0.3, "reach": 0.2, "direction": 0.2, "promo_fit": 0.3},
     "check_in": {
