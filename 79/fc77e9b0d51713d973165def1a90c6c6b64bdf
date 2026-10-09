@@ -1,0 +1,19 @@
+README.md
+  s_70ae0658d91832::t_31744ec9c07df5 3,5,7,10-11,14,16,18-22,24,26,29-40,43,45-80,82-86,88,90,100-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "79fc77e9b0d51713d973165def1a90c6c6b64bdf",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
