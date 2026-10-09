@@ -2,6 +2,8 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/radar.sh
+source "$REPO/lib/radar.sh"
 CLAUDE="$HOME/.claude"
 PLUGIN="$CLAUDE/skills/at"
 WITH_RADAR=0
@@ -105,26 +107,8 @@ install_repo_files() {
   chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
 }
 
-strip_radar_hooks() {
-  python3 - "$PLUGIN/hooks/hooks.json" << 'PY'
-import json, sys
-path = sys.argv[1]
-def is_radar(entry):
-    return any("bin/radar" in h.get("command", "") for h in entry.get("hooks", []))
-data = json.load(open(path))
-hooks = data.get("hooks", {})
-for event in list(hooks):
-    hooks[event] = [e for e in hooks[event] if not is_radar(e)]
-    if not hooks[event]:
-        del hooks[event]
-json.dump(data, open(path, "w"), indent=2)
-open(path, "a").write("\n")
-PY
-}
-
 drop_radar() {
-  rm -rf "$PLUGIN/skills/radar" "$PLUGIN/radar" "$PLUGIN/bin/radar"
-  strip_radar_hooks
+  remove_radar_from_plugin "$PLUGIN"
   echo "radar: not installed (use --radar --vault <dir>)"
   if [ -f "$CLAUDE/at-radar.json" ]; then
     echo "radar: vault kept; $CLAUDE/at-radar.json untouched"

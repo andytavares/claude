@@ -30,7 +30,7 @@ JSON
 }
 
 run_install() { HOME="$H" bash "$ROOT/install.sh" "$@"; }
-run_uninstall() { HOME="$H" bash "$ROOT/uninstall.sh"; }
+run_uninstall() { HOME="$H" bash "$ROOT/uninstall.sh" "$@"; }
 
 assert_settings_kept_without_old_gate() {
   python3 -c '
@@ -175,6 +175,30 @@ test_uninstall_leaves_vault() {
   assert_contains "$WORK/out.txt" 'vault'
 }
 
+test_uninstall_only_radar() {
+  seed_home
+  run_install --radar --vault "$WORK/vault" > /dev/null
+  local claude_md_before
+  claude_md_before="$(cat "$C/CLAUDE.md")"
+  run_uninstall --radar > "$WORK/out.txt"
+  assert_radar_files_gone
+  assert_gone "$C/at-radar.json"
+  assert_exists "$C/skills/at/skills/brief/SKILL.md"
+  assert_exists "$C/rules/clean-code.md"
+  assert_eq "$(cat "$C/CLAUDE.md")" "$claude_md_before" "CLAUDE.md untouched"
+  assert_exists "$WORK/vault/Radar Config.md"
+  assert_contains "$WORK/out.txt" 'Radar uninstalled'
+}
+
+test_uninstall_rejects_unknown_option() {
+  seed_home
+  run_install > /dev/null
+  local status=0
+  run_uninstall --bogus > "$WORK/out.txt" 2>&1 || status=$?
+  assert_eq "$status" 1 "exit status for an unknown option"
+  assert_exists "$C/skills/at"
+}
+
 test_install; echo "ok install"
 test_reinstall_keeps_first_backup; echo "ok reinstall"
 test_uninstall; echo "ok uninstall"
@@ -186,4 +210,6 @@ test_reinstall_without_radar_keeps_vault; echo "ok reinstall without radar"
 test_flag_pairing_errors_change_nothing; echo "ok flag pairing errors"
 test_missing_vault_is_created; echo "ok missing vault created"
 test_uninstall_leaves_vault; echo "ok uninstall leaves vault"
+test_uninstall_only_radar; echo "ok uninstall only radar"
+test_uninstall_rejects_unknown_option; echo "ok uninstall rejects unknown option"
 echo "All install tests passed."
