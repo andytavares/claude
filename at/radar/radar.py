@@ -11,6 +11,16 @@ from pathlib import Path
 
 import vault
 
+ANSWER_KINDS = [
+    "pursue",
+    "park",
+    "reject",
+    "correction",
+    "exists",
+    "out_of_scope",
+    "direction",
+    "weight",
+]
 NOT_INSTALLED = "Radar is not installed: run ./install.sh --radar --vault <dir>"
 
 
@@ -75,7 +85,23 @@ def run_nudge(args, settings, home):
         print(json.dumps({"hookSpecificOutput": context}))
 
 
+def run_trends(args, settings, home):
+    import trends
+
+    print(json.dumps(trends.trends(settings, today()), indent=2))
+
+
+def run_verify(args, settings, home):
+    import verify
+
+    failures = verify.verify(settings, Path(args.path))
+    print("\n".join(failures) or "every number traces to a linked note")
+    sys.exit(1 if failures else 0)
+
+
 COMMANDS = {
+    "trends": run_trends,
+    "verify": run_verify,
     "capture": run_capture,
     "digest": run_digest,
     "pull": run_pull,
@@ -91,8 +117,9 @@ def parse_args():
     parser = argparse.ArgumentParser(prog="radar")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("init").add_argument("vault")
-    for name in ["capture", "digest", "pull", "entities", "checkin", "nudge"]:
+    for name in ["capture", "digest", "pull", "trends", "entities", "checkin", "nudge"]:
         commands.add_parser(name)
+    commands.add_parser("verify").add_argument("path")
     note = commands.add_parser("note")
     note.add_argument("text")
     note.add_argument("--about", action="append", default=[])
@@ -100,8 +127,11 @@ def parse_args():
     note.add_argument("--source", default="note")
     answer = commands.add_parser("answer")
     answer.add_argument("number", type=int)
-    answer.add_argument("response", choices=["act", "watch", "known", "out_of_scope"])
-    answer.add_argument("--note")
+    answer.add_argument("kind", choices=ANSWER_KINDS)
+    answer.add_argument("--text")
+    answer.add_argument("--until")
+    answer.add_argument("--who", default="me")
+    answer.add_argument("--weight", help="dimension=value, e.g. impact=0.4")
     return parser.parse_args()
 
 

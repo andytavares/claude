@@ -128,7 +128,9 @@ test_install_with_radar() {
   assert_hooks_have_radar
   assert_contains "$C/at-radar.json" "$WORK/vault"
   assert_exists "$WORK/vault/Radar Config.md"
-  assert_exists "$WORK/vault/Radar/Blind spots"
+  assert_exists "$WORK/vault/Radar/Opportunities"
+  assert_exists "$WORK/vault/Radar/Context/Ladder.md"
+  assert_exists "$WORK/vault/Radar/Board.base"
   assert_contains "$WORK/out.txt" 'Radar uses'
 }
 

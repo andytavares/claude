@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 from typing import NamedTuple
 
+import seeds
 import yaml
 
 POINTER = Path(".claude") / "at-radar.json"
@@ -15,36 +16,13 @@ FOLDERS = [
     "Signals",
     "Entities",
     "Themes",
-    "Blind spots",
+    "Opportunities",
+    "Pitches",
+    "Context",
     "Feedback",
     "Briefs",
 ]
-DEFAULTS = {
-    "radar_folder": "Radar",
-    "capture": {"sessions": True, "prompt_text": "first-line", "skip_paths": []},
-    "sources": {"github": True, "linear": False, "memory_corrections": True},
-    "windows": {"attention_days": 30, "signal_days": 90},
-    "check_in": {"max_blind_spots": 3, "nudge_at_session_start": "daily"},
-    "detectors": {"aging_pr_days": 7, "silence_days": 14, "repeated_correction": 3},
-    "priorities": [],
-    "out_of_scope": [],
-}
-CONFIG_BODY = """# Radar settings
-
-The properties above are the radar's settings. Edit them here; the next check-in uses them.
-
-- **radar_folder**: where the radar keeps its notes in this vault.
-- **capture**: whether Claude sessions are recorded, how much of each prompt is kept
-  (`none`, `first-line` or `full`), and repo paths never recorded.
-- **sources**: extra signals to pull: your open GitHub PRs, Linear issues (when a
-  session has the Linear connector), and corrections you gave Claude more than once.
-- **windows**: how many days of sessions count as attention, and of signals as evidence.
-- **check_in**: how many blind spots one check-in shows, and whether the first session
-  of the day gets a one-line reminder (`off`, `daily` or `every`).
-- **detectors**: when a PR counts as aging, a repo as silent, a correction as repeated.
-- **priorities**: what you mean to spend time on, each with an `until` date.
-- **out_of_scope**: topics never to raise; a blind spot whose title contains one is held back.
-"""
+DEFAULTS = seeds.DEFAULTS
 
 
 class Settings(NamedTuple):
@@ -79,11 +57,27 @@ def init_vault(home, vault_dir):
     pointer.write_text(json.dumps({"vault": str(Path(vault_dir).resolve())}) + "\n")
     note = Path(vault_dir) / CONFIG_NOTE
     if not note.exists():
-        write_note(note, DEFAULTS, CONFIG_BODY)
+        write_note(note, DEFAULTS, seeds.CONFIG_BODY)
     settings = load_settings(home)
     for folder in FOLDERS:
         (settings.folder / folder).mkdir(parents=True, exist_ok=True)
+    seed_context(settings)
     return settings
+
+
+def seed_context(settings):
+    context = settings.folder / "Context"
+    if not (context / "Ladder.md").exists():
+        write_note(
+            context / "Ladder.md",
+            {"type": "context", "provisional": True},
+            seeds.LADDER,
+        )
+    if not (context / "Priorities.md").exists():
+        write_note(context / "Priorities.md", {"type": "context"}, seeds.PRIORITIES)
+    board = settings.folder / "Board.base"
+    if not board.exists():
+        atomic_write(board, seeds.BOARD.format(folder=settings.config["radar_folder"]))
 
 
 def read_note(path):
