@@ -1,0 +1,23 @@
+at/radar/sources.py
+  s_70ae0658d91832::t_1a7aca56a4f306 2-3,8-11,14-16,19-20,24,26-33,37-38,41-64,66-68,70-76
+tests/radar/fixtures/status/github.json
+  s_70ae0658d91832::t_3bc6149cd89b25 1-17
+tests/radar/test_sources.py
+  s_70ae0658d91832::t_d8baaaeded91a3 2-3,9-11,15,17-18,21-24,27-32,34,37-38,41-42,45-63,66,69-132,136-146,149-166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "45d14dea7114d2e0e0b4ff26944921c95e3ef80b",
+  "prompts": {},
+  "sessions": {
+    "s_70ae0658d91832": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98822014-aa0b-4156-a6ce-3cbc6144bd21",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
