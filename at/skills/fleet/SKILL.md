@@ -3,7 +3,7 @@ name: fleet
 description: Triage every background session, merge green PRs, re-dispatch failures, and subscribe to be woken when any session finishes
 disable-model-invocation: true
 argument-hint: "[--watch] [--no-merge]"
-allowed-tools: Bash(claude agents *) Bash(until *) Bash(claude logs *) Bash(claude --bg *) Bash(gh pr *) Bash(git *) Read Write
+allowed-tools: Bash(claude agents *) Bash(until *) Bash(claude logs *) Bash(claude --bg *) Bash(claude rm *) Bash(gh pr *) Bash(git *) Read Write
 effort: medium
 ---
 Sessions right now:
