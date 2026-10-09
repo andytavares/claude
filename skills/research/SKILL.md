@@ -1,6 +1,6 @@
 ---
 name: research
-description: Turn a brief, spec, or prompt into a formatted PRD or Design Document, published as a shareable artifact by default
+description: Turn a brief, spec, or prompt into a formatted One Pager, PRD, or Design Document, published as a shareable artifact by default
 disable-model-invocation: true
 argument-hint: "[brief path | spec path | prompt] [--one-pager | --prd | --design]"
 model: opus
@@ -8,7 +8,7 @@ effort: high
 ---
 Input: $ARGUMENTS
 
-If the argument is a path, read it; it is the brief or spec. Otherwise it is the prompt. Choose the format: `--prd` or `--design` if given, else PRD when the input is about users, outcomes, or scope, and Design Document when it is about how to build something already decided.
+If the argument is a path, read it; it is the brief or spec. Otherwise it is the prompt. Choose the format: `--one-pager`, `--prd` or `--design` if given, else One Pager when the input asks for a short pitch or summary to align on before deeper work, PRD when the input is about users, outcomes, or scope, and Design Document when it is about how to build something already decided.
 
 Research before writing. Read the parts of this codebase the input touches. For anything external, fetch current documentation rather than relying on memory, and cite it. Every claim that could be false carries its evidence: a file path, a command and its output, or a URL. Anything you could not verify goes in the open questions, never stated as fact.
 
