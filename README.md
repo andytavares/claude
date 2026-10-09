@@ -1,74 +1,93 @@
 # claude
 
-My Claude Code setup: global instructions, skills, agents, and the clean-code gate. Skills and agents ship as a plugin named `at`, so they run as `/at:<skill>` and never collide with other skills. One script installs all of it into `~/.claude`.
+My Claude Code setup: global rules, a clean-code standard, and a plugin named `at` that holds the skills, agents and the clean-code gate. Every skill runs as `/at:<skill>`, so none of them collide with other skills.
 
-## Install
+## Install, update, remove
 
-Requires `uv` and `python3`; `npx` is optional (used for the copy-paste check).
+Requires `uv` and `python3`. `npx` is optional; the gate uses it for the copy-paste check.
 
 ```sh
-./install.sh     # backs up settings.json and CLAUDE.md once, then installs everything below
-./uninstall.sh   # removes the plugin and rules, and restores CLAUDE.md from the first backup
+./install.sh     # backs up settings.json and CLAUDE.md once, then installs everything
+./uninstall.sh   # removes the plugin and rules, and restores CLAUDE.md from that first backup
 ```
 
-Start a new Claude Code session and run `claude plugin list` to confirm `at@skills-dir` is loaded. Re-run `./install.sh` after editing anything here. Install also removes loose copies of these skills, agents and gate hooks left by earlier installs; other skills and agents in `~/.claude` are left alone.
+Start a new Claude Code session, then run `claude plugin list` and look for `at@skills-dir … loaded`. To change anything, edit it here and run `./install.sh` again. Skills and agents of your own in `~/.claude` are left alone.
 
-## What it installs
+## How it fits together
 
-| From | To `~/.claude/` | What it is |
-| --- | --- | --- |
-| `CLAUDE.md` | `CLAUDE.md` | Operating rules for every session |
-| `rules/clean-code.md` | `rules/` | The clean-code standard, loaded in every session |
-| `at/` | `skills/at/` | The `at` plugin: the skills below, the `at:worker` and `at:google-code-reviewer` agents, and the clean-gate hooks (`PostToolUse` on `Edit\|Write\|MultiEdit`, and `Stop`) |
+| Layer | Installed to | Loaded | What it does |
+| --- | --- | --- | --- |
+| `CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, short replies |
+| `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
+| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` and `at:google-code-reviewer` agents, and the clean-gate hooks that check every edit |
+
+Only `/at:survey` and `/at:google-review` can start on their own when Claude thinks they fit. Every other skill runs only when you type it.
+
+## Pick the skill
+
+```mermaid
+flowchart TD
+  Q{"What do you have?"}
+  Q -->|"a question about the code"| EX["/at:explain"]
+  Q -->|"a ticket or an ask"| BR["/at:brief"]
+  Q -->|"ten asks at once"| IN["/at:intake"]
+  Q -->|"a document to write"| RS["/at:research"]
+  Q -->|"an idea to prove"| PC["/at:poc"]
+  Q -->|"a library to judge"| TE["/at:tool-eval"]
+  BR -->|"size S or M"| IM["/at:implement"]
+  BR -->|"size L, or needs a decision"| IV["/at:interview"] --> SP["SPEC.md"] --> IM
+  IN --> DP["background sessions"] --> FL["/at:fleet"]
+  IM --> PR["draft PR"]
+```
+
+For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in the current session.
 
 ## Skills
 
-| Skill | Use it to |
+| Skill | Use it when | Runs on | You get |
+| --- | --- | --- | --- |
+| `/at:brief` | You have a Linear key or a short ask and want it sized | Opus, medium | `briefs/<id>.md`, sized S, M or L |
+| `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus, high | `SPEC.md` covering what the ask didn't mention |
+| `/at:research` | You need a one-pager (`--one-pager`), PRD (`--prd`) or design doc (`--design`) | Opus, high | A shareable artifact |
+| `/at:design-doc` | You have a spec and want a design doc checked once for gaps | Opus, high | `DESIGN.md` |
+| `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
+| `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
+| `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
+| `/at:ticket` | One ticket, done in this session | Session model, high | A PR |
+| `/at:intake` | A batch of asks to size and launch together | Session model, medium | Briefs, background sessions, a watch on them |
+| `/at:dispatch` | Briefs are written and you want them running | Session model, low | One background session per brief |
+| `/at:fleet` | Background sessions have finished | Session model, medium | Green PRs merged, failures relaunched once, questions for you |
+| `/at:poc` | You want to prove an idea runs | Session model, high | A demo command, its output, and a README |
+| `/at:tool-eval` | You're deciding whether to adopt a library | Session model, high | `evals/<tool>/EVAL.md` with a verdict |
+| `/at:google-review` | You want a review of the current diff | Session model | Findings by `file:line`; you pick which to apply |
+| `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
+
+## Getting the best results
+
+- **Start from a file, not a paragraph.** Skills read a brief or spec by path. Anything bigger than a one-line change goes through `/at:brief` first, and the size it picks sets the model and effort: S is Sonnet at medium, M is Sonnet at high, L goes to `/at:interview` or `/at:research`.
+- **Let size set effort, not worry.** Raise effort only after a run fails for lack of it; `/at:fleet` does this itself, one level at a time. On the 5.5 models, medium already handles most multi-step coding.
+- **Survey before you build.** `/at:implement` does this for you, but for work in your own session, run `/at:survey <what you're adding>` first. On terminator, asking for a "last edited 5m ago" label showed the label already existed (`NoteList.tsx:296`) and that `relativeTime` is copied, with different output, in two other files.
+- **Read gate findings like review comments.** Fix each one, or say why it's intended. Known false positive: a test helper with the same name as a real function. Tune each repo with a `.clean-gate.json` (below).
+- **Judge the PR by its first section.** Every PR from `/at:implement` opens with "How to read this change": the entry point, then each step in call order. If you can't follow it, ask for a rewrite before reading the code.
+- **Done means the checks ran.** The PR carries each command and its exit code. A summary that says "tests pass" without output isn't done.
+- **Too much to read?** Run `/at:word-salad` with no argument to rewrite the last reply, or pass it text or a file path.
+- **One ask per session.** Start a new session between unrelated tasks, so old context doesn't steer the new one.
+
+## The clean-code gate
+
+The gate runs after every edit and once when Claude finishes a turn. It sends its findings back to Claude, which fixes them before carrying on.
+
+| Check | Rule |
 | --- | --- |
-| `/at:brief` | Turn a Linear key or a quick prompt into a brief sized to the work |
-| `/at:intake` | Size, brief and dispatch a whole batch of asks at once |
-| `/at:interview` | Clarify an ask until nothing is ambiguous, then write the spec |
-| `/at:research` | Write a one-pager (`--one-pager`), PRD (`--prd`) or design document (`--design`), published as an artifact |
-| `/at:design-doc` | Draft a design document from a spec and have it gap-reviewed once |
-| `/at:explain` | Answer a question about the codebase in the format asked for |
-| `/at:survey` | Map the flow, the code to reuse and the example to copy before writing code |
-| `/at:implement` | Plan on Opus, build with Sonnet workers, end in a PR |
-| `/at:ticket` | Do one Linear ticket end to end in this session |
-| `/at:poc` | Build a proof of concept with a runnable demonstration |
-| `/at:tool-eval` | Evaluate a tool or library against fixed criteria |
-| `/at:dispatch` | Launch briefs as background sessions |
-| `/at:fleet` | Triage background sessions, merge green PRs, re-dispatch failures |
-| `/at:google-review` | Review the current diff against Google's code review standard |
-| `/at:word-salad` | Rewrite a wall of text, or by default the last response, into plain, short, ordered prose |
+| Size | A new function has at most 30 lines, complexity 10 and 3 parameters |
+| Ratchet | A changed function that was already over a limit may not grow; untouched code is never reported |
+| Repeated name | A new function's name isn't already defined in another tracked file |
+| Comment run | No added comment longer than 3 lines, except a header at line 1 |
+| Copy-paste | No block copied from elsewhere in the repo (end of turn only, needs `npx`) |
 
-## Readable by default
+[lizard](https://github.com/terryyin/lizard) reads functions in 26 languages and [jscpd](https://github.com/kucherenko/jscpd) finds copies in 200+ formats. In a language lizard can't read, only the comment and copy-paste checks run.
 
-Design: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
-
-```mermaid
-flowchart LR
-  A["/at:survey"] -->|reuse map| B["write code<br/>rules/clean-code.md"]
-  B -->|each Edit / Write| C{"clean-gate<br/>post-tool-use"}
-  C -->|findings| B
-  C -->|clean| D{"clean-gate<br/>stop"}
-  D -->|findings, once| B
-  D -->|clean| E["google-code-reviewer<br/>reuse and flow"]
-  E -->|approve| F["PR with<br/>How to read this change"]
-```
-
-`/at:implement` runs the survey before planning, gives each worker the Reuse and Shape lines it needs, runs the reviewer before shipping, and starts the PR body with "How to read this change".
-
-| Gate check | Rule |
-| --- | --- |
-| Size | A new function has at most 30 lines, complexity 10 and 3 parameters. |
-| Ratchet | A changed function that was already over a limit may not grow. Untouched code is never reported. |
-| Repeated name | A new function's name is not already defined in another tracked file. |
-| Comment run | No added comment longer than 3 lines, except a header at line 1. |
-| Copy-paste | No clone between a changed file and the rest of the repo (stop hook only, needs `npx`). |
-
-Functions are read by [lizard](https://github.com/terryyin/lizard) (26 languages); copy-paste by [jscpd](https://github.com/kucherenko/jscpd). In other languages only the comment and copy-paste checks run.
-
-An optional `.clean-gate.json` at a repo root overrides the defaults:
+An optional `.clean-gate.json` at a repo root changes the defaults for that repo:
 
 ```json
 {
@@ -78,7 +97,9 @@ An optional `.clean-gate.json` at a repo root overrides the defaults:
 }
 ```
 
-Measure a branch: `uv run --script ~/.claude/skills/at/hooks/clean-gate/gate.py report main..HEAD`
+To measure a branch: `uv run --script ~/.claude/skills/at/hooks/clean-gate/gate.py report main..HEAD`
+
+The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 
 ## Tests
 
