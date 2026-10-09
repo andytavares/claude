@@ -1,0 +1,144 @@
+from datetime import timedelta
+
+import detect
+import vault
+
+SECTIONS = [
+    "What changed because of your feedback",
+    "Commitments",
+    "Blind spots",
+    "Held back",
+    "Sources",
+]
+
+
+def run_digest(settings, home):
+    import digest
+
+    digest.digest(settings, home)
+
+
+def run_pull(settings, home):
+    import sources
+
+    sources.pull(settings, home)
+
+
+def recent_feedback(settings, today):
+    start = str(today - timedelta(days=7))
+    return [
+        (path.stem, props)
+        for path, props in vault.notes(settings, "Feedback")
+        if str(props["date"])[:10] >= start
+    ]
+
+
+def links(names):
+    return ", ".join(vault.link(name) for name in names)
+
+
+def feedback_lines(applied):
+    return [
+        f"- {vault.link(stem)}: {props['response']} {props['responds_to']}"
+        for stem, props in applied
+    ]
+
+
+def commitment_lines(spots):
+    return [
+        f"- {spot['title']} ({links(spot['evidence'])})"
+        for spot in spots
+        if spot["detector"] == "aging_commitments"
+    ]
+
+
+def blind_spot_lines(spots):
+    lines = []
+    for number, spot in enumerate(spots, 1):
+        lines += [
+            f"{number}. {spot['title']}",
+            f"   - Detector: {spot['detector']}",
+            f"   - Why it was missed: {spot['why_missed']}",
+            f"   - Evidence: {links(spot['evidence'])}",
+        ]
+    return lines
+
+
+def held_lines(held):
+    return [f"- {spot['title']} (out of scope: {spot['matched']})" for spot in held]
+
+
+def source_lines(health):
+    return [f"- {name}: {status}" for name, status in health.items()]
+
+
+def render(week, sections):
+    parts = [f"# Radar check-in {week}"]
+    for heading in SECTIONS:
+        parts += ["", f"## {heading}", "", *(sections[heading] or ["None."])]
+    return "\n".join(parts) + "\n"
+
+
+def write_brief(settings, today, sections):
+    year, week, _ = today.isocalendar()
+    path = settings.folder / "Briefs" / f"{year}-W{week:02d}.md"
+    vault.write_note(path, {"type": "brief", "date": str(today)})
+    text = path.read_text()
+    front = text[: text.index("\n---\n", 3) + 5]
+    vault.atomic_write(path, front + render(f"{year}-W{week:02d}", sections))
+    return path
+
+
+def section_lines(spots, held, applied_and_health):
+    applied, health = applied_and_health
+    return {
+        SECTIONS[0]: feedback_lines(applied),
+        SECTIONS[1]: commitment_lines(spots),
+        SECTIONS[2]: blind_spot_lines(spots),
+        SECTIONS[3]: held_lines(held),
+        SECTIONS[4]: source_lines(health),
+    }
+
+
+def checkin(settings, home, today):
+    run_digest(settings, home)
+    run_pull(settings, home)
+    found = detect.detect(settings, today)
+    spots, held = found["blind_spots"], found["suppressed"]
+    applied = recent_feedback(settings, today)
+    health = vault.load_state(settings).get("sources", {})
+    lines = section_lines(spots, held, (applied, health))
+    path = write_brief(settings, today, lines)
+    state = vault.load_state(settings)
+    vault.save_state(settings, {**state, "last_checkin": [s["note"] for s in spots]})
+    return {
+        "brief": str(path),
+        "blind_spots": spots,
+        "suppressed": held,
+        "feedback_applied": [stem for stem, _ in applied],
+        "sources": health,
+    }
+
+
+def open_blind_spots(settings):
+    return sum(
+        props.get("status") == "open"
+        for _, props in vault.notes(settings, "Blind spots")
+    )
+
+
+def due_today(settings, today):
+    mode = settings.config["check_in"]["nudge_at_session_start"]
+    if mode == "every":
+        return True
+    return mode == "daily" and vault.load_state(settings).get("nudged_on") != str(today)
+
+
+def nudge(settings, today):
+    count = open_blind_spots(settings)
+    if not count or not due_today(settings, today):
+        return None
+    state = vault.load_state(settings)
+    vault.save_state(settings, {**state, "nudged_on": str(today)})
+    plural = "" if count == 1 else "s"
+    return f"Radar: {count} open blind spot{plural}. Run /at:radar to see them."

@@ -63,7 +63,7 @@ def run_checkin(args, settings, home):
 def run_answer(args, settings, home):
     import feedback
 
-    print(feedback.answer(settings, args.number, args.response, args.note, today()))
+    print(feedback.answer(settings, vars(args), today()))
 
 
 def run_nudge(args, settings, home):
