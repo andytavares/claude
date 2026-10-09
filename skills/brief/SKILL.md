@@ -18,7 +18,7 @@ Read enough of the codebase to know which files are involved and whether the app
 | **M** | Several files, approach clear once the code is read, no design choice | A paragraph of intent, the files by real path, what is out of scope, acceptance criteria as statements that can be false, the proof command. |
 | **L** | A design choice, more than one reasonable approach, cross-cutting, or unclear boundaries | Run `/research` on the ask with `--design` (or `--prd` if it is product-shaped) and make its output the brief. Note at the top which decisions are still open. |
 
-Every size ends with one line, `size: S | M | L`, and for S and M a `model:` and `effort:` line: `sonnet`/`medium` for S, `sonnet`/`high` for M. L is handed to `/do-work`, which plans on its own.
+Every size ends with one line, `size: S | M | L`, and for S and M a `model:` and `effort:` line: `sonnet`/`medium` for S, `sonnet`/`high` for M. L is handed to `/implement`, which plans on its own.
 
 If the ask is L and the design choice cannot be made without the asker, do not guess: write the brief up to the open decision and say `needs /interview` on the last line.
 
