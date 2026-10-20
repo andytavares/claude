@@ -33,14 +33,16 @@ A worker that reports a failing check gets one relaunch with the failure text ad
 
 A worker that has not reported by its time box, or says it is waiting on its own background work, gets one message asking for its report now.
 
+When a unit's checks pass, commit it on the feature branch in the repo's convention, one commit per unit, so Prove sees the work in `main...HEAD`.
+
 ## Prove
 
-Run the repo's own lint, test, and coverage commands once each, in full. Every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
-
-Then run the `at:google-code-reviewer` agent on the branch with `main` as base, passing the reuse map. Fix every `[MUST]`, then run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report main..HEAD`.
+1. Run the bundled `code-review` skill once as `/code-review medium --fix main...HEAD` and wait for its findings. Fix any finding it did not fix itself, in this session; do not relaunch workers for review findings. Commit the fixes.
+2. Run the repo's own lint, test, and coverage commands once each, in full. Every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
+3. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report main..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
 
 ## Ship
 
-Commit on a feature branch in the repo's convention, one commit per unit, and open a PR with `gh`. The body starts with "How to read this change": the entry point, then each step in call order as `path:line`, with a mermaid diagram when the change spans more than three files. Then the plan, what each unit did, the command outputs, and the clean-gate report.
+Commit anything Prove changed, then open a PR with `gh`. The body starts with "How to read this change": the entry point, then each step in call order as `path:line`, with a mermaid diagram when the change spans more than three files. Then the plan, what each unit did, the command outputs, and the clean-gate report.
 
 Finish with the PR URL. Nothing else.
