@@ -1,0 +1,22 @@
+tests/test_install.sh
+  s_c6b88245b79d7b::t_50998f9bf61351 19,23-24,59-60
+install.sh
+  s_c6b88245b79d7b::t_751912eb74da89 81,85-88
+  s_c6b88245b79d7b::t_07840696f9789d 89-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d9473b8c5b4421543bcd16347ec5fdf16cbd28f4",
+  "prompts": {},
+  "sessions": {
+    "s_c6b88245b79d7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c0bfee7-3df8-49dc-ae18-b06bdc63e238",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
