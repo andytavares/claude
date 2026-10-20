@@ -1,0 +1,26 @@
+README.md
+  s_c6b88245b79d7b::t_0f5698efce6793 7,28,183
+  s_c6b88245b79d7b::t_31ca37b768c29e 31,79,162,171
+at/skills/implement/SKILL.md
+  s_c6b88245b79d7b::t_4da51656c598c4 40
+  s_c6b88245b79d7b::t_0fe7230277213d 36
+  s_c6b88245b79d7b::t_81c3997f0c9480 41-42
+  s_c6b88245b79d7b::t_6ba24fadcb218a 38
+  s_c6b88245b79d7b::t_58c76a2b199045 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3f5f8a61585646cce7ea46baf06fa6aaea6465a1",
+  "prompts": {},
+  "sessions": {
+    "s_c6b88245b79d7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c0bfee7-3df8-49dc-ae18-b06bdc63e238",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
