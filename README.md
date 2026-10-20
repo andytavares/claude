@@ -4,7 +4,7 @@ My Claude Code setup: global rules, a clean-code standard, and a plugin named `a
 
 ## Install, update, remove
 
-Requires `uv` and `python3`. `npx` is optional; the gate uses it for the copy-paste check.
+Requires `uv` and `python3`.
 
 ```sh
 ./install.sh                                  # everything except the radar
@@ -25,10 +25,10 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | --- | --- | --- | --- |
 | `CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
-| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` and `at:google-code-reviewer` agents, and the clean-gate hooks that check every edit |
+| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, and the clean-gate hooks that check every edit |
 | Radar (optional) | `~/.claude/skills/at/radar/` and your vault | Two session hooks; the rest on demand | Finds and pitches promotion-worthy projects from evidence; see [The radar](#the-radar) |
 
-Only `/at:survey` and `/at:google-review` can start on their own when Claude thinks they fit. Every other skill runs only when you type it.
+Only `/at:survey` can start on its own when Claude thinks it fits. Every other skill runs only when you type it.
 
 ## Pick the skill
 
@@ -67,7 +67,6 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 | `/at:fleet` | Background sessions have finished | Session model, medium | Green PRs merged, failures relaunched once, questions for you |
 | `/at:poc` | You want to prove an idea runs | Session model, high | A demo command, its output, and a README |
 | `/at:tool-eval` | You're deciding whether to adopt a library | Session model, high | `evals/<tool>/EVAL.md` with a verdict |
-| `/at:google-review` | You want a review of the current diff | Session model | Findings by `file:line`; you pick which to apply |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
 | `/at:radar` | Weekly check-in, a pitch, a note from any tool, or an answer | Opus, high | Ranked opportunities and pitches in your vault (only with `--radar`) |
 | `/at:radar-scan` | Monthly, to find new opportunities in the evidence | Workflow, about 10 agents | `Opportunities/` notes, scored and critic-checked |
@@ -77,7 +76,7 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 - **Start from a file, not a paragraph.** Skills read a brief or spec by path. Anything bigger than a one-line change goes through `/at:brief` first, and the size it picks sets the model and effort: S is Sonnet at medium, M is Sonnet at high, L goes to `/at:interview` or `/at:research`.
 - **Let size set effort, not worry.** Raise effort only after a run fails for lack of it; `/at:fleet` does this itself, one level at a time. On the 5.5 models, medium already handles most multi-step coding.
 - **Survey before you build.** `/at:implement` does this for you, but for work in your own session, run `/at:survey <what you're adding>` first. On terminator, asking for a "last edited 5m ago" label showed the label already existed (`NoteList.tsx:296`) and that `relativeTime` is copied, with different output, in two other files.
-- **Read gate findings like review comments.** Fix each one, or say why it's intended. Known false positive: a test helper with the same name as a real function. Tune each repo with a `.clean-gate.json` (below).
+- **Read gate findings like review comments.** Fix each one, or say why it's intended. Tune each repo with a `.clean-gate.json` (below).
 - **Judge the PR by its first section.** Every PR from `/at:implement` opens with "How to read this change": the entry point, then each step in call order. If you can't follow it, ask for a rewrite before reading the code.
 - **Done means the checks ran.** The PR carries each command and its exit code. A summary that says "tests pass" without output isn't done.
 - **Too much to read?** Run `/at:word-salad` with no argument to rewrite the last reply, or pass it text or a file path.
@@ -160,7 +159,7 @@ Status pages are Atlassian Statuspage sites listed in `status_pages` (GitHub by 
 
 ## The clean-code gate
 
-The gate runs after every edit and once when Claude finishes a turn, including in agent sessions Foundry starts, since those write code too. It sends its findings back to Claude, which fixes them before carrying on.
+The gate runs after every edit, including in agent sessions Foundry starts, since those write code too. It sends its findings back to Claude, which fixes them before carrying on.
 
 | Check | Rule |
 | --- | --- |
@@ -168,9 +167,8 @@ The gate runs after every edit and once when Claude finishes a turn, including i
 | Ratchet | A changed function that was already over a limit may not grow; untouched code is never reported |
 | Repeated name | A new function's name isn't already defined in another tracked file |
 | Comment run | No added comment longer than 3 lines, except a header at line 1 |
-| Copy-paste | No block copied from elsewhere in the repo (end of turn only, needs `npx`) |
 
-[lizard](https://github.com/terryyin/lizard) reads functions in 26 languages and [jscpd](https://github.com/kucherenko/jscpd) finds copies in 200+ formats. In a language lizard can't read, only the comment and copy-paste checks run.
+[lizard](https://github.com/terryyin/lizard) reads functions in 26 languages. In a language lizard can't read, only the comment check runs.
 
 An optional `.clean-gate.json` at a repo root changes the defaults for that repo:
 
@@ -182,7 +180,7 @@ An optional `.clean-gate.json` at a repo root changes the defaults for that repo
 }
 ```
 
-To measure a branch: `uv run --script ~/.claude/skills/at/hooks/clean-gate/gate.py report main..HEAD`
+To measure a branch, including files edited through Bash, which the edit hook does not see: `uv run --script ~/.claude/skills/at/hooks/clean-gate/gate.py report main..HEAD`
 
 The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 
