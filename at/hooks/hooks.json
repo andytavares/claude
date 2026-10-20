@@ -11,16 +11,6 @@
         ]
       }
     ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py\" check --hook stop"
-          }
-        ]
-      }
-    ],
     "SessionEnd": [
       {
         "hooks": [

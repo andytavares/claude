@@ -121,6 +121,26 @@ def test_repeated_name_points_at_the_other_file(tmp_path, lang):
     assert "Reuse it" in reason
 
 
+def test_new_spec_file_repeating_a_name_is_clean(tmp_path):
+    repo = make_repo(tmp_path, {"b.ts": func("ts", "formatTotal", 3)})
+    (repo / "tests").mkdir()
+    write(repo, {"tests/a.spec.ts": func("ts", "formatTotal", 3)})
+    assert check_file(repo, "tests/a.spec.ts") == ""
+
+
+def test_name_defined_only_in_a_spec_file_is_not_a_repeat(tmp_path):
+    repo = make_repo(tmp_path, {"a.spec.ts": func("ts", "formatTotal", 3)})
+    write(repo, {"b.ts": func("ts", "formatTotal", 3)})
+    assert check_file(repo, "b.ts") == ""
+
+
+def test_helper_under_tests_directory_is_not_a_repeat(tmp_path):
+    repo = make_repo(tmp_path, {"b.ts": func("ts", "formatTotal", 3)})
+    (repo / "tests").mkdir()
+    write(repo, {"tests/helpers.ts": func("ts", "formatTotal", 3)})
+    assert check_file(repo, "tests/helpers.ts") == ""
+
+
 def test_ignored_name_is_not_a_repeat(tmp_path):
     repo = make_repo(tmp_path, {"one.ts": func("ts", "formatTotal", 3)})
     config = {"ignoreNames": ["formatTotal"]}
@@ -190,22 +210,6 @@ def test_post_tool_use_block_names_the_path(tmp_path):
     )
 
 
-def test_stop_hook_is_silent_when_already_active(tmp_path):
-    repo = make_repo(tmp_path, {"base.ts": func("ts", "base", 2)})
-    write(repo, {"a.ts": func("ts", "relativeTime", 40)})
-    hook = json.dumps({"stop_hook_active": True})
-    done = run_gate(repo, hook, "check", "--hook", "stop")
-    assert (done.returncode, done.stdout) == (0, "")
-
-
-def test_stop_hook_finds_untracked_file(tmp_path):
-    repo = make_repo(tmp_path, {"base.ts": func("ts", "base", 2)})
-    write(repo, {"a.ts": func("ts", "relativeTime", 40)})
-    done = run_gate(repo, json.dumps({}), "check", "--hook", "stop")
-    assert done.returncode == 0
-    assert "a.ts:1  relativeTime has" in json.loads(done.stdout)["reason"]
-
-
 def test_report_counts_a_two_commit_range(tmp_path):
     repo = make_repo(tmp_path, {"a.ts": func("ts", "legacyBig", 50)})
     write(repo, {"a.ts": func("ts", "legacyBig", 58) + func("ts", "fresh", 40)})
@@ -216,6 +220,7 @@ def test_report_counts_a_two_commit_range(tmp_path):
     assert "functions over a limit: 1" in done.stdout
     assert "ratchet breaches: 1" in done.stdout
     assert "added lines:" in done.stdout
+    assert "a.ts:62  fresh has" in done.stdout
 
 
 def test_file_outside_a_git_repo_is_ignored(tmp_path):

@@ -7,10 +7,8 @@ import argparse
 import fnmatch
 import json
 import re
-import shutil
 import subprocess
 import sys
-import tempfile
 from collections import Counter
 from pathlib import Path
 from typing import NamedTuple
@@ -146,9 +144,21 @@ def is_checkable_name(name, config):
     )
 
 
+TEST_DIRECTORIES = {"test", "tests", "__tests__"}
+TEST_FILE_PATTERNS = ["*.spec.*", "*.test.*", "test_*.py", "*_test.go"]
+
+
+def is_test_path(path):
+    parts = Path(path).parts
+    in_test_directory = any(part in TEST_DIRECTORIES for part in parts[:-1])
+    return in_test_directory or any(
+        fnmatch.fnmatch(parts[-1], pattern) for pattern in TEST_FILE_PATTERNS
+    )
+
+
 def definitions_elsewhere(root, path, name):
     listing = git(root, "grep", "-l", "-w", name) or ""
-    others = [p for p in listing.split("\n") if p and p != path]
+    others = [p for p in listing.split("\n") if p and p != path and not is_test_path(p)]
     found = []
     for other in others:
         text = (root / other).read_text(errors="replace")
@@ -174,6 +184,8 @@ def repeat_finding(root, change, function):
 
 
 def repeat_findings(root, change, config):
+    if is_test_path(change.path):
+        return []
     old_names = {f.name for f in change.old_functions}
     new = [f for f in change.new_functions if f.name not in old_names]
     named = [f for f in new if is_checkable_name(short_name(f.name), config)]
@@ -257,45 +269,12 @@ def check_file(root, path, config):
     return find_issues(root, change, config) if change else []
 
 
-def clone_findings(root, changed_paths):
-    if not shutil.which("npx") or not changed_paths:
-        return []
-    with tempfile.TemporaryDirectory() as out:
-        command = [
-            "npx",
-            "-y",
-            "jscpd@5.3.2",
-            str(root),
-            "-r",
-            "json",
-            "-o",
-            out,
-            "-a",
-            "--silent",
-        ]
-        subprocess.run(command, capture_output=True, text=True, check=False)
-        try:
-            report = json.loads((Path(out) / "jscpd-report.json").read_text())
-        except (OSError, ValueError):
-            return []
-    return clones_touching(root, report.get("duplicates", []), set(changed_paths))
-
-
-def clones_touching(root, duplicates, changed_paths):
-    found = []
-    for clone in duplicates:
-        first, second = clone["firstFile"], clone["secondFile"]
-        for mine, other in ((first, second), (second, first)):
-            path = str(Path(mine["name"]).resolve().relative_to(root))
-            if path in changed_paths:
-                other_path = Path(other["name"]).resolve().relative_to(root)
-                message = f"{clone['lines']} lines copied from {other_path}:{other['startLoc']['line']}"
-                found.append(Finding(path, mine["startLoc"]["line"], "clone", message))
-    return found
+def finding_line(finding):
+    return f"{finding.path}:{finding.line}  {finding.message}"
 
 
 def block_message(findings):
-    lines = [f"{f.path}:{f.line}  {f.message}" for f in findings]
+    lines = [finding_line(f) for f in findings]
     return json.dumps({"decision": "block", "reason": "\n".join(lines + [VERDICT])})
 
 
@@ -312,26 +291,9 @@ def post_tool_use(payload):
     return check_file(root, str(file.relative_to(root)), load_config(root))
 
 
-def stop_files(root):
-    tracked = git(root, "diff", "--name-only", "HEAD") or ""
-    untracked = git(root, "ls-files", "--others", "--exclude-standard") or ""
-    return [p for p in (tracked + untracked).split("\n") if p and (root / p).is_file()]
-
-
-def stop(payload):
-    root = repo_root(Path.cwd())
-    if payload.get("stop_hook_active") or root is None:
-        return []
-    config, found = load_config(root), []
-    paths = stop_files(root)
-    for path in paths:
-        found += check_file(root, path, config)
-    return found + clone_findings(root, paths)
-
-
-def run_check(hook):
+def run_check():
     payload = json.loads(sys.stdin.read() or "{}")
-    emit(post_tool_use(payload) if hook == "post-tool-use" else stop(payload))
+    emit(post_tool_use(payload))
 
 
 def added_lines(root, span):
@@ -358,6 +320,8 @@ def run_report(span):
     root = repo_root(Path.cwd())
     found = report_findings(root, span, load_config(root))
     counts = Counter(f.kind for f in found)
+    for f in found:
+        print(finding_line(f))
     print(f"functions over a limit: {counts['size']}")
     print(f"ratchet breaches: {counts['ratchet']}")
     print(f"repeated names: {counts['repeat']}")
@@ -369,7 +333,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers(dest="command", required=True)
     check = commands.add_parser("check")
-    check.add_argument("--hook", choices=["post-tool-use", "stop"], required=True)
+    check.add_argument("--hook", choices=["post-tool-use"], required=True)
     commands.add_parser("report").add_argument("span")
     return parser.parse_args()
 
@@ -377,7 +341,7 @@ def parse_args():
 def main():
     args = parse_args()
     if args.command == "check":
-        run_check(args.hook)
+        run_check()
     else:
         run_report(args.span)
 
