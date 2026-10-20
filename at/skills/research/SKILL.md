@@ -32,4 +32,4 @@ Match the input. A two-sentence brief produces a page; a whole spec produces wha
 
 Publish the document as an artifact by default: load the `artifact-design` skill first, write the HTML, then publish with the Artifact tool, icon `document`, title the document's name.
 
-Print the artifact URL and the file path. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
+Print the artifact URL and the file path. Unless another skill invoked this one, then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.

@@ -114,6 +114,7 @@ assert_radar_files_gone() {
   assert_gone "$C/skills/at/bin/radar"
   assert_gone "$C/skills/at/skills/radar"
   assert_gone "$C/skills/at/workflows/radar-scan.js"
+  assert_gone "$C/skills/at/workflows"
   if grep -qF 'bin/radar' "$C/skills/at/hooks/hooks.json"; then fail "radar hook still installed"; fi
   if grep -qF 'check --hook stop' "$C/skills/at/hooks/hooks.json"; then fail "clean-gate Stop hook still installed"; fi
   assert_contains "$C/skills/at/hooks/hooks.json" 'clean-gate/gate.py\" check --hook post-tool-use'
