@@ -1,0 +1,33 @@
+at/skills/research/SKILL.md
+  s_c6b88245b79d7b::t_72c48271c93c90 35
+at/evals/brief-sizing/l/prompt.md
+  s_c6b88245b79d7b::t_72c48271c93c90 5
+at/evals/brief-sizing/s/prompt.md
+  s_c6b88245b79d7b::t_72c48271c93c90 5
+at/evals/brief-sizing/m/prompt.md
+  s_c6b88245b79d7b::t_72c48271c93c90 5
+README.md
+  s_c6b88245b79d7b::t_85a37178b23196 16
+at/evals/brief-sizing/l/graders/open-decisions.md
+  s_c6b88245b79d7b::t_72c48271c93c90 1-6
+at/skills/implement/SKILL.md
+  s_c6b88245b79d7b::t_85a37178b23196 17,48
+tests/test_install.sh
+  s_c6b88245b79d7b::t_85a37178b23196 117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2e61efaf39b82490b5976be12c61a0b914ab6654",
+  "prompts": {},
+  "sessions": {
+    "s_c6b88245b79d7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c0bfee7-3df8-49dc-ae18-b06bdc63e238",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
