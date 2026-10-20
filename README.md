@@ -23,7 +23,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 
 | Layer | Installed to | Loaded | What it does |
 | --- | --- | --- | --- |
-| `CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, short replies |
+| `global/CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, and the clean-gate hooks that check every edit |
 | Radar (optional) | `~/.claude/skills/at/radar/` and your vault | Two session hooks; the rest on demand | Finds and pitches promotion-worthy projects from evidence; see [The radar](#the-radar) |
@@ -57,7 +57,6 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 | `/at:brief` | You have a Linear key or a short ask and want it sized | Opus, medium | `briefs/<id>.md`, sized S, M or L |
 | `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus, high | `SPEC.md` covering what the ask didn't mention |
 | `/at:research` | You need a one-pager (`--one-pager`), PRD (`--prd`) or design doc (`--design`) | Opus, high | A shareable artifact |
-| `/at:design-doc` | You have a spec and want a design doc checked once for gaps | Opus, high | `DESIGN.md` |
 | `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
