@@ -14,6 +14,8 @@ If you are not in a git worktree switch to the one for this body of work or crea
 
 ## Plan
 
+If you can state the diff in one sentence, say the sentence, skip the survey and the workers: write the failing test, make it pass, commit, then go to Prove.
+
 Run the `at:survey` skill on the brief first. Read the files the brief names and their callers. Write the plan as a numbered list of units, each one a change a worker can make in one sitting without seeing the others: the files it touches, the Reuse and Shape lines from the survey it needs, the test it writes first, and the command that proves it. Units that must touch the same files are one unit. Order them by dependency. Keep the list as short as the work allows.
 
 If the brief says `needs /at:interview` or a unit cannot be written without a decision the brief does not make, stop and say which decision. Do not guess it.
@@ -45,4 +47,4 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 Commit anything Prove changed, then open a PR with `gh`. The body starts with "How to read this change": the entry point, then each step in call order as `path:line`, with a mermaid diagram when the change spans more than three files. Then the plan, what each unit did, the command outputs, and the clean-gate report.
 
-Finish with the PR URL. Nothing else.
+Finish with the PR URL. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.

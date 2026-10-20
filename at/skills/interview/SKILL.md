@@ -27,4 +27,4 @@ Write `SPEC.md`:
 - Open decisions, if any survived, each with the options and your recommendation.
 - An end-to-end verification step.
 
-Print the path and the number of blind spots found. Nothing else.
+Print the path and the number of blind spots found. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
