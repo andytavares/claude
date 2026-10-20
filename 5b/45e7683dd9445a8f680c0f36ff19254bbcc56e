@@ -1,0 +1,26 @@
+tests/test_gate.py
+  s_c6b88245b79d7b::t_d1ce592b39addc 137-143
+  s_c6b88245b79d7b::t_458d0153332672 124-136,223
+at/hooks/clean-gate/gate.py
+  s_c6b88245b79d7b::t_d15d4120ef0e5f 272-273,277
+  s_c6b88245b79d7b::t_60a7d8c74f48bf 324
+  s_c6b88245b79d7b::t_458d0153332672 147-158,161,187-188,294,296,323,336,344
+tests/test_install.sh
+  s_c6b88245b79d7b::t_512e29c65c01c4 110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5b45e7683dd9445a8f680c0f36ff19254bbcc56e",
+  "prompts": {},
+  "sessions": {
+    "s_c6b88245b79d7b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c0bfee7-3df8-49dc-ae18-b06bdc63e238",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
