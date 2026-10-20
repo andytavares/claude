@@ -52,6 +52,7 @@ assert_plugin_installed() {
   assert_exists "$C/skills/at/hooks/hooks.json"
   assert_exists "$C/skills/at/skills/word-salad/SKILL.md"
   [ -x "$C/skills/at/hooks/clean-gate/gate.py" ] || fail "gate.py not executable"
+  assert_exists "$C/skills/at/hooks/clean-gate/gate.py.lock"
 }
 
 assert_loose_copies_removed() {
@@ -133,6 +134,7 @@ test_install_with_radar() {
   mkdir -p "$WORK/vault"
   run_install --radar --vault "$WORK/vault" > "$WORK/out.txt"
   assert_exists "$C/skills/at/radar/radar.py"
+  assert_exists "$C/skills/at/radar/radar.py.lock"
   assert_exists "$C/skills/at/bin/radar"
   assert_hooks_have_radar
   assert_contains "$C/at-radar.json" "$WORK/vault"
