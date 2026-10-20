@@ -78,7 +78,14 @@ remove_loose_copies() {
   for skill in "$REPO"/at/skills/*/; do remove_path "$CLAUDE/skills/$(basename "$skill")"; done
   for agent in "$REPO"/at/agents/*.md; do remove_path "$CLAUDE/agents/$(basename "$agent")"; done
   remove_path "$CLAUDE/hooks/clean-gate"
+  remove_retired_copies
   remove_settings_gate_hooks
+}
+
+# Retired from the repo, so the loops above no longer name them.
+remove_retired_copies() {
+  remove_path "$CLAUDE/skills/google-review"
+  remove_path "$CLAUDE/agents/google-code-reviewer.md"
 }
 
 remove_settings_gate_hooks() {

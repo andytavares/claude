@@ -16,10 +16,12 @@ assert_contains() { grep -qF -- "$2" "$1" || fail "$1 lacks '$2'"; }
 
 seed_home() {
   rm -rf "$H"
-  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/agents" "$C/hooks/clean-gate"
+  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/skills/google-review" "$C/agents" "$C/hooks/clean-gate"
   echo "my own skill" > "$C/skills/mine/SKILL.md"
   echo "loose copy from an earlier install" > "$C/skills/research/SKILL.md"
   echo "loose copy from an earlier install" > "$C/agents/worker.md"
+  echo "retired skill from an earlier install" > "$C/skills/google-review/SKILL.md"
+  echo "retired agent from an earlier install" > "$C/agents/google-code-reviewer.md"
   echo "loose copy from an earlier install" > "$C/hooks/clean-gate/gate.py"
   printf '%s' "$ORIGINAL_CLAUDE_MD" > "$C/CLAUDE.md"
   cat > "$C/settings.json" << 'JSON'
@@ -54,6 +56,8 @@ assert_plugin_installed() {
 assert_loose_copies_removed() {
   assert_gone "$C/skills/research"
   assert_gone "$C/agents/worker.md"
+  assert_gone "$C/skills/google-review"
+  assert_gone "$C/agents/google-code-reviewer.md"
   assert_gone "$C/hooks/clean-gate"
 }
 
