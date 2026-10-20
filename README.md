@@ -6,6 +6,8 @@ My Claude Code setup: global rules, a clean-code standard, and a plugin named `a
 
 Requires `uv` and `python3`.
 
+The gate and the radar are uv scripts. Each pins its dependencies exactly, sets `exclude-newer = "2 weeks"` so nothing published in the last 14 days resolves ([uv: dependency cooldowns](https://docs.astral.sh/uv/concepts/resolution/#dependency-cooldowns)), and has a lockfile beside it (`gate.py.lock`, `radar.py.lock`) with the hash of every package. After changing a script's dependencies, run `uv lock --script <script>` and commit the lockfile.
+
 ```sh
 ./install.sh                                  # everything except the radar
 ./install.sh --radar --vault ~/Notes/Radar    # everything, plus the radar with its vault in that folder
@@ -186,9 +188,9 @@ The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 ## Tests
 
 ```sh
-uv run --no-project --with pytest --with pyyaml --with lizard==1.24.1 pytest -q tests
+uv run --exclude-newer "2 weeks" --no-project --with pytest==9.1.1 --with pyyaml==6.0.2 --with lizard==1.24.1 pytest -q tests
 bash tests/test_install.sh
-uvx ruff check at tests && uvx ruff format --check at tests
+uvx --exclude-newer "2 weeks" ruff@0.16.10 check at tests && uvx --exclude-newer "2 weeks" ruff@0.16.10 format --check at tests
 claude plugin validate at
 shellcheck -x install.sh uninstall.sh lib/radar.sh tests/test_install.sh at/bin/radar
 ```
