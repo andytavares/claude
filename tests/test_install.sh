@@ -16,11 +16,12 @@ assert_contains() { grep -qF -- "$2" "$1" || fail "$1 lacks '$2'"; }
 
 seed_home() {
   rm -rf "$H"
-  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/skills/google-review" "$C/agents" "$C/hooks/clean-gate"
+  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/skills/google-review" "$C/skills/design-doc" "$C/agents" "$C/hooks/clean-gate"
   echo "my own skill" > "$C/skills/mine/SKILL.md"
   echo "loose copy from an earlier install" > "$C/skills/research/SKILL.md"
   echo "loose copy from an earlier install" > "$C/agents/worker.md"
   echo "retired skill from an earlier install" > "$C/skills/google-review/SKILL.md"
+  echo "retired skill from an earlier install" > "$C/skills/design-doc/SKILL.md"
   echo "retired agent from an earlier install" > "$C/agents/google-code-reviewer.md"
   echo "loose copy from an earlier install" > "$C/hooks/clean-gate/gate.py"
   printf '%s' "$ORIGINAL_CLAUDE_MD" > "$C/CLAUDE.md"
@@ -45,7 +46,7 @@ assert "Stop" not in d["hooks"], "old clean-gate Stop hook still in settings.jso
 }
 
 assert_plugin_installed() {
-  cmp -s "$ROOT/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
+  cmp -s "$ROOT/global/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
   assert_exists "$C/rules/clean-code.md"
   assert_exists "$C/skills/at/.claude-plugin/plugin.json"
   assert_exists "$C/skills/at/hooks/hooks.json"
@@ -57,6 +58,7 @@ assert_loose_copies_removed() {
   assert_gone "$C/skills/research"
   assert_gone "$C/agents/worker.md"
   assert_gone "$C/skills/google-review"
+  assert_gone "$C/skills/design-doc"
   assert_gone "$C/agents/google-code-reviewer.md"
   assert_gone "$C/hooks/clean-gate"
 }
@@ -69,6 +71,7 @@ test_install() {
   assert_settings_kept_without_old_gate
   assert_eq "$(cat "$C/skills/mine/SKILL.md")" "my own skill" "unrelated skill"
   assert_contains "$WORK/out.txt" 'Installed.'
+  assert_contains "$WORK/out.txt" '/reload-plugins'
 }
 
 test_reinstall_keeps_first_backup() {
@@ -110,6 +113,8 @@ assert_radar_files_gone() {
   assert_gone "$C/skills/at/radar"
   assert_gone "$C/skills/at/bin/radar"
   assert_gone "$C/skills/at/skills/radar"
+  assert_gone "$C/skills/at/workflows/radar-scan.js"
+  assert_gone "$C/skills/at/workflows"
   if grep -qF 'bin/radar' "$C/skills/at/hooks/hooks.json"; then fail "radar hook still installed"; fi
   if grep -qF 'check --hook stop' "$C/skills/at/hooks/hooks.json"; then fail "clean-gate Stop hook still installed"; fi
   assert_contains "$C/skills/at/hooks/hooks.json" 'clean-gate/gate.py\" check --hook post-tool-use'

@@ -3,7 +3,8 @@
 
 remove_radar_from_plugin() {
   local plugin="$1"
-  rm -rf "$plugin/skills/radar" "$plugin/radar" "$plugin/bin/radar"
+  rm -rf "$plugin/skills/radar" "$plugin/radar" "$plugin/bin/radar" "$plugin/workflows/radar-scan.js"
+  rmdir "$plugin/workflows" 2> /dev/null || true
   [ -f "$plugin/hooks/hooks.json" ] || return 0
   python3 - "$plugin/hooks/hooks.json" << 'PY'
 import json, sys

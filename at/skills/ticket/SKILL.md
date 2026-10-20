@@ -14,4 +14,4 @@ Implement Linear ticket $ARGUMENTS.
 5. Run this repo's own lint, test, and coverage commands from its scripts. Fix until every exit code is 0.
 6. Commit on a feature branch in this repo's commit convention and open a PR with `gh`. The PR body is: what was asked, what changed, the command outputs.
 
-Finish with the PR URL. Nothing else.
+Finish with the PR URL. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.

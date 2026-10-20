@@ -22,7 +22,7 @@ Problem, who has it, and the evidence. Goals and non-goals. Users and the jobs t
 
 ## Design Document sections
 
-Context and the problem in one paragraph. Goals and non-goals. Current state, from the code, with paths. Options considered, at least two, each with tradeoffs. The decision and why. The design: components, interfaces, data, and the sequence of changes, with real file paths. Testing and verification: the commands that will prove it. Risks and mitigations. Open questions. Alternatives rejected, in one line each.
+Context and the problem in one paragraph. Goals and non-goals. Current state, from the code, with paths. Options considered, at least two, each with tradeoffs. The decision and why. The design: components, interfaces, data, and the sequence of changes, with real file paths. Testing and verification: the commands that will prove it. Risks and mitigations. Open questions. Alternatives rejected, in one line each. When the draft is complete, have one fresh subagent read only the input and the document once, and report requirements the document misses and claims the codebase contradicts; fix those, ignore style findings.
 
 ## Length
 
@@ -32,4 +32,4 @@ Match the input. A two-sentence brief produces a page; a whole spec produces wha
 
 Publish the document as an artifact by default: load the `artifact-design` skill first, write the HTML, then publish with the Artifact tool, icon `document`, title the document's name.
 
-Print the artifact URL and the file path. Nothing else.
+Print the artifact URL and the file path. Unless another skill invoked this one, then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.

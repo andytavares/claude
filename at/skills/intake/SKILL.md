@@ -36,4 +36,4 @@ claude --bg --name "<id>" --model <model> --effort <effort> --permission-mode au
 
 ## Finish
 
-Print one table: id, size, model/effort, route, session name or "done here" or "needs /at:interview". Then run `/at:fleet --watch` so this session is woken when any of them finishes. Nothing else.
+Print one table: id, size, model/effort, route, session name or "done here" or "needs /at:interview". Then run `/at:fleet --watch` so this session is woken when any of them finishes. After that, the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.

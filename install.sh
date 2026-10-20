@@ -85,6 +85,7 @@ remove_loose_copies() {
 # Retired from the repo, so the loops above no longer name them.
 remove_retired_copies() {
   remove_path "$CLAUDE/skills/google-review"
+  remove_path "$CLAUDE/skills/design-doc"
   remove_path "$CLAUDE/agents/google-code-reviewer.md"
 }
 
@@ -108,7 +109,7 @@ PY
 }
 
 install_repo_files() {
-  install_path "$REPO/CLAUDE.md" "$CLAUDE/CLAUDE.md"
+  install_path "$REPO/global/CLAUDE.md" "$CLAUDE/CLAUDE.md"
   for rule in "$REPO"/rules/*.md; do install_path "$rule" "$CLAUDE/rules/$(basename "$rule")"; done
   install_path "$REPO/at" "$PLUGIN"
   chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
@@ -135,7 +136,7 @@ main() {
   remove_loose_copies
   install_repo_files
   if [ "$WITH_RADAR" = 1 ]; then setup_radar; else drop_radar; fi
-  echo "Installed. Start a new Claude Code session; skills run as /at:<skill>."
+  echo "Installed. Run /reload-plugins in open Claude Code sessions, or start a new one; skills run as /at:<skill>."
 }
 
 main "$@"
