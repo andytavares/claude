@@ -48,6 +48,7 @@ assert "Stop" not in d["hooks"], "old clean-gate Stop hook still in settings.jso
 assert_plugin_installed() {
   cmp -s "$ROOT/global/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
   assert_exists "$C/rules/clean-code.md"
+  assert_exists "$C/rules/writing.md"
   assert_exists "$C/skills/at/.claude-plugin/plugin.json"
   assert_exists "$C/skills/at/hooks/hooks.json"
   assert_exists "$C/skills/at/skills/word-salad/SKILL.md"
@@ -85,6 +86,7 @@ test_uninstall() {
   run_uninstall > "$WORK/out.txt"
   assert_gone "$C/skills/at"
   assert_gone "$C/rules/clean-code.md"
+  assert_gone "$C/rules/writing.md"
   assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "CLAUDE.md restored"
   assert_eq "$(cat "$C/skills/mine/SKILL.md")" "my own skill" "unrelated skill"
 }
