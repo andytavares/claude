@@ -228,3 +228,9 @@ def test_file_outside_a_git_repo_is_ignored(tmp_path):
     hook = json.dumps({"tool_input": {"file_path": str(tmp_path / "a.ts")}})
     done = run_gate(tmp_path, hook, "check", "--hook", "post-tool-use")
     assert (done.returncode, done.stdout) == (0, "")
+
+
+def test_stale_stop_hook_exits_zero_silently(tmp_path):
+    done = run_gate(tmp_path, "{}", "check", "--hook", "stop")
+    assert done.returncode == 0, done.stderr
+    assert done.stdout == ""

@@ -6,6 +6,8 @@ My Claude Code setup: global rules, a clean-code standard, and a plugin named `a
 
 Requires `uv` and `python3`.
 
+The gate and the radar are uv scripts. Each pins its dependencies exactly, sets `exclude-newer = "2 weeks"` so nothing published in the last 14 days resolves ([uv: dependency cooldowns](https://docs.astral.sh/uv/concepts/resolution/#dependency-cooldowns)), and has a lockfile beside it (`gate.py.lock`, `radar.py.lock`) with the hash of every package. After changing a script's dependencies, run `uv lock --script <script>` and commit the lockfile.
+
 ```sh
 ./install.sh                                  # everything except the radar
 ./install.sh --radar --vault ~/Notes/Radar    # everything, plus the radar with its vault in that folder
@@ -13,7 +15,7 @@ Requires `uv` and `python3`.
 ./uninstall.sh --radar                        # removes only the radar
 ```
 
-Install backs up `settings.json` and `CLAUDE.md` once. Start a new Claude Code session, then run `claude plugin list` and look for `at@skills-dir … loaded`. To change anything, edit it here and run `./install.sh` again with the same flags. Skills and agents of your own in `~/.claude` are left alone.
+Install backs up `settings.json` and `CLAUDE.md` once. Run `/reload-plugins` in open Claude Code sessions or start a new one, then run `claude plugin list` and look for `at@skills-dir … loaded`. To change anything, edit it here and run `./install.sh` again with the same flags. Skills and agents of your own in `~/.claude` are left alone.
 
 The radar's vault folder is created if it doesn't exist, and opens in Obsidian as a vault. Uninstalling never deletes the vault or your notes; reinstalling without `--radar` stops the radar but keeps them too.
 
@@ -23,7 +25,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 
 | Layer | Installed to | Loaded | What it does |
 | --- | --- | --- | --- |
-| `CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, short replies |
+| `global/CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `rules/writing.md` | `~/.claude/rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
 | `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, and the clean-gate hooks that check every edit |
@@ -58,7 +60,6 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 | `/at:brief` | You have a Linear key or a short ask and want it sized | Opus, medium | `briefs/<id>.md`, sized S, M or L |
 | `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus, high | `SPEC.md` covering what the ask didn't mention |
 | `/at:research` | You need a one-pager (`--one-pager`), PRD (`--prd`) or design doc (`--design`) | Opus, high | A shareable artifact |
-| `/at:design-doc` | You have a spec and want a design doc checked once for gaps | Opus, high | `DESIGN.md` |
 | `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
@@ -188,9 +189,9 @@ The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 ## Tests
 
 ```sh
-uv run --no-project --with pytest --with pyyaml --with lizard==1.24.1 pytest -q tests
+uv run --exclude-newer "2 weeks" --no-project --with pytest==9.1.1 --with pyyaml==6.0.2 --with lizard==1.24.1 pytest -q tests
 bash tests/test_install.sh
-uvx ruff check at tests && uvx ruff format --check at tests
+uvx --exclude-newer "2 weeks" ruff@0.16.10 check at tests && uvx --exclude-newer "2 weeks" ruff@0.16.10 format --check at tests
 claude plugin validate at
 shellcheck -x install.sh uninstall.sh lib/radar.sh tests/test_install.sh at/bin/radar
 ```

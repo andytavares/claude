@@ -2,6 +2,8 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = ["lizard==1.24.1"]
+# [tool.uv]
+# exclude-newer = "2 weeks"
 # ///
 import argparse
 import fnmatch
@@ -333,7 +335,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     commands = parser.add_subparsers(dest="command", required=True)
     check = commands.add_parser("check")
-    check.add_argument("--hook", choices=["post-tool-use"], required=True)
+    check.add_argument("--hook", choices=["post-tool-use", "stop"], required=True)
     commands.add_parser("report").add_argument("span")
     return parser.parse_args()
 
@@ -341,7 +343,9 @@ def parse_args():
 def main():
     args = parse_args()
     if args.command == "check":
-        run_check()
+        # "stop" is accepted for sessions still running a pre-reinstall Stop hook.
+        if args.hook == "post-tool-use":
+            run_check()
     else:
         run_report(args.span)
 
