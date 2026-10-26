@@ -43,6 +43,6 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 ## Ship
 
-Commit anything Prove changed, then open a PR with `gh`. The body starts with "How to read this change": the entry point, then each step in call order as `path:line`, with a mermaid diagram when the change spans more than three files. Then the plan, what each unit did, the command outputs, and the clean-gate report.
+Commit anything Prove changed, then open a PR with `gh`. The body uses the PR format in `~/.claude/rules/writing.md`. "Reviewer notes" lists each unit in one line. "Checks" holds the command outputs and the clean-gate report.
 
 Finish with the PR URL. Nothing else.

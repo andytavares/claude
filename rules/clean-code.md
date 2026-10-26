@@ -21,4 +21,4 @@ A comment states a constraint the code cannot show, in one to three lines. Do no
 Validate only at system boundaries (user input, external APIs); no handling for cases that cannot happen. No helpers for one-time operations. No configurability nobody asked for.
 
 ## Show the reader the way
-Every PR body has a "How to read this change" section: the entry point, then each step in call order as `path:line`.
+Every PR body has a "How to read this change" section: the entry point, then each step in call order as `path:line`. The rest of the PR body follows the PR format in `writing.md`.

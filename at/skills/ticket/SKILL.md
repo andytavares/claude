@@ -12,6 +12,6 @@ Implement Linear ticket $ARGUMENTS.
 3. Write the failing test first, where this repo has tests.
 4. Make the smallest change that makes it pass, matching the surrounding code.
 5. Run this repo's own lint, test, and coverage commands from its scripts. Fix until every exit code is 0.
-6. Commit on a feature branch in this repo's commit convention and open a PR with `gh`. The PR body is: what was asked, what changed, the command outputs.
+6. Commit on a feature branch in this repo's commit convention and open a PR with `gh`. The PR body uses the PR format in `~/.claude/rules/writing.md`, with the ticket key in "This PR".
 
 Finish with the PR URL. Nothing else.

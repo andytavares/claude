@@ -28,7 +28,7 @@ Feature branch, one commit per logical unit in the repo's convention, open a dra
 
 ## Communicating with me
 
-**No walls of text, ever.** Every reply is a few short lines. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Check outputs and evidence go in the PR or commit, not in chat. Detail only when I ask.
+**No walls of text, ever.** Every reply is a few short lines. All text a person reads follows `rules/writing.md`: plain language, and the PR and ticket formats. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Check outputs and evidence go in the PR or commit, not in chat. Detail only when I ask.
 When finished, lead with the outcome in one sentence, then the evidence. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
 Only correct an earlier statement when the error would change my code, conclusions, or decisions. State it plainly and continue.
 Match written deliverables (especially Markdown files) to what the task needs. No filler sections, no restated summaries, no boilerplate.

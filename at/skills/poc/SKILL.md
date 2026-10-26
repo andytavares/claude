@@ -16,4 +16,4 @@ Done when:
 - The demonstration command runs and produces the yes output. Put the command and output in the README.
 - `README.md` in that directory says how to run it, what was proved, what was not, and what it would take to make it real.
 
-Commit on a branch and open a draft PR so the result is visible.
+Commit on a branch and open a draft PR so the result is visible. The PR body uses the PR format in `~/.claude/rules/writing.md`.
