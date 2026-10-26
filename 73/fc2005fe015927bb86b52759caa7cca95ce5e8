@@ -1,0 +1,21 @@
+tests/test_install.sh
+  s_ca7ba7fedea1d5::t_1e554b0fb20b67 50,85
+rules/writing.md
+  s_ca7ba7fedea1d5::t_fe3e6a4924f5cf 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "73fc2005fe015927bb86b52759caa7cca95ce5e8",
+  "prompts": {},
+  "sessions": {
+    "s_ca7ba7fedea1d5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "50188562-4dc9-46b4-8677-9bd25a5255da",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
