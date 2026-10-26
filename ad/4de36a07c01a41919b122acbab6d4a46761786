@@ -1,0 +1,29 @@
+CLAUDE.md
+  s_ca7ba7fedea1d5::t_340ba95f113f02 31
+README.md
+  s_ca7ba7fedea1d5::t_340ba95f113f02 28,81
+rules/clean-code.md
+  s_ca7ba7fedea1d5::t_340ba95f113f02 24
+at/skills/ticket/SKILL.md
+  s_ca7ba7fedea1d5::t_340ba95f113f02 15
+at/skills/implement/SKILL.md
+  s_ca7ba7fedea1d5::t_340ba95f113f02 46
+at/skills/poc/SKILL.md
+  s_ca7ba7fedea1d5::t_340ba95f113f02 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ad4de36a07c01a41919b122acbab6d4a46761786",
+  "prompts": {},
+  "sessions": {
+    "s_ca7ba7fedea1d5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "50188562-4dc9-46b4-8677-9bd25a5255da",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
