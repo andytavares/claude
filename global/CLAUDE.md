@@ -24,7 +24,7 @@ Failing test first, then make it pass. Unit tests always; integration and e2e on
 
 ## Dependencies
 
-Never install a package version published less than 14 days ago, direct or transitive, for any reason. Use the package manager's own setting: npm `min-release-age=14` in the project `.npmrc`, uv `exclude-newer = "2 weeks"`. Pin exact versions, commit the lockfile with hashes, and install from it (`npm ci`, `uv sync --locked`). Pin GitHub Actions to a full commit SHA, with the tag in a comment.
+Pin exact versions, commit the lockfile with hashes, and install from it (`npm ci`, `uv sync --locked`). Pin GitHub Actions to a full commit SHA, with the tag in a comment.
 
 ## Git
 
