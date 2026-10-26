@@ -22,10 +22,6 @@ Reproduce, find the cause, fix the cause. A workaround or a quick fix is mine to
 
 Failing test first, then make it pass. Unit tests always; integration and e2e only when needed. Tests assert behavior and edge cases and fail when the code is wrong. No tautologies, no asserting a mock returned what it was told.
 
-## Dependencies
-
-Never install a package version published less than 14 days ago, direct or transitive, for any reason. Use the package manager's own setting: npm `min-release-age=14` in the project `.npmrc`, uv `exclude-newer = "2 weeks"`. Pin exact versions, commit the lockfile with hashes, and install from it (`npm ci`, `uv sync --locked`). Pin GitHub Actions to a full commit SHA, with the tag in a comment.
-
 ## Git
 
 Feature branch, one commit per logical unit in the repo's convention, open a draft PR.
