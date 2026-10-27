@@ -1,6 +1,6 @@
 # Writing
 
-These rules apply to all text a person reads: chat replies, PR descriptions, tickets, commit messages, review comments and docs. Follow them unless the user asks for a different style or format. The reader acts on what you write, so text that can mean two things causes wrong work.
+These rules apply to all text you write: chat replies, PR descriptions, tickets, commit messages, code comments, review comments, docs, and briefs or prompts for other agents. Follow them unless the user asks for a different style or format. The reader acts on what you write, so text that can mean two things causes wrong work.
 
 ## Every word earns its place
 - Write the minimum text that makes the point. If you can remove a word and the meaning stays, remove it.
@@ -9,7 +9,7 @@ These rules apply to all text a person reads: chat replies, PR descriptions, tic
 - One meaning only. If a sentence can be read two ways, rewrite it.
 
 ## Simplified Technical English
-Follow ASD-STE100 to about 80%. Apply these rules strictly:
+Follow ASD-STE100. Apply these rules to every sentence:
 - One topic per sentence. Procedural sentences: at most 20 words. Descriptive sentences: at most 25 words.
 - Active voice. Imperative for instructions ("Run `install.sh`", not "`install.sh` should be run").
 - One word, one meaning. Use the same term for the same thing in all the text. Do not use synonyms for variety.
@@ -18,7 +18,7 @@ Follow ASD-STE100 to about 80%. Apply these rules strictly:
 - Keep articles ("the", "a"). No noun clusters of more than three words.
 - Say what is true, not what is possibly true. Use "can" or "must", not "might", "should" or "may", unless the uncertainty is the fact.
 
-Relax these STE rules:
+Only these two STE rules are relaxed:
 - Technical names (functions, files, tools, error text) are always allowed. Write them exactly as they are.
 - You do not have to use only the STE dictionary. Use the everyday technical word the reader knows.
 
@@ -30,6 +30,7 @@ Use these sections, in this order:
 1–3 short sentences: what the code does now, or what is wrong.
 
 ## This PR
+Ticket: link to the one ticket this PR closes.
 1–3 short sentences: what changes.
 
 ## Reviewer notes
