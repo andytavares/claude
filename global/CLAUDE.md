@@ -16,7 +16,7 @@ Done means the project's own check ran and its exit code was 0. The command and 
 
 ## Root cause
 
-Reproduce, find the cause, fix the cause. A workaround or a quick fix is mine to approve: present it as an option with its cons and wait.
+Reproduce, find the cause, fix the cause. A workaround or a quick fix is mine to approve. Finish the rest of the task first, then present it in the final summary as an option with its cons, and wait.
 
 ## Tests
 
@@ -29,6 +29,20 @@ Pin exact versions, commit the lockfile with hashes, and install from it (`npm c
 ## Git
 
 Feature branch, one commit per logical unit in the repo's convention, open a draft PR.
+
+One task is one PR, unless I say otherwise. Extra PRs split one review and one merge into many.
+- Use a stacked PR (each PR based on the branch of the one before) when the change is more than 1,000 lines, not counting test files.
+- Use separate PRs only when the change spans more than one repo, or when the parts must merge in a set order because merging them together would break `main`.
+- Do not split work into more PRs only to make each one smaller.
+
+Every PR links exactly one ticket. One ticket can link many PRs.
+
+## Finish the task
+
+Do all the work I asked for before you end your turn. A stop halfway leaves the task idle until I come back.
+- When a task has more than a few steps, propose a `/goal` condition at the start. Make the condition name the full deliverable, for example "the draft PR is open and its checks pass".
+- Stop and ask only before a change that is critical and breaks things, or that cannot be undone: deleting data, rewriting shared git history, a destructive migration, a production deploy, or a message to people outside this session.
+- For every other decision, take the most logical path and continue. Record each deviation from the plan, and list all of them in the final summary.
 
 ## Communicating with me
 
