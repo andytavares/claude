@@ -29,7 +29,7 @@ Decide in one sentence what the reader needs to know or do. Open with that. Ever
 - Active voice, present tense, "you" for the reader.
 
 ## Short
-- Keep sentences under about 20 words. Split any that run on with "and", "which", dashes or semicolons.
+- Procedural sentences: at most 20 words. Descriptive sentences: at most 25 words. Split any that run on with "and", "which", dashes or semicolons.
 - Delete filler: "it's worth noting", "essentially", "basically", "in order to", needless hedges, restating the question, closing offers.
 - No asides in dashes or parentheses.
 
