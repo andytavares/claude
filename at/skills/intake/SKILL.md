@@ -16,7 +16,7 @@ For every ask, size it and route it. Do all of them before dispatching any, so t
 
 | Size | Signal | Route | Model / effort |
 |---|---|---|---|
-| **trivial** | One file, one obvious edit, describable as a one-line diff | Do it here, now, in this session, then commit and open a PR | this session as-is |
+| **trivial** | One file, one obvious edit, describable as a one-line diff | Do it here, now, in this session, then commit and open a draft PR | this session as-is |
 | **small** | Files you can name, approach obvious, under an hour | `claude --bg` | `sonnet` / `medium` |
 | **medium** | Several files or modules, approach clear once the code is read | `claude --bg` | `sonnet` / `high` |
 | **large** | Approach not obvious, root-cause work, cross-cutting | `claude --bg` | `opus` / `high` |
@@ -36,4 +36,4 @@ claude --bg --name "<id>" --model <model> --effort <effort> --permission-mode au
 
 ## Finish
 
-Print one table: id, size, model/effort, route, session name or "done here" or "needs /at:interview". Then run `/at:fleet --watch` so this session is woken when any of them finishes. After that, the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
+Print one table: id, size, model/effort, route, session name or "done here" or "needs /at:interview". Then tell the user to run `/at:fleet --watch` to be woken when any of them finishes. After that, the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
