@@ -45,6 +45,6 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 ## Ship
 
-Commit anything Prove changed, then open a PR with `gh`. The body uses the PR format in `~/.claude/rules/writing.md`. "Reviewer notes" lists each unit in one line. "Checks" holds the command outputs and the clean-gate report.
+Commit anything Prove changed, then open a draft PR with `gh`. The body uses the PR format in `~/.claude/rules/writing.md`. "Reviewer notes" lists each unit in one line. "Checks" holds the command outputs and the clean-gate report.
 
 Finish with the PR URL. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
