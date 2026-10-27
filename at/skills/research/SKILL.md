@@ -14,7 +14,7 @@ Research before writing. Read the parts of this codebase the input touches. For 
 
 ## One Pager sections
 
-Context and the problem in one paragraph, the proposed solution in 1-2 paragraphs and 2 diagrams at most if needed, the current state of the system, the outline of the changes needed. Should never be more than two pages of text.
+Context and the problem in one paragraph, the proposed solution in 1-2 paragraphs and 2 diagrams at most if needed, the current state of the system, the outline of the changes needed. Maximum two pages of text.
 
 ## PRD sections
 

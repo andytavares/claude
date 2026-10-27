@@ -10,7 +10,7 @@ Work: $ARGUMENTS
 
 If the argument is a path, read it; it is the brief or spec. Otherwise it is the ask, and a size-S brief in your head is enough.
 
-If you are not in a git worktree switch to the one for this body of work or create a new worktree for this work if one does not exist yet. By default worktrees should exist in the root of the repo you're working in, inside a `.worktrees` folder, allow the user to override this either via prompt or their repo level `CLAUDE.md`.
+Work in a git worktree. If you are not in one, use the existing worktree for this work, or create one in `.worktrees/` at the repo root. A worktree location in the prompt or in the repo's `CLAUDE.md` replaces this default.
 
 ## Plan
 

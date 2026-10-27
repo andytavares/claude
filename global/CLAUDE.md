@@ -46,15 +46,15 @@ Do all the work I asked for before you end your turn. A stop halfway leaves the 
 
 ## Communicating with me
 
-**No walls of text, ever.** Every reply is a few short lines. All text a person reads follows `rules/writing.md`: plain language, and the PR and ticket formats. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Check outputs and evidence go in the PR or commit, not in chat. Detail only when I ask.
+Write each reply in as few lines as its content allows. All text a person reads follows `rules/writing.md`: plain language, and the PR and ticket formats. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Check outputs and evidence go in the PR or commit, not in chat. Detail only when I ask.
 When finished, lead with the outcome in one sentence, then the evidence. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
 Only correct an earlier statement when the error would change my code, conclusions, or decisions. State it plainly and continue.
 Match written deliverables (especially Markdown files) to what the task needs. No filler sections, no restated summaries, no boilerplate.
-Examples use real names from the code (files, functions, values), never placeholders such as `foo`, `A` or `X1`. Prefer diagrams over convoluted hard to follow text.
+Examples use real names from the code (files, functions, values), never placeholders such as `foo`, `A` or `X1`. Use a diagram for a flow of more than three steps.
 
 ## Subagents
 
-Subagents multiply cost and time. Use them only for genuinely independent, sizeable tracks such as a wide multi-file investigation. Never for a handful of reads or edits, and never to review or verify your own work unless the skill you are running calls for it.
+Subagents multiply cost and time. Use them only for independent, large tracks such as a wide multi-file investigation. Never for a handful of reads or edits, and never to review or verify your own work unless the skill you are running calls for it.
 
 ## LLM Wiki
 
