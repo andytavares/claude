@@ -1,0 +1,19 @@
+at/skills/intake/SKILL.md
+  s_5a67f7e5d50b19::t_48b303b1010fd5 19,39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "43725efa5b34e42cc13411a5c8d368e1991af2db",
+  "prompts": {},
+  "sessions": {
+    "s_5a67f7e5d50b19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fb3ea374-a5e3-4ac7-9f3b-0e5b1838f09d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
