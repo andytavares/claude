@@ -1,7 +1,6 @@
 ---
 name: research
 description: Turn a brief, spec, or prompt into a formatted One Pager, PRD, or Design Document, published as a shareable artifact by default
-disable-model-invocation: true
 argument-hint: "[brief path | spec path | prompt] [--one-pager | --prd | --design]"
 model: opus
 effort: high
@@ -14,7 +13,7 @@ Research before writing. Read the parts of this codebase the input touches. For 
 
 ## One Pager sections
 
-Context and the problem in one paragraph, the proposed solution in 1-2 paragraphs and 2 diagrams at most if needed, the current state of the system, the outline of the changes needed. Should never be more than two pages of text.
+Context and the problem in one paragraph, the proposed solution in 1-2 paragraphs and 2 diagrams at most if needed, the current state of the system, the outline of the changes needed. Maximum two pages of text.
 
 ## PRD sections
 

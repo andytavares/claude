@@ -66,7 +66,7 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 | `/at:ticket` | One ticket, done in this session | Session model, high | A PR |
 | `/at:intake` | A batch of asks to size and launch together | Session model, medium | Briefs, background sessions, a watch on them |
 | `/at:dispatch` | Briefs are written and you want them running | Session model, low | One background session per brief |
-| `/at:fleet` | Background sessions have finished | Session model, medium | Green PRs merged, failures relaunched once, questions for you |
+| `/at:fleet` | Background sessions have finished | Session model, medium | Green draft PRs listed for review, failures relaunched once, questions for you |
 | `/at:poc` | You want to prove an idea runs | Session model, high | A demo command, its output, and a README |
 | `/at:tool-eval` | You're deciding whether to adopt a library | Session model, high | `evals/<tool>/EVAL.md` with a verdict |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |

@@ -1,7 +1,6 @@
 ---
 name: explain
 description: Research this codebase and answer a question about it in the format asked for
-disable-model-invocation: true
 argument-hint: "[question] [as: table | list | diagram | prose | doc]"
 model: opus
 effort: high

@@ -1,6 +1,6 @@
 # Clean code
 
-Readability decides every tie. A reader should follow any change from its entry point to its end without asking the author anything.
+Readability decides every tie. A reader must be able to follow any change from its entry point to its end without asking the author anything.
 
 ## Reuse first
 Before adding a function, type or constant, search for one that already does the job: `git grep -w` on the likely name and on a key literal, and the LSP's workspace symbols. Use it, or extend it if it is close. Private copies drift: three `relativeTime()` helpers in one repo each ended up with a different output.

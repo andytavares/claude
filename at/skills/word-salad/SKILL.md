@@ -29,7 +29,7 @@ Decide in one sentence what the reader needs to know or do. Open with that. Ever
 - Active voice, present tense, "you" for the reader.
 
 ## Short
-- Keep sentences under about 20 words. Split any that run on with "and", "which", dashes or semicolons.
+- Procedural sentences: at most 20 words. Descriptive sentences: at most 25 words. Split any that run on with "and", "which", dashes or semicolons.
 - Delete filler: "it's worth noting", "essentially", "basically", "in order to", needless hedges, restating the question, closing offers.
 - No asides in dashes or parentheses.
 
@@ -42,4 +42,4 @@ Decide in one sentence what the reader needs to know or do. Open with that. Ever
 Code, commands, paths, URLs and numbers stay as they were. Add no new facts, opinions or caveats. If the original contradicts itself or looks wrong, keep its content and flag that in one line at the end.
 
 ## Output
-Only the rewritten text: no preamble, no "here's a simpler version", no list of changes. It should be clearly shorter than the original. If the original is already clear, say so in one line instead.
+Only the rewritten text: no preamble, no "here's a simpler version", no list of changes. Make it shorter than the original. If the original is already clear, say so in one line instead.
