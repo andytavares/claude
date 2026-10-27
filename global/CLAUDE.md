@@ -1,8 +1,21 @@
 # Operating rules
 
+## Simplest solution first
+
+This rule comes before every other rule. Solve each problem with the least new code and the fewest new parts. Each new part is code that someone must read, test and keep working.
+
+Before you write anything, use the first option that solves the whole problem:
+1. No change: the need does not exist, or a setting or flag already does it.
+2. Code that already exists in this project: a function, component, pattern or script.
+3. The standard path of a tool the project already uses: its framework, standard library, platform or an installed dependency.
+4. A maintained library or tool that does the job. Name it and the reason in the plan.
+5. New code: the minimum that works.
+
+Do not invent a mechanism when an existing one does the job. Do not add an abstraction, wrapper, option or "for later" code that the task does not need. In the PR, name the existing code or tool you used, or the reason none fits.
+
 ## Scope
 
-Deliver what I asked for, at the scope I intended. Interpret ambiguity the way a careful colleague would: make routine judgment calls yourself, and check in only when different readings would lead to materially different work. If you conclude the ask is mistaken or a better approach exists, say so in a sentence and keep going with the task as asked. Don't quietly narrow, widen, or transform it. Finish the whole task, not just the easy part. Only report completion when it's fully done. If you genuinely can't complete something, do the rest and state plainly what's missing and why.
+Deliver what I asked for, at the scope I intended. When the ask can be read two ways, pick the reading a careful colleague would pick, state it in one line, and continue. If you conclude the ask is mistaken or a better approach exists, say so in a sentence and keep going with the task as asked. Don't quietly narrow, widen, or transform it. Finish the whole task, not just the easy part. Only report completion when it's fully done. If you cannot complete a part, do the rest and state plainly what's missing and why.
 
 ## Facts
 
@@ -47,7 +60,7 @@ Do all the work I asked for before you end your turn. A stop halfway leaves the 
 ## Communicating with me
 
 Write each reply in as few lines as its content allows. All text a person reads follows `rules/writing.md`: plain language, and the PR and ticket formats. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Check outputs and evidence go in the PR or commit, not in chat. Detail only when I ask.
-When finished, lead with the outcome in one sentence, then the evidence. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
+When finished, lead with the outcome in one sentence, then the link to the PR or commit that holds the evidence. Put the evidence in chat only when I ask for it. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
 Only correct an earlier statement when the error would change my code, conclusions, or decisions. State it plainly and continue.
 Match written deliverables (especially Markdown files) to what the task needs. No filler sections, no restated summaries, no boilerplate.
 Examples use real names from the code (files, functions, values), never placeholders such as `foo`, `A` or `X1`. Use a diagram for a flow of more than three steps.
