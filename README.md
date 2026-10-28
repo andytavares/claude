@@ -36,14 +36,10 @@ flowchart TD
   Q -->|"a question about the code"| EX["/at:explain"]
   Q -->|"a ticket or an ask"| BR["/at:brief"]
   Q -->|"a document to write"| RS["/at:research"]
-  Q -->|"an idea to prove"| PC["/at:poc"]
-  Q -->|"a library to judge"| TE["/at:tool-eval"]
   BR -->|"size S or M"| IM["/at:implement"]
   BR -->|"size L, or needs a decision"| IV["/at:interview"] --> SP["SPEC.md"] --> IM
   IM --> PR["draft PR"]
 ```
-
-For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in the current session.
 
 ## Skills
 
@@ -55,9 +51,6 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 | `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
-| `/at:ticket` | One ticket, done in this session | Session model, high | A PR |
-| `/at:poc` | You want to prove an idea runs | Session model, high | A demo command, its output, and a README |
-| `/at:tool-eval` | You're deciding whether to adopt a library | Session model, high | `evals/<tool>/EVAL.md` with a verdict |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
 
 ## Getting the best results
