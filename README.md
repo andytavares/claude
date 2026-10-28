@@ -6,7 +6,7 @@ My Claude Code setup: global rules, a clean-code standard, and a plugin named `a
 
 Requires `uv` and `python3`.
 
-The gate and the radar are uv scripts. Each pins its dependencies exactly, sets `exclude-newer = "2 weeks"` so nothing published in the last 14 days resolves ([uv: dependency cooldowns](https://docs.astral.sh/uv/concepts/resolution/#dependency-cooldowns)), and has a lockfile beside it (`gate.py.lock`, `radar.py.lock`) with the hash of every package. After changing a script's dependencies, run `uv lock --script <script>` and commit the lockfile.
+The gate and the radar are uv scripts. Each pins its dependencies exactly, and has a lockfile beside it (`gate.py.lock`, `radar.py.lock`) with the hash of every package. After changing a script's dependencies, run `uv lock --script <script>` and commit the lockfile.
 
 ```sh
 ./install.sh                                  # everything except the radar
@@ -79,7 +79,7 @@ For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in 
 - **Let size set effort, not worry.** Raise effort only after a run fails for lack of it; `/at:fleet` does this itself, one level at a time. On the 5.5 models, medium already handles most multi-step coding.
 - **Survey before you build.** `/at:implement` does this for you, but for work in your own session, run `/at:survey <what you're adding>` first. On terminator, asking for a "last edited 5m ago" label showed the label already existed (`NoteList.tsx:296`) and that `relativeTime` is copied, with different output, in two other files.
 - **Read gate findings like review comments.** Fix each one, or say why it's intended. Tune each repo with a `.clean-gate.json` (below).
-- **Judge the PR by its first sections.** Every PR opens with "Current state" and "This PR" in three sentences or fewer each, then "How to read this change": the entry point, then each step in call order. If you can't follow them, ask for a rewrite before reading the code.
+- **Judge the PR by its first sections.** Every PR opens with "Current state" and "This PR" in three sentences or fewer each. If you can't follow them, ask for a rewrite before reading the code.
 - **Done means the checks ran.** The PR carries each command and its exit code. A summary that says "tests pass" without output isn't done.
 - **Too much to read?** Run `/at:word-salad` with no argument to rewrite the last reply, or pass it text or a file path.
 - **One ask per session.** Start a new session between unrelated tasks, so old context doesn't steer the new one.
@@ -189,9 +189,9 @@ The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 ## Tests
 
 ```sh
-uv run --exclude-newer "2 weeks" --no-project --with pytest==9.1.1 --with pyyaml==6.0.2 --with lizard==1.24.1 pytest -q tests
+uv run --no-project --with pytest==9.1.1 --with pyyaml==6.0.2 --with lizard==1.24.1 pytest -q tests
 bash tests/test_install.sh
-uvx --exclude-newer "2 weeks" ruff@0.16.10 check at tests && uvx --exclude-newer "2 weeks" ruff@0.16.10 format --check at tests
+uvx ruff@0.16.10 check at tests && uvx ruff@0.16.10 format --check at tests
 claude plugin validate at
 shellcheck -x install.sh uninstall.sh lib/radar.sh tests/test_install.sh at/bin/radar
 ```

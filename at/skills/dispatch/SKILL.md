@@ -20,7 +20,7 @@ With `--headless`, a print run with hard rails instead, for scripts and fan-outs
 
 ```bash
 claude -p "$(cat <brief>)" --model <model> --effort <effort> --permission-mode auto \
-  --max-turns 60 --max-budget-usd 25 --output-format stream-json --verbose
+  --max-budget-usd 25 --output-format stream-json --verbose
 ```
 
 Print one line per launch: session name and command. Do not wait, attach, or summarize.

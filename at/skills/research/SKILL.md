@@ -13,7 +13,7 @@ Research before writing. Read the parts of this codebase the input touches. For 
 
 ## One Pager sections
 
-Executive Summary explaining from a leadership perspective why this is needed, Executive Summary explaining from a leadership perspective why this is needed, Context and the problem in one paragraph, the proposed solution in 1-2 paragraphs and 2 diagrams at most if needed, the current state of the system, the outline of the changes needed. Maximum two pages of text.
+Executive Summary: why this is needed, from a leadership perspective. Context and the problem, in one paragraph. The proposed solution, in one or two paragraphs, with at most two diagrams. The current state of the system. The outline of the changes. Maximum two pages of text.
 
 ## PRD sections
 
@@ -31,6 +31,6 @@ Match the input. A two-sentence brief produces a page; a whole spec produces wha
 
 Publish the document as an artifact by default: load the `artifact-design` skill first, write the HTML, then publish with the Artifact tool, icon `document`, title the document's name.
 
-Print the artifact URL and the file path. Unless another skill invoked this one, then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
+Print the artifact URL and the file path. Then, unless another skill invoked this one, the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
 
-All output must follow the writing guidelines in `~/claude/rules/writing.md`.
+All output must follow the writing guidelines in `~/.claude/rules/writing.md`.

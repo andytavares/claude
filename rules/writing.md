@@ -23,7 +23,7 @@ Only these two STE rules are relaxed:
 - You do not have to use only the STE dictionary. Use the everyday technical word the reader knows.
 
 ## PR descriptions
-Describe the PR in this format, you do not need section headings writing this as parahgaphs is fine as long as it follows the rules:
+Describe the PR in this format, you do not need section headings writing this as paragraphs is fine as long as it follows the rules:
 
 ```markdown
 ## Current state

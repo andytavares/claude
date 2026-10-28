@@ -2,8 +2,6 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = ["pyyaml==6.0.2"]
-# [tool.uv]
-# exclude-newer = "2 weeks"
 # ///
 import argparse
 import json
