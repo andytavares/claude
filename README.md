@@ -34,35 +34,26 @@ Only `/at:survey` can start on its own when Claude thinks it fits. Every other s
 flowchart TD
   Q{"What do you have?"}
   Q -->|"a question about the code"| EX["/at:explain"]
-  Q -->|"a ticket or an ask"| BR["/at:brief"]
-  Q -->|"a document to write"| RS["/at:research"]
-  Q -->|"an idea to prove"| PC["/at:poc"]
-  Q -->|"a library to judge"| TE["/at:tool-eval"]
-  BR -->|"size S or M"| IM["/at:implement"]
-  BR -->|"size L, or needs a decision"| IV["/at:interview"] --> SP["SPEC.md"] --> IM
+  Q -->|"a small, clear ask"| IM["/at:implement"]
+  Q -->|"a document to write"| RS["/at:research"] --> IM
+  Q -->|"an ask that needs decisions"| IV["/at:interview"] --> SP["SPEC.md"] --> IM
   IM --> PR["draft PR"]
 ```
-
-For one small ticket you'll watch yourself, `/at:ticket LIN-123` does it all in the current session.
 
 ## Skills
 
 | Skill | Use it when | Runs on | You get |
 | --- | --- | --- | --- |
-| `/at:brief` | You have a Linear key or a short ask and want it sized | Opus, medium | `briefs/<id>.md`, sized S, M or L |
 | `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus, high | `SPEC.md` covering what the ask didn't mention |
 | `/at:research` | You need a one-pager (`--one-pager`), PRD (`--prd`) or design doc (`--design`) | Opus, high | A shareable artifact |
 | `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
-| `/at:ticket` | One ticket, done in this session | Session model, high | A PR |
-| `/at:poc` | You want to prove an idea runs | Session model, high | A demo command, its output, and a README |
-| `/at:tool-eval` | You're deciding whether to adopt a library | Session model, high | `evals/<tool>/EVAL.md` with a verdict |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
 
 ## Getting the best results
 
-- **Start from a file, not a paragraph.** Skills read a brief or spec by path. Anything bigger than a one-line change goes through `/at:brief` first, and the size it picks sets the route: S and M go to `/at:implement`, L goes to `/at:interview` or `/at:research`.
+- **Start from a file, not a paragraph.** Skills read a brief or spec by path. A small, clear ask goes straight to `/at:implement`. Anything with a design choice goes through `/at:research` or `/at:interview` first.
 - **Let size set effort, not worry.** Raise effort only after a run fails for lack of it, one level at a time. On the 5.5 models, medium already handles most multi-step coding.
 - **Survey before you build.** `/at:implement` does this for you, but for work in your own session, run `/at:survey <what you're adding>` first. On terminator, asking for a "last edited 5m ago" label showed the label already existed (`NoteList.tsx:296`) and that `relativeTime` is copied, with different output, in two other files.
 - **Read gate findings like review comments.** Fix each one, or say why it's intended. Tune each repo with a `.clean-gate.json` (below).
