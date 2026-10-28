@@ -8,7 +8,7 @@ effort: medium
 ---
 Work: $ARGUMENTS
 
-If the argument is a path, read it; it is the brief or spec. Otherwise it is the ask, and a size-S brief in your head is enough.
+If the argument is a path, read it; it is the brief or spec. If it looks like a Linear key, read the ticket with the Linear tools, including comments and linked issues. Otherwise it is the ask, and a size-S brief in your head is enough.
 
 Work in a git worktree. If you are not in one, use the existing worktree for this work, or create one in `.worktrees/` at the repo root. A worktree location in the prompt or in the repo's `CLAUDE.md` replaces this default.
 
