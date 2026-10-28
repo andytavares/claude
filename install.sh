@@ -2,35 +2,12 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=lib/radar.sh
-source "$REPO/lib/radar.sh"
 CLAUDE="$HOME/.claude"
 PLUGIN="$CLAUDE/skills/at"
-WITH_RADAR=0
-VAULT=""
 
 parse_args() {
-  while [ "$#" -gt 0 ]; do
-    case "$1" in
-      --radar) WITH_RADAR=1 ;;
-      --vault)
-        [ "$#" -ge 2 ] || { echo "--vault needs a directory" >&2; exit 1; }
-        VAULT="$2"
-        shift
-        ;;
-      *)
-        echo "unknown option: $1" >&2
-        exit 1
-        ;;
-    esac
-    shift
-  done
-  if [ "$WITH_RADAR" = 1 ] && [ -z "$VAULT" ]; then
-    echo "--radar needs --vault <dir>" >&2
-    exit 1
-  fi
-  if [ "$WITH_RADAR" = 0 ] && [ -n "$VAULT" ]; then
-    echo "--vault only works together with --radar" >&2
+  if [ "$#" -gt 0 ]; then
+    echo "unknown option: $1" >&2
     exit 1
   fi
 }
@@ -87,6 +64,7 @@ remove_retired_copies() {
   remove_path "$CLAUDE/skills/google-review"
   remove_path "$CLAUDE/skills/design-doc"
   remove_path "$CLAUDE/agents/google-code-reviewer.md"
+  remove_path "$CLAUDE/at-radar.json"
 }
 
 remove_settings_gate_hooks() {
@@ -115,18 +93,6 @@ install_repo_files() {
   chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
 }
 
-drop_radar() {
-  remove_radar_from_plugin "$PLUGIN"
-  echo "radar: not installed (use --radar --vault <dir>)"
-  if [ -f "$CLAUDE/at-radar.json" ]; then
-    echo "radar: vault kept; $CLAUDE/at-radar.json untouched"
-  fi
-}
-
-setup_radar() {
-  "$PLUGIN/bin/radar" init "$VAULT"
-}
-
 main() {
   parse_args "$@"
   require_tools
@@ -135,7 +101,6 @@ main() {
   backup "$CLAUDE/CLAUDE.md"
   remove_loose_copies
   install_repo_files
-  if [ "$WITH_RADAR" = 1 ]; then setup_radar; else drop_radar; fi
   echo "Installed. Run /reload-plugins in open Claude Code sessions, or start a new one; skills run as /at:<skill>."
 }
 
