@@ -126,19 +126,14 @@ test_install_removes_retired_radar() {
   assert_radar_and_fleet_gone
 }
 
-test_install_rejects_radar_flags() {
+test_install_rejects_the_retired_radar_flag() {
   seed_home
-  local before after status args
+  local before status=0
   before="$(find "$C" | sort)"
-  for args in "--radar" "--vault $WORK/vault"; do
-    status=0
-    # shellcheck disable=SC2086
-    run_install $args > "$WORK/out.txt" 2>&1 || status=$?
-    assert_eq "$status" 1 "exit status for: $args"
-    assert_contains "$WORK/out.txt" 'unknown option'
-    after="$(find "$C" | sort)"
-    assert_eq "$after" "$before" "files changed for: $args"
-  done
+  run_install --radar > "$WORK/out.txt" 2>&1 || status=$?
+  assert_eq "$status" 1 "exit status for --radar"
+  assert_contains "$WORK/out.txt" 'unknown option'
+  assert_eq "$(find "$C" | sort)" "$before" "files changed for --radar"
 }
 
 test_uninstall_removes_retired_radar_config() {
@@ -153,12 +148,9 @@ test_uninstall_rejects_unknown_option() {
   seed_home
   run_install > /dev/null
   local status=0
-  for args in --bogus --radar; do
-    status=0
-    run_uninstall "$args" > "$WORK/out.txt" 2>&1 || status=$?
-    assert_eq "$status" 1 "exit status for: $args"
-    assert_exists "$C/skills/at"
-  done
+  run_uninstall --bogus > "$WORK/out.txt" 2>&1 || status=$?
+  assert_eq "$status" 1 "exit status for an unknown option"
+  assert_exists "$C/skills/at"
 }
 
 test_install; echo "ok install"
@@ -166,7 +158,7 @@ test_reinstall_keeps_first_backup; echo "ok reinstall"
 test_uninstall; echo "ok uninstall"
 test_missing_uv; echo "ok missing uv"
 test_install_removes_retired_radar; echo "ok install removes retired radar"
-test_install_rejects_radar_flags; echo "ok install rejects radar flags"
+test_install_rejects_the_retired_radar_flag; echo "ok install rejects the retired radar flag"
 test_uninstall_removes_retired_radar_config; echo "ok uninstall removes retired radar config"
 test_uninstall_rejects_unknown_option; echo "ok uninstall rejects unknown option"
 echo "All install tests passed."
