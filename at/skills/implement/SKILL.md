@@ -28,7 +28,7 @@ Delegate each unit to the `at:worker` subagent (Sonnet, medium effort), with the
 
 Checks in a brief are targeted, never whole-suite:
 - the tests for the files the unit touches, run once;
-- anything the unit made or changed that must be stable, repeated at most 3 times (`--repeat-each=3`, `vitest --repeat`);
+- anything the unit made or changed that must be stable, repeated at most 3 times;
 - never a loop that runs every test on its own, and never the full suite repeated. Those belong to Prove, once. Launch independent units in one message so they run concurrently; launch dependent ones after their dependency reports back. Brief each worker precisely the first time. When a worker reports, take its result; do not redo its work.
 
 A worker that reports a failing check gets one relaunch with the failure text added to its brief. A second failure comes back to you: fix that unit yourself, in this session.
@@ -39,12 +39,12 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 ## Prove
 
-1. Run the bundled `code-review` skill once as `/code-review medium --fix main...HEAD` and wait for its findings. Fix any finding it did not fix itself, in this session; do not relaunch workers for review findings. Commit the fixes.
-2. Run the repo's own lint, test, and coverage commands once each, in full. Every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
+1. Only run the bundled `code-review` skill once as `/code-review medium --fix main...HEAD` and wait for its findings specifically when asked to. Fix any finding it did not fix itself, in this session; do not relaunch workers for review findings. Commit the fixes.
+2. Run precommit checks once until every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
 3. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report main..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
 
 ## Ship
 
-Commit anything Prove changed, then open a draft PR with `gh`. The body uses the PR format in `~/.claude/rules/writing.md`. "Reviewer notes" lists each unit in one line. "Checks" holds the command outputs and the clean-gate report.
+Commit anything Prove changed, then open a draft PR with `gh`. The body uses the PR format in `~/.claude/rules/writing.md`.
 
 Finish with the PR URL. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.

@@ -12,6 +12,8 @@ If the input is a file path, rewrite that file's text. If it is text, rewrite it
 
 Write for a reader who is smart, busy and new to the topic. Keep every fact, decision, number, path, command and link that matters. Drop everything else.
 
+## When in doubt `~/.claude/rules/writing.md` is the main source of truth for all written output.
+
 ## Lead with the point
 Decide in one sentence what the reader needs to know or do. Open with that. Everything after it supports it, in the order the reader needs it.
 

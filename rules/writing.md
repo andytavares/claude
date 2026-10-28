@@ -23,31 +23,23 @@ Only these two STE rules are relaxed:
 - You do not have to use only the STE dictionary. Use the everyday technical word the reader knows.
 
 ## PR descriptions
-Use these sections, in this order:
+Describe the PR in this format, you do not need section headings writing this as parahgaphs is fine as long as it follows the rules:
 
 ```markdown
 ## Current state
 1–3 short sentences: what the code does now, or what is wrong.
 
 ## This PR
-Ticket: link to the one ticket this PR closes.
+Fixes: or Part Of: link to the one ticket this PR closes.
 1–3 short sentences: what changes.
 
-## Reviewer notes
+## Reviewer notes [OPTIONAL]
 - Short bullets: risks, decisions, what was not done, what to check by hand.
-
-## How to read this change
-1. `path:line` of the entry point, then each step in call order.
-
-<details><summary>Checks</summary>
-
-Each command, its exit code and the relevant output.
-</details>
+- Do not include this section unless it adds value to a human reviewer.
 ```
 
 - Omit "Reviewer notes" when there is nothing to say.
-- For a complex change (more than three files, or a flow that is hard to follow in text), add a mermaid diagram under "How to read this change".
-- End with the attribution line the session gives.
+- For a complex change, or a flow that is hard to follow in text, you may add a mermaid diagram if it helps with understanding.
 
 ## Tickets
 Use these sections, in this order:

@@ -18,7 +18,7 @@ The ask is usually a view of part of the problem. Your job is the whole of it. B
 
 Then interview with the AskUserQuestion tool. Only ask what the code and the research could not answer. Prioritise the not-covered and unknown items: those are the blind spots. Give the recommended answer with each question. Keep going until every item on the map is covered or explicitly deferred with a reason.
 
-Write `SPEC.md`:
+Create a claude artifact by default with the results as a spec:
 
 - The problem in full, including the parts the original ask left out.
 - Goals and explicit non-goals, with the deferrals and their reasons.
