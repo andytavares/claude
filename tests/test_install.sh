@@ -102,129 +102,71 @@ test_missing_uv() {
   assert_contains "$WORK/out.txt" 'uv'
 }
 
-assert_hooks_have_radar() {
+seed_radar_install() {
+  mkdir -p "$C/skills/at/radar" "$C/skills/at/bin" "$C/skills/at/workflows" "$C/skills/at/skills/radar"
+  echo '{"vault": "/tmp/vault"}' > "$C/at-radar.json"
+}
+
+assert_radar_and_fleet_gone() {
+  assert_gone "$C/skills/at/radar"
+  assert_gone "$C/skills/at/bin"
+  assert_gone "$C/skills/at/workflows"
+  for skill in radar intake dispatch fleet; do assert_gone "$C/skills/at/skills/$skill"; done
+  assert_gone "$C/at-radar.json"
   python3 -c '
 import json, sys
 h = json.load(open(sys.argv[1]))["hooks"]
-for event, verb in (("SessionEnd", "capture"), ("SessionStart", "nudge")):
-    cmds = [x["command"] for e in h[event] for x in e["hooks"]]
-    assert any("bin/radar" in c and verb in c for c in cmds), event' "$C/skills/at/hooks/hooks.json" \
-    || fail "radar hooks missing"
+assert list(h) == ["PostToolUse"], list(h)' "$C/skills/at/hooks/hooks.json" || fail "hooks other than the clean gate installed"
 }
 
-assert_radar_files_gone() {
-  assert_gone "$C/skills/at/radar"
-  assert_gone "$C/skills/at/bin/radar"
-  assert_gone "$C/skills/at/skills/radar"
-  assert_gone "$C/skills/at/workflows/radar-scan.js"
-  assert_gone "$C/skills/at/workflows"
-  if grep -qF 'bin/radar' "$C/skills/at/hooks/hooks.json"; then fail "radar hook still installed"; fi
-  if grep -qF 'check --hook stop' "$C/skills/at/hooks/hooks.json"; then fail "clean-gate Stop hook still installed"; fi
-  assert_contains "$C/skills/at/hooks/hooks.json" 'clean-gate/gate.py\" check --hook post-tool-use'
-}
-
-test_install_without_radar() {
+test_install_removes_retired_radar() {
   seed_home
-  run_install > "$WORK/out.txt"
-  assert_radar_files_gone
-  assert_contains "$WORK/out.txt" 'radar: not installed (use --radar --vault <dir>)'
-  assert_gone "$C/at-radar.json"
+  seed_radar_install
+  run_install > /dev/null
+  assert_radar_and_fleet_gone
 }
 
-test_install_with_radar() {
+test_install_rejects_radar_flags() {
   seed_home
-  mkdir -p "$WORK/vault"
-  run_install --radar --vault "$WORK/vault" > "$WORK/out.txt"
-  assert_exists "$C/skills/at/radar/radar.py"
-  assert_exists "$C/skills/at/radar/radar.py.lock"
-  assert_exists "$C/skills/at/bin/radar"
-  assert_hooks_have_radar
-  assert_contains "$C/at-radar.json" "$WORK/vault"
-  assert_exists "$WORK/vault/Radar Config.md"
-  assert_exists "$WORK/vault/Radar/Opportunities"
-  assert_exists "$WORK/vault/Radar/Context/Ladder.md"
-  assert_exists "$WORK/vault/Radar/Board.base"
-  assert_contains "$WORK/out.txt" 'Radar uses'
-}
-
-test_reinstall_keeps_config_edit() {
-  echo "my edit" >> "$WORK/vault/Radar Config.md"
-  run_install --radar --vault "$WORK/vault" > /dev/null
-  assert_contains "$WORK/vault/Radar Config.md" 'my edit'
-}
-
-test_reinstall_without_radar_keeps_vault() {
-  run_install > "$WORK/out.txt"
-  assert_radar_files_gone
-  assert_exists "$C/at-radar.json"
-  assert_contains "$WORK/vault/Radar Config.md" 'my edit'
-  assert_contains "$WORK/out.txt" 'vault kept'
-}
-
-test_flag_pairing_errors_change_nothing() {
-  seed_home
-  local before after status
+  local before after status args
   before="$(find "$C" | sort)"
   for args in "--radar" "--vault $WORK/vault"; do
     status=0
     # shellcheck disable=SC2086
     run_install $args > "$WORK/out.txt" 2>&1 || status=$?
     assert_eq "$status" 1 "exit status for: $args"
+    assert_contains "$WORK/out.txt" 'unknown option'
     after="$(find "$C" | sort)"
     assert_eq "$after" "$before" "files changed for: $args"
   done
 }
 
-test_missing_vault_is_created() {
+test_uninstall_removes_retired_radar_config() {
   seed_home
-  run_install --radar --vault "$WORK/new/vault" > /dev/null
-  assert_exists "$WORK/new/vault/.obsidian"
-  assert_exists "$WORK/new/vault/Radar Config.md"
-}
-
-test_uninstall_leaves_vault() {
-  run_install --radar --vault "$WORK/vault" > /dev/null
-  run_uninstall > "$WORK/out.txt"
+  run_install > /dev/null
+  echo '{"vault": "/tmp/vault"}' > "$C/at-radar.json"
+  run_uninstall > /dev/null
   assert_gone "$C/at-radar.json"
-  assert_exists "$WORK/vault/Radar Config.md"
-  assert_contains "$WORK/out.txt" 'vault'
-}
-
-test_uninstall_only_radar() {
-  seed_home
-  run_install --radar --vault "$WORK/vault" > /dev/null
-  local claude_md_before
-  claude_md_before="$(cat "$C/CLAUDE.md")"
-  run_uninstall --radar > "$WORK/out.txt"
-  assert_radar_files_gone
-  assert_gone "$C/at-radar.json"
-  assert_exists "$C/skills/at/skills/brief/SKILL.md"
-  assert_exists "$C/rules/clean-code.md"
-  assert_eq "$(cat "$C/CLAUDE.md")" "$claude_md_before" "CLAUDE.md untouched"
-  assert_exists "$WORK/vault/Radar Config.md"
-  assert_contains "$WORK/out.txt" 'Radar uninstalled'
 }
 
 test_uninstall_rejects_unknown_option() {
   seed_home
   run_install > /dev/null
   local status=0
-  run_uninstall --bogus > "$WORK/out.txt" 2>&1 || status=$?
-  assert_eq "$status" 1 "exit status for an unknown option"
-  assert_exists "$C/skills/at"
+  for args in --bogus --radar; do
+    status=0
+    run_uninstall "$args" > "$WORK/out.txt" 2>&1 || status=$?
+    assert_eq "$status" 1 "exit status for: $args"
+    assert_exists "$C/skills/at"
+  done
 }
 
 test_install; echo "ok install"
 test_reinstall_keeps_first_backup; echo "ok reinstall"
 test_uninstall; echo "ok uninstall"
 test_missing_uv; echo "ok missing uv"
-test_install_without_radar; echo "ok install without radar"
-test_install_with_radar; echo "ok install with radar"
-test_reinstall_keeps_config_edit; echo "ok config edit kept"
-test_reinstall_without_radar_keeps_vault; echo "ok reinstall without radar"
-test_flag_pairing_errors_change_nothing; echo "ok flag pairing errors"
-test_missing_vault_is_created; echo "ok missing vault created"
-test_uninstall_leaves_vault; echo "ok uninstall leaves vault"
-test_uninstall_only_radar; echo "ok uninstall only radar"
+test_install_removes_retired_radar; echo "ok install removes retired radar"
+test_install_rejects_radar_flags; echo "ok install rejects radar flags"
+test_uninstall_removes_retired_radar_config; echo "ok uninstall removes retired radar config"
 test_uninstall_rejects_unknown_option; echo "ok uninstall rejects unknown option"
 echo "All install tests passed."
