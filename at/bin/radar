@@ -1,2 +1,0 @@
-#!/bin/sh
-exec uv run --quiet --script "$(dirname "$0")/../radar/radar.py" "$@"
