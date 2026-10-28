@@ -60,4 +60,4 @@ Optional. Links, file paths, approaches and traps that help the implementer. Sho
 ```
 
 - Omit an optional section when it has no content. Do not write "N/A".
-- An acceptance criterion states a result ("`/at:brief LIN-123` writes `briefs/LIN-123.md`"), not a task ("Update the brief skill").
+- An acceptance criterion states a result ("`/at:research --prd` prints the artifact URL"), not a task ("Update the research skill").
