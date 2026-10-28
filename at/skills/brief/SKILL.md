@@ -22,4 +22,4 @@ Every size ends with one line, `size: S | M | L`, and for S and M a `model:` and
 
 If the ask is L and the design choice cannot be made without the asker, do not guess: write the brief up to the open decision and say `needs /at:interview` on the last line.
 
-Print the path and the size. Then the short report `CLAUDE.md` and ``~/.claude/rules/writing.md`` asks for: what was done, what was skipped, what differs from the plan.
+Print the path and the size. Then the short report `CLAUDE.md` and `~/.claude/rules/writing.md` asks for: what was done, what was skipped, what differs from the plan.

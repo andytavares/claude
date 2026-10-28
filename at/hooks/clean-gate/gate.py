@@ -2,8 +2,6 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = ["lizard==1.24.1"]
-# [tool.uv]
-# exclude-newer = "2 weeks"
 # ///
 import argparse
 import fnmatch

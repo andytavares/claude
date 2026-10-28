@@ -25,7 +25,7 @@ Every number you present to me comes with the command or query that produced it.
 
 ## Done
 
-Done means the project's own check(s) ran and its exit code was 0. The command and its output go in your response, not a summary of it. If a check could not run, say "not measured" and why. Never a pass by inference. Only include this in the output if there's something I need to know failures/warnings/abnormalities/etc.
+Done means the project's own check(s) ran and its exit code was 0. The command and its output go in the PR or commit, not a summary of it. If a check could not run, say "not measured" and why. Never a pass by inference. Show check output in chat only when I ask, or when I need it to understand the work (a failure, a warning, an abnormality).
 
 ## Root cause
 
@@ -44,7 +44,7 @@ Pin exact versions, commit the lockfile with hashes, and install from it using t
 Work in a clean worktree/feature branch for each new feature, only reuse a feature branch or worktree when specifically told to do so or if the work is directly related (use Stacked PRs here if needed). One commit per logical unit in the repo's convention, open a draft PR when done.
 
 One task is one PR, unless I say otherwise. Extra PRs split one review and one merge into many.
-- Use a stacked PR (each PR based on the branch of the one before) when the change is large an undweildy for a human to understand (touches many domains, very large change, work that must be sequenced to succeed, etc.).
+- Use a stacked PR (each PR based on the branch of the one before) when the change is large and unwieldy for a human to understand (touches many domains, very large change, work that must be sequenced to succeed, etc.).
 - Use separate PRs only when the change spans more than one repo, or when the parts must merge in a set order because merging them together would break `main`.
 - Do not split work into more PRs only to make each one smaller.
 
@@ -60,7 +60,7 @@ Do all the work I asked for before you end your turn. A stop halfway leaves the 
 ## Communicating with me
 
 Write each reply in as few lines as its content allows. All text a person reads follows `rules/writing.md`: plain language, and the PR and ticket formats. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Detail only when I ask.
-When finished, lead with the outcome in one sentence, then the link to the PR or commit that holds the evidence. Put the evidence in chat only when I ask for it. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
+When finished, lead with the outcome in one sentence, then the link to the PR or commit that holds the evidence. Put the evidence in chat only when I ask for it, or when I need it to understand the work. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
 Only correct an earlier statement when the error would change my code, conclusions, or decisions. State it plainly and continue.
 Match written deliverables (especially Markdown files) to what the task needs. No filler sections, no restated summaries, no boilerplate.
 Examples use real names from the code (files, functions, values), never placeholders such as `foo`, `A` or `X1`. Use a diagram for a flow of more than three steps.
@@ -68,7 +68,3 @@ Examples use real names from the code (files, functions, values), never placehol
 ## Subagents
 
 Subagents multiply cost and time. Use them only for independent, large tracks such as a wide multi-file investigation. Never for a handful of reads or edits, and never to review or verify your own work unless the skill you are running calls for it.
-
-## LLM Wiki
-
-Knowledge base at `/Users/atavares/Google Drive/My Drive/llm-wiki`. When I ask to add to, query, or maintain the wiki: read its `CLAUDE.md` first, use the templates under its `skills/llm-wiki/references/templates/`, raw sources to `raw/`, pages to `wiki/`, and always update `wiki/index.md` and `wiki/log.md`.
