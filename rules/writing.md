@@ -22,6 +22,13 @@ Only these two STE rules are relaxed:
 - Technical names (functions, files, tools, error text) are always allowed. Write them exactly as they are.
 - You do not have to use only the STE dictionary. Use the everyday technical word the reader knows.
 
+## UI and UX changes
+Every artifact or spec that changes a UI or UX shows a before and an after rendering of each changed screen or state.
+- Put the two renderings side by side, or one directly after the other, at the same size.
+- Before: a screenshot of the current UI. If there is no current UI, write "New screen" and show only the after.
+- After: a mockup or screenshot of the changed UI.
+- Under each pair, list each change, why it is made, and what the user now sees or does differently.
+
 ## PR descriptions
 Describe the PR in this format, you do not need section headings writing this as paragraphs is fine as long as it follows the rules:
 
