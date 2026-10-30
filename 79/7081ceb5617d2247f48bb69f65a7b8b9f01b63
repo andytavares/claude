@@ -1,0 +1,19 @@
+rules/writing.md
+  s_fd1d75edfadf8e::t_297c3bb58d0ce9 25-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "797081ceb5617d2247f48bb69f65a7b8b9f01b63",
+  "prompts": {},
+  "sessions": {
+    "s_fd1d75edfadf8e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3a342d1f-966d-4343-a154-8fb50d2188a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
