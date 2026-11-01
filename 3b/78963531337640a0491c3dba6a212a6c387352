@@ -1,0 +1,33 @@
+at/skills/implement/SKILL.md
+  s_1334926a0f8434::t_6e5d027c166807 13
+at/hooks/sync/sync.sh
+  s_1334926a0f8434::t_479e4f2ef6b2df 1-51
+tests/test_sync.sh
+  s_1334926a0f8434::t_cd76eeaf73bc84 1-99
+at/.claude-plugin/plugin.json
+  s_1334926a0f8434::t_30d077bf68334c 3
+README.md
+  s_1334926a0f8434::t_595b3cea782244 27,65-68,101,104
+at/hooks/hooks.json
+  s_1334926a0f8434::t_30d077bf68334c 13-23
+global/CLAUDE.md
+  s_1334926a0f8434::t_f3f31abcbc3d6d 44-45
+tests/test_install.sh
+  s_1334926a0f8434::t_30d077bf68334c 119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3b78963531337640a0491c3dba6a212a6c387352",
+  "prompts": {},
+  "sessions": {
+    "s_1334926a0f8434": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "06c783ef-6eaf-40f3-847d-387f15e84a92",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
