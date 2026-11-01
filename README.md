@@ -24,7 +24,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `global/CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, one PR per task, finish without stopping, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `rules/writing.md` | `~/.claude/rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
-| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, and the clean-gate hooks that check every edit |
+| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, and the sync hook that pulls at session start |
 
 Only `/at:survey` can start on its own when Claude thinks it fits. Every other skill runs only when you type it.
 
@@ -62,6 +62,10 @@ flowchart TD
 - **Too much to read?** Run `/at:word-salad` with no argument to rewrite the last reply, or pass it text or a file path.
 - **One ask per session.** Start a new session between unrelated tasks, so old context doesn't steer the new one.
 
+## Start from the latest code
+
+At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-forwards the current branch. On a feature branch, it also tells Claude to merge the default branch when that branch has commits from more than 3 hours ago that the feature branch lacks. It never merges or overwrites work itself: a branch that cannot fast-forward is reported, not changed.
+
 ## The clean-code gate
 
 The gate runs after every edit, including in agent sessions Foundry starts, since those write code too. It sends its findings back to Claude, which fixes them before carrying on.
@@ -94,7 +98,8 @@ The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 ```sh
 uv run --no-project --with pytest==9.1.1 --with lizard==1.24.1 pytest -q tests
 bash tests/test_install.sh
+bash tests/test_sync.sh
 uvx ruff@0.16.10 check at tests && uvx ruff@0.16.10 format --check at tests
 claude plugin validate at
-shellcheck -x install.sh uninstall.sh tests/test_install.sh
+shellcheck -x install.sh uninstall.sh at/hooks/sync/sync.sh tests/test_install.sh tests/test_sync.sh
 ```

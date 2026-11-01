@@ -41,6 +41,8 @@ Pin exact versions, commit the lockfile with hashes, and install from it using t
 
 ## Git
 
+Start every task from the latest remote code. Pull the current branch first, and create new branches and worktrees from the freshly fetched default branch. On a feature branch, merge the default branch when it has commits from more than 3 hours ago that the branch lacks. The `at` plugin's SessionStart hook pulls and reports this at session start; do it yourself for a task that starts later in the session.
+
 Work in a clean worktree/feature branch for each new feature, only reuse a feature branch or worktree when specifically told to do so or if the work is directly related (use Stacked PRs here if needed). One commit per logical unit in the repo's convention, open a draft PR when done.
 
 One task is one PR, unless I say otherwise. Extra PRs split one review and one merge into many.
