@@ -41,7 +41,7 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 ## Prove
 
-1. For a large or complex change, run the bundled `code-review` skill once as `/code-review medium --fix main...HEAD` and wait for its findings. Skip it for trivial work. Fix any finding it did not fix itself, in this session; do not relaunch workers for review findings. Commit the fixes.
+1. For a large or complex change, run the `at:review` skill once with no argument and wait for its report. Skip it for trivial work. If its first line counts fewer files than the diff has, review the missing files yourself. Fix each finding in this session; do not relaunch workers for review findings. Commit the fixes. Do not review again after the fixes.
 2. Run precommit checks once until every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
 3. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report main..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
 

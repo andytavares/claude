@@ -49,6 +49,7 @@ flowchart TD
 | `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
+| `/at:review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you | Opus, medium, in a fork | One line per bug, and a count of the files it read |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
 
 ## Getting the best results
