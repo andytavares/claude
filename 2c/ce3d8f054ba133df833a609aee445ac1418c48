@@ -1,0 +1,23 @@
+at/skills/review/SKILL.md
+  s_b60417a369f467::t_f5121af03ee87a 1-14
+README.md
+  s_b60417a369f467::t_cb9bc44433c834 52
+at/skills/implement/SKILL.md
+  s_b60417a369f467::t_60cf4a9d59faa9 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2cce3d8f054ba133df833a609aee445ac1418c48",
+  "prompts": {},
+  "sessions": {
+    "s_b60417a369f467": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5c1bbd24-cb25-4818-a0a5-875dcb605fcd",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
