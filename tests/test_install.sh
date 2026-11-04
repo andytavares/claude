@@ -50,6 +50,9 @@ assert_plugin_installed() {
   cmp -s "$ROOT/global/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
   assert_exists "$C/rules/clean-code.md"
   assert_exists "$C/rules/writing.md"
+  assert_exists "$C/rules/plugin-evals.md"
+  assert_contains "$C/CLAUDE.md" "opens with the numbered fix steps"
+  assert_contains "$C/CLAUDE.md" "do not repeat its work"
   assert_exists "$C/skills/at/.claude-plugin/plugin.json"
   assert_exists "$C/skills/at/hooks/hooks.json"
   assert_exists "$C/skills/at/skills/word-salad/SKILL.md"
@@ -119,7 +122,7 @@ assert_radar_and_fleet_gone() {
   python3 -c '
 import json, sys
 h = json.load(open(sys.argv[1]))["hooks"]
-assert sorted(h) == ["PostToolUse", "SessionStart"], list(h)' "$C/skills/at/hooks/hooks.json" || fail "hooks other than the clean gate and sync installed"
+assert sorted(h) == ["PostToolUse", "PreToolUse", "SessionStart"], list(h)' "$C/skills/at/hooks/hooks.json" || fail "hooks other than the clean gate, zsh guard and sync installed"
 }
 
 test_install_removes_retired_radar() {
