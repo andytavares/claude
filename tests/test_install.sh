@@ -16,12 +16,13 @@ assert_contains() { grep -qF -- "$2" "$1" || fail "$1 lacks '$2'"; }
 
 seed_home() {
   rm -rf "$H"
-  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/skills/google-review" "$C/skills/design-doc" "$C/agents" "$C/hooks/clean-gate"
+  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/skills/google-review" "$C/skills/design-doc" "$C/skills/investigate-build" "$C/agents" "$C/hooks/clean-gate"
   echo "my own skill" > "$C/skills/mine/SKILL.md"
   echo "loose copy from an earlier install" > "$C/skills/research/SKILL.md"
   echo "loose copy from an earlier install" > "$C/agents/worker.md"
   echo "retired skill from an earlier install" > "$C/skills/google-review/SKILL.md"
   echo "retired skill from an earlier install" > "$C/skills/design-doc/SKILL.md"
+  echo "loose skill the diagnose skill replaces" > "$C/skills/investigate-build/SKILL.md"
   echo "retired agent from an earlier install" > "$C/agents/google-code-reviewer.md"
   echo "loose copy from an earlier install" > "$C/hooks/clean-gate/gate.py"
   printf '%s' "$ORIGINAL_CLAUDE_MD" > "$C/CLAUDE.md"
@@ -52,6 +53,7 @@ assert_plugin_installed() {
   assert_exists "$C/skills/at/.claude-plugin/plugin.json"
   assert_exists "$C/skills/at/hooks/hooks.json"
   assert_exists "$C/skills/at/skills/word-salad/SKILL.md"
+  assert_eq "$(cat "$C/skills/at/.source-repo")" "$ROOT" "recorded source repo"
   [ -x "$C/skills/at/hooks/clean-gate/gate.py" ] || fail "gate.py not executable"
   assert_exists "$C/skills/at/hooks/clean-gate/gate.py.lock"
 }
@@ -61,6 +63,7 @@ assert_loose_copies_removed() {
   assert_gone "$C/agents/worker.md"
   assert_gone "$C/skills/google-review"
   assert_gone "$C/skills/design-doc"
+  assert_gone "$C/skills/investigate-build"
   assert_gone "$C/agents/google-code-reviewer.md"
   assert_gone "$C/hooks/clean-gate"
 }
@@ -144,6 +147,15 @@ test_uninstall_removes_retired_radar_config() {
   assert_gone "$C/at-radar.json"
 }
 
+test_uninstall_keeps_the_data_store() {
+  seed_home
+  run_install > /dev/null
+  mkdir -p "$H/at-skills-data/github.com/klaviyo/k-repo"
+  echo "term" > "$H/at-skills-data/github.com/klaviyo/k-repo/GLOSSARY.md"
+  run_uninstall > /dev/null
+  assert_exists "$H/at-skills-data/github.com/klaviyo/k-repo/GLOSSARY.md"
+}
+
 test_uninstall_rejects_unknown_option() {
   seed_home
   run_install > /dev/null
@@ -160,5 +172,6 @@ test_missing_uv; echo "ok missing uv"
 test_install_removes_retired_radar; echo "ok install removes retired radar"
 test_install_rejects_the_retired_radar_flag; echo "ok install rejects the retired radar flag"
 test_uninstall_removes_retired_radar_config; echo "ok uninstall removes retired radar config"
+test_uninstall_keeps_the_data_store; echo "ok uninstall keeps the data store"
 test_uninstall_rejects_unknown_option; echo "ok uninstall rejects unknown option"
 echo "All install tests passed."

@@ -9,7 +9,7 @@ Input: $ARGUMENTS
 
 If the argument is a path, read it; it is the brief or spec. Otherwise it is the prompt. Choose the format: `--one-pager`, `--prd` or `--design` if given, else One Pager when the input asks for a short pitch or summary to align on before deeper work, PRD when the input is about users, outcomes, or scope, and Design Document when it is about how to build something already decided.
 
-Research before writing. Read the parts of this codebase the input touches. For anything external, fetch current documentation rather than relying on memory, and cite it. Every claim that could be false carries its evidence: a file path, a command and its output, or a URL. Anything you could not verify goes in the open questions, never stated as fact.
+Run the `glossary` skill first and use its terms. Research before writing. Read the parts of this codebase the input touches. For anything external, fetch current documentation rather than relying on memory, and cite it. Every claim that could be false carries its evidence: a file path, a command and its output, or a URL. Anything you could not verify goes in the open questions, never stated as fact.
 
 ## One Pager sections
 
