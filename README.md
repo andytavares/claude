@@ -24,7 +24,8 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `global/CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, one PR per task, finish without stopping, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `rules/writing.md` | `~/.claude/rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
-| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, and the sync hook that pulls at session start |
+| `rules/plugin-evals.md` | `~/.claude/rules/` | Every session | How to write plugin eval graders and what the eval sandbox denies |
+| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, the zsh-guard hook that blocks Bash commands zsh runs differently, and the sync hook that pulls at session start |
 
 Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:review`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:retro` and `/at:word-salad` run only when you type them.
 
