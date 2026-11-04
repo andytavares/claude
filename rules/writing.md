@@ -30,22 +30,21 @@ Every artifact or spec that changes a UI or UX shows a before and an after rende
 - Under each pair, list each change, why it is made, and what the user now sees or does differently.
 
 ## PR descriptions
-Describe the PR in this format, you do not need section headings writing this as paragraphs is fine as long as it follows the rules:
+Write the PR description as two short paragraphs with no headings for them, then a "Reviewer notes" section.
 
 ```markdown
-## Current state
-1–3 short sentences: what the code does now, or what is wrong.
+Paragraph one: what the code does now, or what is wrong. 1–3 short sentences.
 
-## This PR
-Fixes: or Part Of: link to the one ticket this PR closes.
-1–3 short sentences: what changes.
+Paragraph two: what this PR changes, starting with the Linear link as "Fixes: <link>" or "Part Of: <link>" on its own line when the work has a ticket. 1–3 short sentences.
 
-## Reviewer notes [OPTIONAL]
-- Short bullets: risks, decisions, what was not done, what to check by hand.
-- Do not include this section unless it adds value to a human reviewer.
+## Reviewer notes
+- Merge danger: one-way door or two-way door, and what breaks if this is wrong.
+- Short bullets for risks, decisions, what was not done, what to check by hand.
 ```
 
-- Omit "Reviewer notes" when there is nothing to say.
+- Example. "Today PR descriptions have a heading for the current state and another for the proposed change." Then, as the second paragraph: "This PR writes both as two plain paragraphs, so the description reads naturally and still says what was and what is."
+- The link is never a PagerDuty or incident.io link, and never a placeholder like "No Linear ticket yet". With no ticket, and when the user said none is needed, leave the line out.
+- "Reviewer notes" is always present. Its first bullet is "Merge danger". A one-way door is a change that cannot be undone by reverting the PR (a migration, a deleted resource, a published artifact). Add the other bullets only when they help a human reviewer.
 - For a complex change, or a flow that is hard to follow in text, you may add a mermaid diagram if it helps with understanding.
 
 ## Tickets

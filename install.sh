@@ -63,6 +63,7 @@ remove_loose_copies() {
 remove_retired_copies() {
   remove_path "$CLAUDE/skills/google-review"
   remove_path "$CLAUDE/skills/design-doc"
+  remove_path "$CLAUDE/skills/investigate-build"
   remove_path "$CLAUDE/agents/google-code-reviewer.md"
   remove_path "$CLAUDE/at-radar.json"
 }
@@ -91,6 +92,8 @@ install_repo_files() {
   for rule in "$REPO"/rules/*.md; do install_path "$rule" "$CLAUDE/rules/$(basename "$rule")"; done
   install_path "$REPO/at" "$PLUGIN"
   chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
+  # /at:retro reads this to find the repo it changes.
+  echo "$REPO" > "$PLUGIN/.source-repo"
 }
 
 main() {

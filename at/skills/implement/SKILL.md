@@ -24,7 +24,7 @@ If the brief says `needs /at:interview` or a unit cannot be written without a de
 
 Before launching any worker, do the shared setup once yourself: install, build, anything every unit's checks need. Workers never rebuild or reinstall while another worker's checks are running.
 
-Delegate each unit to the `at:worker` subagent (Sonnet, medium effort), with the unit's text as its whole brief plus the repo's lint and test commands, scoped to what the unit touches. Each brief ends with a time box ("report within 20 minutes with what you have").
+Delegate each unit to the `at:worker` subagent (Sonnet, medium effort), with the unit's text as its whole brief, the glossary directory path (get it by running the `glossary` skill) when that directory exists, plus the repo's lint and test commands, scoped to what the unit touches. Each brief ends with a time box ("report within 20 minutes with what you have").
 
 Checks in a brief are targeted, never whole-suite:
 - the tests for the files the unit touches, run once;
@@ -41,7 +41,7 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 ## Prove
 
-1. For a large or complex change, run the `at:review` skill once with no argument and wait for its report. Skip it for trivial work. If its first line counts fewer files than the diff has, review the missing files yourself. Fix each finding in this session; do not relaunch workers for review findings. Commit the fixes. Do not review again after the fixes.
+1. For a large or complex change, run the `at:review` skill once, as `at:review <default branch> <the brief or spec path or URL>` when the work has one, and wait for its report. Fix the `Against the spec` list too. Skip it for trivial work. If its first line counts fewer files than the diff has, review the missing files yourself. Fix each finding in this session; do not relaunch workers for review findings. Commit the fixes. Do not review again after the fixes.
 2. Run precommit checks once until every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
 3. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report main..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
 

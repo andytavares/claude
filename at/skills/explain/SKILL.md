@@ -7,7 +7,7 @@ effort: high
 ---
 Question: $ARGUMENTS
 
-Answer from the code, not from memory. Follow calls across files until the answer is grounded; a claim about behaviour names the file and line it comes from. Use git history when the question is "why".
+Run the `glossary` skill first and use its terms. Answer from the code, not from memory. Follow calls across files until the answer is grounded; a claim about behaviour names the file and line it comes from. Use git history when the question is "why".
 
 For a question wide enough that reading would fill this context, use one subagent per independent area, brief each precisely once, and merge what comes back. Do not use subagents for a few file reads.
 

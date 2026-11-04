@@ -26,7 +26,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `rules/writing.md` | `~/.claude/rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
 | `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, and the sync hook that pulls at session start |
 
-Only `/at:survey` can start on its own when Claude thinks it fits. Every other skill runs only when you type it.
+Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:review`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:retro` and `/at:word-salad` run only when you type them.
 
 ## Pick the skill
 
@@ -34,9 +34,10 @@ Only `/at:survey` can start on its own when Claude thinks it fits. Every other s
 flowchart TD
   Q{"What do you have?"}
   Q -->|"a question about the code"| EX["/at:explain"]
+  Q -->|"something is broken"| DG["/at:diagnose"]
   Q -->|"a small, clear ask"| IM["/at:implement"]
   Q -->|"a document to write"| RS["/at:research"] --> IM
-  Q -->|"an ask that needs decisions"| IV["/at:interview"] --> SP["SPEC.md"] --> IM
+  Q -->|"an ask that needs decisions"| IV["/at:interview"] --> SP["spec artifact"] --> IM
   IM --> PR["draft PR"]
 ```
 
@@ -44,12 +45,14 @@ flowchart TD
 
 | Skill | Use it when | Runs on | You get |
 | --- | --- | --- | --- |
-| `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus, high | `SPEC.md` covering what the ask didn't mention |
+| `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus, high | A spec artifact covering what the ask didn't mention |
 | `/at:research` | You need a one-pager (`--one-pager`), PRD (`--prd`) or design doc (`--design`) | Opus, high | A shareable artifact |
 | `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
+| `/at:diagnose` | Something is broken, failing or slow, or you have a Buildkite or PR URL and ask why | Opus, high | The cause with evidence, then a fix with a regression test |
+| `/at:retro` | The session repeated friction | Opus, high | A brief for `/at:implement` that fixes this config |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
-| `/at:review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you | Opus, medium, in a fork | One line per bug, and a count of the files it read |
+| `/at:review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you. Add a spec path to check the diff against it | Opus, medium, in a fork | One line per bug, a second list against the spec, and a count of the files it read |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
 
 ## Getting the best results
@@ -58,10 +61,14 @@ flowchart TD
 - **Let size set effort, not worry.** Raise effort only after a run fails for lack of it, one level at a time. On the 5.5 models, medium already handles most multi-step coding.
 - **Survey before you build.** `/at:implement` does this for you, but for work in your own session, run `/at:survey <what you're adding>` first. On terminator, asking for a "last edited 5m ago" label showed the label already existed (`NoteList.tsx:296`) and that `relativeTime` is copied, with different output, in two other files.
 - **Read gate findings like review comments.** Fix each one, or say why it's intended. Tune each repo with a `.clean-gate.json` (below).
-- **Judge the PR by its first sections.** Every PR opens with "Current state" and "This PR" in three sentences or fewer each. If you can't follow them, ask for a rewrite before reading the code.
+- **Judge the PR by its first two paragraphs.** Every PR opens with one paragraph on what the code does now and one on what changes, three sentences or fewer each, then "Reviewer notes" with its "Merge danger" line. If you can't follow them, ask for a rewrite before reading the code.
 - **Done means the checks ran.** The PR carries each command and its exit code. A summary that says "tests pass" without output isn't done.
 - **Too much to read?** Run `/at:word-salad` with no argument to rewrite the last reply, or pass it text or a file path.
 - **One ask per session.** Start a new session between unrelated tasks, so old context doesn't steer the new one.
+
+## Glossary and decision records
+
+The `glossary` skill keeps a glossary and decision records for each repo in `~/at-skills-data/<host>/<org>/<repo>/`, taken from the `origin` remote, so no repo holds them. `/at:interview`, `/at:diagnose`, `/at:explain` and `/at:research` read them first. `/at:interview` and `/at:diagnose` add terms. `~/at-skills-data` is a local git repo with no remote, and each write is a commit. `uninstall.sh` never touches it.
 
 ## Start from the latest code
 
@@ -99,8 +106,9 @@ The design behind all this: https://claude.ai/artifact/17jp31c5gsQX9JQQbvgd4i
 ```sh
 uv run --no-project --with pytest==9.1.1 --with lizard==1.24.1 pytest -q tests
 bash tests/test_install.sh
+bash tests/test_glossary_path.sh
 bash tests/test_sync.sh
 uvx ruff@0.16.10 check at tests && uvx ruff@0.16.10 format --check at tests
 claude plugin validate at
-shellcheck -x install.sh uninstall.sh at/hooks/sync/sync.sh tests/test_install.sh tests/test_sync.sh
+shellcheck -x install.sh uninstall.sh at/hooks/sync/sync.sh at/skills/glossary/path.sh tests/test_install.sh tests/test_sync.sh tests/test_glossary_path.sh
 ```
