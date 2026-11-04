@@ -5,7 +5,7 @@ Analyze pants build dependency graph from a peek.json file.
 Usage:
     python3 analyze_deps.py <peek.json> [changed_target ...]
 
-If no changed targets are given, reads changed targets from stats.jsonl in same dir.
+If no changed targets are given, prints the --changed-since command from stats.jsonl in the same dir.
 Outputs:
   - Direct changed targets
   - Total changeset size and type breakdown
@@ -25,7 +25,6 @@ def load_peek(path):
 
 
 def build_graphs(data):
-    forward = defaultdict(set)  # target -> deps
     reverse = defaultdict(set)  # target -> things that depend on it
     types = {}
 
@@ -33,11 +32,10 @@ def build_graphs(data):
         addr = item["address"]
         types[addr] = item.get("target_type", "unknown")
         deps = item.get("dependencies", [])
-        forward[addr] = set(deps)
         for dep in deps:
             reverse[dep].add(addr)
 
-    return forward, reverse, types
+    return reverse, types
 
 
 TARGET_TYPE = "docker_image"
@@ -62,23 +60,6 @@ def find_paths_to_type(start_targets, reverse, types):
                 queue.append((dependent, path + [dependent]))
 
     return results
-
-
-def find_bottlenecks(start_targets, reverse, types):
-    """Find which single targets, when changed, cause the most downstream impact."""
-    # Count how many of the changeset targets each intermediate node feeds
-    all_reachable = set()
-    queue = deque(start_targets)
-    visited = set(start_targets)
-    while queue:
-        node = queue.popleft()
-        all_reachable.add(node)
-        for dep in reverse.get(node, []):
-            if dep not in visited:
-                visited.add(dep)
-                queue.append(dep)
-
-    return all_reachable
 
 
 def print_summary(data, types):
@@ -152,7 +133,7 @@ def main():
 
     peek_path, explicit_targets = sys.argv[1], sys.argv[2:]
     data = load_peek(peek_path)
-    _, reverse, types = build_graphs(data)
+    reverse, types = build_graphs(data)
     print_summary(data, types)
     if not explicit_targets:
         print_changeset_command(peek_path)

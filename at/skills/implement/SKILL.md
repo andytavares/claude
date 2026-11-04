@@ -24,7 +24,7 @@ If the brief says `needs /at:interview` or a unit cannot be written without a de
 
 Before launching any worker, do the shared setup once yourself: install, build, anything every unit's checks need. Workers never rebuild or reinstall while another worker's checks are running.
 
-Delegate each unit to the `at:worker` subagent (Sonnet, medium effort), with the unit's text as its whole brief, the glossary directory path from `glossary/path.sh` when it exists, plus the repo's lint and test commands, scoped to what the unit touches. Each brief ends with a time box ("report within 20 minutes with what you have").
+Delegate each unit to the `at:worker` subagent (Sonnet, medium effort), with the unit's text as its whole brief, the glossary directory path (get it by running the `glossary` skill) when that directory exists, plus the repo's lint and test commands, scoped to what the unit touches. Each brief ends with a time box ("report within 20 minutes with what you have").
 
 Checks in a brief are targeted, never whole-suite:
 - the tests for the files the unit touches, run once;

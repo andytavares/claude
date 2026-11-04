@@ -14,8 +14,8 @@ if [ -z "$remote" ]; then
   exit 0
 fi
 
-# git@host:org/repo.git and https://user@host/org/repo.git both become host/org/repo.
+# git@host:org/repo.git, https://user@host/org/repo.git and ssh://git@host:2222/org/repo.git all become host/org/repo.
 key="${remote#*://}"
 key="${key#*@}"
-key="${key/:/\/}"
+key="$(echo "$key" | sed -E 's#^([^/:]+):([0-9]+)/#\1/#; s#^([^/:]+):#\1/#')"
 echo "$root/${key%.git}"

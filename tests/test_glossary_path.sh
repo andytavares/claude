@@ -31,6 +31,10 @@ test_https_remote_with_git_suffix_and_credentials() {
   assert_eq "$(path_for "$(make_repo c https://user@github.com/klaviyo/app.git)")" "$H/at-skills-data/github.com/klaviyo/app" "https remote with user and .git"
 }
 
+test_ssh_remote_with_port() {
+  assert_eq "$(path_for "$(make_repo e ssh://git@github.com:2222/klaviyo/k-repo.git)")" "$H/at-skills-data/github.com/klaviyo/k-repo" "ssh remote with port"
+}
+
 test_no_remote_uses_folder_name() {
   assert_eq "$(path_for "$(make_repo scratch-repo)")" "$H/at-skills-data/local/scratch-repo" "no remote"
 }
@@ -52,6 +56,7 @@ test_outside_a_repo_fails() {
 test_ssh_remote; echo "ok ssh remote"
 test_https_remote; echo "ok https remote"
 test_https_remote_with_git_suffix_and_credentials; echo "ok https with credentials"
+test_ssh_remote_with_port; echo "ok ssh with port"
 test_no_remote_uses_folder_name; echo "ok no remote"
 test_worktree_shares_the_main_checkout_path; echo "ok worktree"
 test_outside_a_repo_fails; echo "ok outside a repo"
