@@ -27,7 +27,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `rules/plugin-evals.md` | `~/.claude/rules/` | Every session | How to write plugin eval graders and what the eval sandbox denies |
 | `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, the zsh-guard hook that blocks Bash commands zsh runs differently, and the sync hook that pulls at session start |
 
-Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:review`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:retro` and `/at:word-salad` run only when you type them.
+Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:review`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:retro`, `/at:word-salad` and `/at:cone-of-shame` run only when you type them.
 
 ## Pick the skill
 
@@ -52,9 +52,10 @@ flowchart TD
 | `/at:diagnose` | Something is broken, failing or slow, or you have a Buildkite or PR URL and ask why | Opus, high | The cause with evidence, then a fix with a regression test |
 | `/at:retro` | The session repeated friction | Opus, high | A brief for `/at:implement` that fixes this config |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
-| `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
+| `/at:implement` | A brief or spec is ready to build | Opus plans, Opus workers build | A draft PR |
 | `/at:review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you. Add a spec path to check the diff against it | Opus, medium, in a fork | One line per bug, a second list against the spec, and a count of the files it read |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
+| `/at:cone-of-shame` | A response broke the rules or was bad. Add a note on what went wrong | Opus, high | The work redone, and a draft PR that fixes the cause in this config |
 
 ## Getting the best results
 

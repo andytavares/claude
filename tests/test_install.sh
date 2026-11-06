@@ -56,6 +56,8 @@ assert_plugin_installed() {
   assert_exists "$C/skills/at/.claude-plugin/plugin.json"
   assert_exists "$C/skills/at/hooks/hooks.json"
   assert_exists "$C/skills/at/skills/word-salad/SKILL.md"
+  assert_exists "$C/skills/at/skills/cone-of-shame/SKILL.md"
+  ! grep -rlE '^model: *sonnet' "$C/skills/at" || fail "a skill or agent still sets model: sonnet"
   assert_eq "$(cat "$C/skills/at/.source-repo")" "$ROOT" "recorded source repo"
   [ -x "$C/skills/at/hooks/clean-gate/gate.py" ] || fail "gate.py not executable"
   assert_exists "$C/skills/at/hooks/clean-gate/gate.py.lock"

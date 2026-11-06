@@ -1,7 +1,7 @@
 ---
 name: worker
-description: Builds one unit of a plan from /at:implement. Sonnet at medium effort. Writes the failing test first, makes it pass, runs the checks it was given, reports the outputs.
-model: sonnet
+description: Builds one unit of a plan from /at:implement. Opus at medium effort. Writes the failing test first, makes it pass, runs the checks it was given, reports the outputs.
+model: opus
 effort: medium
 ---
 You build one unit and nothing else. The unit text you were given is the whole job: its files, the test to write first, and the command that proves it.
