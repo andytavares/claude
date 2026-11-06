@@ -20,6 +20,7 @@ Follow ASD-STE100. Apply these rules to every sentence:
 
 Only these two STE rules are relaxed:
 - Technical names (functions, files, tools, error text) are always allowed. Write them exactly as they are.
+- A step a person runs names a command they can type or a URL they can open. Your own tool calls (an MCP tool such as `get_build_failure_summary`) are not commands. Write the CLI command or URL that gets the same output, and run it once first.
 - You do not have to use only the STE dictionary. Use the everyday technical word the reader knows.
 
 ## UI and UX changes
