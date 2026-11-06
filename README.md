@@ -52,7 +52,7 @@ flowchart TD
 | `/at:diagnose` | Something is broken, failing or slow, or you have a Buildkite or PR URL and ask why | Opus, high | The cause with evidence, then a fix with a regression test |
 | `/at:retro` | The session repeated friction | Opus, high | A brief for `/at:implement` that fixes this config |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A reuse map of up to 20 lines |
-| `/at:implement` | A brief or spec is ready to build | Opus plans, Sonnet workers build | A draft PR |
+| `/at:implement` | A brief or spec is ready to build | Opus plans, Opus workers build | A draft PR |
 | `/at:review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you. Add a spec path to check the diff against it | Opus, medium, in a fork | One line per bug, a second list against the spec, and a count of the files it read |
 | `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
 
