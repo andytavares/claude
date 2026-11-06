@@ -1,0 +1,25 @@
+tests/test_install.sh
+  s_adf68d7b5e5ac0::t_95e9ea48a381db 59
+at/skills/cone-of-shame/SKILL.md
+  s_adf68d7b5e5ac0::t_2e0f50ca8e3450 1-44
+README.md
+  s_adf68d7b5e5ac0::t_e2a1c367dcd721 30,58
+at/.claude-plugin/plugin.json
+  s_adf68d7b5e5ac0::t_e2a1c367dcd721 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "26cbc1b8100267396d2e92a55c8c7bf9b46083cb",
+  "prompts": {},
+  "sessions": {
+    "s_adf68d7b5e5ac0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77c0ce48-9658-412d-ae73-c07615a24342",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
