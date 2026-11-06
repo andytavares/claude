@@ -10,6 +10,8 @@ Work: $ARGUMENTS
 
 If the argument is a path, read it; it is the brief or spec. If it looks like a Linear key, read the ticket with the Linear tools, including comments and linked issues. Otherwise it is the ask, and a size-S brief in your head is enough.
 
+If the brief or spec has open questions (an "Open questions" section, or items marked open, TBD or unresolved), ask the user each one with the AskUserQuestion tool before you start any other step. Ask up to 4 per call, with the recommended answer as the first option, marked "(Recommended)". Treat each answer as part of the spec. Start the plan only when every open question has an answer or the user defers it.
+
 Work in a git worktree. If you are not in one, use the existing worktree for this work, or create one in `.worktrees/` at the repo root. Run `git fetch` first and create a new worktree from the remote default branch (`origin/main`). In an existing worktree, pull its branch, and merge the default branch if it has commits from more than 3 hours ago that the branch lacks. A worktree location in the prompt or in the repo's `CLAUDE.md` replaces this default.
 
 ## Plan
