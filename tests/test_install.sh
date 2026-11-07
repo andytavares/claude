@@ -134,6 +134,22 @@ test_install_removes_retired_radar() {
   assert_radar_and_fleet_gone
 }
 
+seed_renamed_skills_install() {
+  mkdir -p "$C/skills/at/skills/retro" "$C/skills/at/skills/review"
+  echo "renamed skill from an earlier install" > "$C/skills/at/skills/retro/SKILL.md"
+  echo "renamed skill from an earlier install" > "$C/skills/at/skills/review/SKILL.md"
+}
+
+test_install_replaces_renamed_skills() {
+  seed_home
+  seed_renamed_skills_install
+  run_install > /dev/null
+  assert_gone "$C/skills/at/skills/retro"
+  assert_gone "$C/skills/at/skills/review"
+  assert_exists "$C/skills/at/skills/postmortem/SKILL.md"
+  assert_exists "$C/skills/at/skills/code-review/SKILL.md"
+}
+
 test_install_rejects_the_retired_radar_flag() {
   seed_home
   local before status=0
@@ -175,6 +191,7 @@ test_reinstall_keeps_first_backup; echo "ok reinstall"
 test_uninstall; echo "ok uninstall"
 test_missing_uv; echo "ok missing uv"
 test_install_removes_retired_radar; echo "ok install removes retired radar"
+test_install_replaces_renamed_skills; echo "ok install replaces renamed skills"
 test_install_rejects_the_retired_radar_flag; echo "ok install rejects the retired radar flag"
 test_uninstall_removes_retired_radar_config; echo "ok uninstall removes retired radar config"
 test_uninstall_keeps_the_data_store; echo "ok uninstall keeps the data store"

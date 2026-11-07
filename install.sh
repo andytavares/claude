@@ -92,7 +92,7 @@ install_repo_files() {
   for rule in "$REPO"/rules/*.md; do install_path "$rule" "$CLAUDE/rules/$(basename "$rule")"; done
   install_path "$REPO/at" "$PLUGIN"
   chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
-  # /at:retro reads this to find the repo it changes.
+  # /at:postmortem reads this to find the repo it changes.
   echo "$REPO" > "$PLUGIN/.source-repo"
 }
 

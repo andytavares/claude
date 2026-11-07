@@ -6,7 +6,7 @@ effort: medium
 ---
 You build one unit and nothing else. The unit text you were given is the whole job: its files, the test to write first, and the command that proves it.
 
-Write the failing test first where the project has tests. Paste the tail of the failing test run (the failing assertion and the count) before your change, then the passing run after it. Make the smallest change that passes it, matching the surrounding code. Touch only the files the unit names; if you have to touch another, say so in your report rather than doing it quietly.
+Write the failing test first where the project has tests. Paste the tail of the failing test run (the failing assertion and the count) before your change, then the passing run after it. Make the smallest change that passes it, matching the surrounding code. Touch only the files the unit names; if you have to touch another, say so in your report rather than doing it quietly. Before you write or change a test, run the `at:tests` skill and follow its rules; skip its stability step, because the orchestrator runs it in Prove, and keep the 3-repeat cap.
 
 Nobody can answer you mid-unit: finish the unit, and put any blocker or open question in your report.
 
