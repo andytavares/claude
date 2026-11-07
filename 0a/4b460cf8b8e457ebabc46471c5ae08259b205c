@@ -1,0 +1,49 @@
+at/evals/tests-write-async/prompt.md
+  s_4377d979fc39bb::t_e6513b690528e5 1-8
+at/evals/tests-audit-finds-bad-tests/graders/shared-state-flagged.md
+  s_4377d979fc39bb::t_197dd34f5a6aeb 1-4,7
+  s_4377d979fc39bb::t_70e806a13ce4f7 5-6
+at/evals/tests-audit-finds-bad-tests/prompt.md
+  s_4377d979fc39bb::t_197dd34f5a6aeb 1-12
+at/evals/tests-write-async/graders/fake-timers.md
+  s_4377d979fc39bb::t_e6513b690528e5 1-5
+at/evals/tests-audit-finds-bad-tests/scaffold.sh
+  s_4377d979fc39bb::t_197dd34f5a6aeb 1-58
+at/evals/tests-audit-finds-bad-tests/graders/sleep-flagged.md
+  s_4377d979fc39bb::t_70e806a13ce4f7 5-6
+  s_4377d979fc39bb::t_197dd34f5a6aeb 1-4,7
+tests/test_install.sh
+  s_4377d979fc39bb::t_b7cb4d17de0da4 60
+at/evals/tests-write-async/case.yaml
+  s_4377d979fc39bb::t_e6513b690528e5 1-4
+at/evals/tests-write-async/graders/no-real-wait.md
+  s_4377d979fc39bb::t_e6513b690528e5 1-6
+at/evals/tests-audit-finds-bad-tests/graders/good-test-kept.md
+  s_4377d979fc39bb::t_197dd34f5a6aeb 1-4,7
+  s_4377d979fc39bb::t_70e806a13ce4f7 5-6
+at/evals/tests-write-async/scaffold.sh
+  s_4377d979fc39bb::t_e6513b690528e5 1-26
+at/evals/tests-audit-finds-bad-tests/graders/mock-echo-flagged.md
+  s_4377d979fc39bb::t_197dd34f5a6aeb 1-4,7
+  s_4377d979fc39bb::t_70e806a13ce4f7 5-6
+at/evals/tests-write-async/graders/advances-timers.md
+  s_4377d979fc39bb::t_e6513b690528e5 1-5
+at/evals/tests-audit-finds-bad-tests/case.yaml
+  s_4377d979fc39bb::t_197dd34f5a6aeb 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a4b460cf8b8e457ebabc46471c5ae08259b205c",
+  "prompts": {},
+  "sessions": {
+    "s_4377d979fc39bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e47ff45-9e45-4ac0-90ba-7480b1e3856b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
