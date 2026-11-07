@@ -25,7 +25,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `rules/writing.md` | `~/.claude/rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
 | `rules/plugin-evals.md` | `~/.claude/rules/` | Every session | How to write plugin eval graders and what the eval sandbox denies |
-| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, the zsh-guard hook that blocks Bash commands zsh runs differently, and the sync hook that pulls at session start |
+| `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, the zsh-guard hook that blocks Bash commands zsh runs differently, the pr-checks hook that stops Claude from ending a turn while a PR it opened has checks running or red, and the sync hook that pulls at session start |
 
 Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:review`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:retro`, `/at:word-salad` and `/at:cone-of-shame` run only when you type them.
 
@@ -71,6 +71,10 @@ flowchart TD
 ## Glossary and decision records
 
 The `glossary` skill keeps a glossary and decision records for each repo in `~/at-skills-data/<host>/<org>/<repo>/`, taken from the `origin` remote, so no repo holds them. `/at:interview`, `/at:diagnose`, `/at:explain` and `/at:research` read them first. `/at:interview` and `/at:diagnose` add terms. `~/at-skills-data` is a local git repo with no remote, and each write is a commit. `uninstall.sh` never touches it.
+
+## A PR is done when its checks pass
+
+The `at/hooks/pr-checks/pr_checks.py` Stop hook reads the session transcript for PR links that `gh pr create` printed. Before Claude ends a turn, it runs `gh pr checks` on each one. If a check is running, failed or was cancelled, the hook blocks the stop and names the checks, so Claude waits with `gh pr checks --watch` and fixes the cause. It blocks once in a row: the next stop goes through, so it cannot loop.
 
 ## Start from the latest code
 
