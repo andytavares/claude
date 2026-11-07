@@ -1,0 +1,23 @@
+at/skills/tests/references/frameworks.md
+  s_4377d979fc39bb::t_1de7fa2bdf37a6 1-68
+at/skills/tests/audit.md
+  s_4377d979fc39bb::t_33a83de32a9fe1 1-80
+at/skills/tests/SKILL.md
+  s_4377d979fc39bb::t_d0dfebcf80d8fa 1-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ecbc24d0215b1754375acc727cb52e5a147b3eda",
+  "prompts": {},
+  "sessions": {
+    "s_4377d979fc39bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e47ff45-9e45-4ac0-90ba-7480b1e3856b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
