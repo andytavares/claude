@@ -53,9 +53,11 @@ git grep -n -i -E 'retries|retry|retryTimes|reruns' -- '*.config.*' pyproject.to
 
 One line per finding:
 
-`path:line — rule ID — action — evidence`
+`path:line test name — rule ID — action — evidence`
 
-Example: `tests/test_cart.py:42 — T-CAN-FAIL — delete — asserts only the value mock_price.return_value was told to return`
+Always name the test, so a reader can find it without opening the file. A project-level finding names the config file instead.
+
+Example: `tests/test_cart.py:42 test_total_returns_price — T-CAN-FAIL — delete — asserts only the value mock_price.return_value was told to return`
 
 ## Actions
 
