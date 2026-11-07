@@ -1,6 +1,6 @@
 ---
-name: review
-description: Review every file in a branch's diff for correctness bugs in one pass. Faster than the bundled /code-review, and it never skips a file.
+name: code-review
+description: Review every file in a branch's diff for correctness bugs. Unlike the bundled /code-review, it reads every file in one pass and never skips one.
 argument-hint: "[base branch] [spec path or artifact URL]  (default: the remote default branch, no spec)"
 context: fork
 model: opus

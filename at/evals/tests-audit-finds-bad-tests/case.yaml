@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: tests-audit-finds-bad-tests
+context:
+  scaffold_script: scaffold.sh

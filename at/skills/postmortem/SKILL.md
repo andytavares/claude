@@ -1,5 +1,5 @@
 ---
-name: retro
+name: postmortem
 description: Read this session and list changes to the Claude config that stop repeated friction. You pick, then it writes a brief for /at:implement.
 disable-model-invocation: true
 argument-hint: "[focus]  (default: the whole session)"
@@ -30,7 +30,7 @@ Ask the user which fixes to keep, with AskUserQuestion, up to 4 per question.
 
 ## Brief
 
-For the fixes the user picked, write one brief to `~/at-skills-data/retro/<YYYY-MM-DD>-<slug>.md` and commit it there (see the `glossary` skill for the git rules). The brief has: the problem, the picked fixes with target files, and acceptance criteria that can be false, each with the command that checks it. No ticket is needed unless the user asks.
+For the fixes the user picked, write one brief to `~/at-skills-data/postmortem/<YYYY-MM-DD>-<slug>.md` and commit it there (see the `glossary` skill for the git rules). The brief has: the problem, the picked fixes with target files, and acceptance criteria that can be false, each with the command that checks it. No ticket is needed unless the user asks.
 
 Print the path and this command, with the real source repo path:
 

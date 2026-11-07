@@ -33,7 +33,7 @@ Reproduce, find the cause, fix the cause. A workaround or a quick fix is mine to
 
 ## Tests
 
-Failing test first, then make it pass. Unit tests always; integration and e2e only when needed. Tests assert behavior and edge cases and fail when the code is wrong. No tautologies, no asserting a mock returned what it was told. Only test cases that are possible do not write tests for a code path that can never happen.
+Failing test first, then make it pass. Unit tests always; integration and e2e only when needed. Tests assert behavior and edge cases and fail when the code is wrong. No tautologies, no asserting a mock returned what it was told. Only test cases that are possible do not write tests for a code path that can never happen. Before you write, change or audit a test, run the `at:tests` skill.
 
 ## Dependencies
 
