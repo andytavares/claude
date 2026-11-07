@@ -19,7 +19,8 @@ Apply the rule list in `${CLAUDE_SKILL_DIR}/SKILL.md` to an existing suite. Scop
    - Run the unit tier with all sockets blocked. Run integration and E2E with only localhost allowed (T-BOUNDARY).
    - Run E2E specs with `--repeat-each=5 --retries=0` and more workers than cores. Use the project's own load tool if it has one.
    - Read CI history. A commit with both a passed and a failed run of one test is a flaky test:
-     `gh run list --limit 100 --json headSha,conclusion --jq 'group_by(.headSha)[] | select((map(.conclusion) | index("success")) and (map(.conclusion) | index("failure"))) | .[0].headSha'`
+     `gh run list --limit 100 --json headSha,workflowName,conclusion --jq 'group_by([.headSha, .workflowName])[] | select((map(.conclusion) | index("success")) and (map(.conclusion) | index("failure"))) | "\(.[0].headSha) \(.[0].workflowName)"'`
+     Each hit is a lead. Confirm in the job logs that the same test passed and failed.
 5. **Pattern scan.** Run the commands in "Pattern list" below. Keep the hit list per file.
 6. **Read.** Read every test file, not only the hits. Read each test with the production code it calls and that code's callers. Give each test one action from "Actions", with the rule ID. For more than about 40 test files, start one subagent per top-level test directory, at most 8. Give each subagent the rule list, its hit list and the finding format.
 7. **Unreachable code.** For each branch that no caller or boundary can reach (T-REACHABLE), ask the user with AskUserQuestion: "delete branch and test", "delete test only" or "keep". Deleting production code is destructive, so never decide alone.
@@ -29,21 +30,22 @@ Apply the rule list in `${CLAUDE_SKILL_DIR}/SKILL.md` to an existing suite. Scop
 
 ## Pattern list
 
-Set `TESTS` to the pathspecs of the test files, for example `TESTS="tests/ '*.test.*' '*.spec.*' 'test_*.py'"`. Each hit is a lead to read, not a finding.
+Set `TESTS` to a shell array of the test pathspecs, then pass it as `"${TESTS[@]}"`. This works in bash and zsh. The patterns use POSIX classes, because `git grep -E` on macOS does not support `\b` or `\s`. Each hit is a lead to read, not a finding.
 
 ```sh
-git grep -L -E '\b(expect|assert)' -- $TESTS                                   # T-CAN-FAIL: file with no assertion
-git grep -n -E 'mockReturnValue|mockResolvedValue|return_value *=' -- $TESTS   # T-CAN-FAIL: possible mock-echo test
-git grep -n -E 'toBeDefined\(\)|toBeTruthy\(\)|is not None$' -- $TESTS         # T-CAN-FAIL: weak assertion
-git grep -n -E 'toHaveBeenCalled|assert_called|assert_any_call' -- $TESTS      # T-STATE: call assertion
-git grep -n -E 'toMatchSnapshot|toMatchInlineSnapshot|snapshot' -- $TESTS      # T-NO-SNAPSHOT-ONLY
-git grep -n -E '\bsleep\(|waitForTimeout|setTimeout\(' -- $TESTS               # T-WAIT-CONDITION
-git grep -n -E 'waitFor\(.*getBy' -- $TESTS                                    # T-READY-TARGET: use findBy
-git grep -n -E '\.(skip|only|fixme)\(|\bx(it|describe)\(|mark\.(skip|xfail)' -- $TESTS   # skipped or focused tests
-git grep -n -E '^\s+(if|for|while)\b|\.forEach\(' -- $TESTS                    # T-READABLE: logic in a test
-git grep -n -E 'fireEvent\.|getByTestId' -- $TESTS                             # T-READABLE: query order, user-event
-git grep -n -E 'https?://' -- $TESTS | grep -v -E 'localhost|127\.0\.0\.1'     # T-BOUNDARY: real host
-git grep -n -E '\.setTimeout\(|timeout: *[0-9]|mark\.timeout' -- $TESTS        # T-CONTROL-TIME: per-test timeout
+TESTS=(tests '*.test.*' '*.spec.*' 'test_*.py')
+git grep -L -E '(expect|assert)' -- "${TESTS[@]}"                                       # T-CAN-FAIL: file with no assertion
+git grep -n -E 'mockReturnValue|mockResolvedValue|return_value[[:space:]]*=' -- "${TESTS[@]}"   # T-CAN-FAIL: possible mock-echo test
+git grep -n -E 'toBeDefined\(\)|toBeTruthy\(\)|is not None$' -- "${TESTS[@]}"            # T-CAN-FAIL: weak assertion
+git grep -n -E 'toHaveBeenCalled|assert_called|assert_any_call' -- "${TESTS[@]}"         # T-STATE: call assertion
+git grep -n -E 'toMatchSnapshot|toMatchInlineSnapshot|snapshot' -- "${TESTS[@]}"         # T-NO-SNAPSHOT-ONLY
+git grep -n -E '(^|[^[:alnum:]_])sleep\(|waitForTimeout|setTimeout\(' -- "${TESTS[@]}"   # T-WAIT-CONDITION
+git grep -n -E 'waitFor\(.*getBy' -- "${TESTS[@]}"                                       # T-READY-TARGET: use findBy
+git grep -n -E '\.(skip|only|fixme)\(|(^|[^[:alnum:]_])x(it|describe)\(|mark\.(skip|xfail)' -- "${TESTS[@]}"   # skipped or focused tests
+git grep -n -E '^[[:space:]]+(if|for|while)[[:space:](]|\.forEach\(' -- "${TESTS[@]}"     # T-READABLE: logic in a test
+git grep -n -E 'fireEvent\.|getByTestId' -- "${TESTS[@]}"                                # T-READABLE: query order, user-event
+git grep -n -E 'https?://' -- "${TESTS[@]}" | grep -v -E 'localhost|127\.0\.0\.1'        # T-BOUNDARY: real host
+git grep -n -E '\.setTimeout\(|timeout:[[:space:]]*[0-9]|mark\.timeout' -- "${TESTS[@]}"  # T-CONTROL-TIME: per-test timeout
 git grep -n -i -E 'retries|retry|retryTimes|reruns' -- '*.config.*' pyproject.toml setup.cfg pytest.ini .github .buildkite   # T-NO-RETRY
 ```
 

@@ -18,7 +18,7 @@ Read the installed version of each tool before you set an option (`npm ls <name>
 ## Vitest
 
 - **Shuffle and seed replay** (T-ALONE): `vitest run --sequence.shuffle --sequence.seed=<n>`, or `sequence: { shuffle: true }` in config. The seed defaults to `Date.now()`. Always pass `--sequence.seed` so the run has a known seed. [UNVERIFIED] whether Vitest prints the seed. https://vitest.dev/config/sequence
-- **Repeat** (T-ALONE): `vitest run <file> --repeats=29` runs each test 30 times. Config: `repeats`. A test fails if any repeat fails. https://vitest.dev/config/repeats
+- **Repeat** (T-ALONE): Vitest 5 and later: `vitest run <file> --repeats=29` runs each test 30 times in one order. A test fails if any repeat fails. It finds timing flakes, not order dependence. Before Vitest 5, use the `repeats` test option or a loop. For 30 shuffled runs, loop 30 runs, each with a new `--sequence.seed`. Check the version with `npm ls vitest`. https://vitest.dev/config/repeats, https://github.com/vitest-dev/vitest/blob/main/docs/blog/vitest-5.md
 - **Workers**: `--maxWorkers=<n>`, a number or a percentage. https://vitest.dev/config/maxworkers
 - **Network block** (T-BOUNDARY): Vitest has no socket block. Use MSW with unhandled requests as errors (see MSW).
 - **Mock, env and global restore** (T-CLEAN-SLATE): `test: { restoreMocks: true, unstubEnvs: true, unstubGlobals: true }`. https://vitest.dev/config/restoremocks, https://vitest.dev/config/unstubenvs, https://vitest.dev/config/unstubglobals
