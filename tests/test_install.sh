@@ -124,7 +124,7 @@ assert_radar_and_fleet_gone() {
   python3 -c '
 import json, sys
 h = json.load(open(sys.argv[1]))["hooks"]
-assert sorted(h) == ["PostToolUse", "PreToolUse", "SessionStart"], list(h)' "$C/skills/at/hooks/hooks.json" || fail "hooks other than the clean gate, zsh guard and sync installed"
+assert sorted(h) == ["PostToolUse", "PreToolUse", "SessionStart", "Stop"], list(h)' "$C/skills/at/hooks/hooks.json" || fail "hooks other than the clean gate, zsh guard, sync and pr-checks installed"
 }
 
 test_install_removes_retired_radar() {
