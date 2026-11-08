@@ -6,7 +6,7 @@ effort: high
 ---
 Problem: $ARGUMENTS
 
-Find the cause with evidence, then fix the cause. Do the phases in order. Do not skip a gate.
+Find the cause with evidence, then fix the cause. Phase 1 is a gate: make no fix until a command fails on the bug. Use Phases 2 to 4 as far as the bug needs them.
 
 Read the glossary first: run the `glossary` skill.
 
@@ -56,4 +56,4 @@ Remove every tagged line and throwaway file. Run the project's checks and report
 
 Lead with the cause in one sentence, then the evidence (`path:line`, the failing job and log line, or the command and its output), the fix, and what you could not determine. If you learned a term of the repo, add it to the glossary. If the cause was a hard-to-reverse decision, offer an ADR.
 
-Adapted from mattpocock/skills (MIT): https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs. The k-repo phase and its files come from the former `investigate-build` skill.
+Adapted from mattpocock/skills (MIT): https://github.com/mattpocock/skills/tree/main/skills/engineering/diagnosing-bugs.

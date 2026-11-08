@@ -2,17 +2,17 @@
 name: implement
 description: Implement a brief or spec. Plans and orchestrates on Opus at medium effort, delegates the building to Opus workers at medium effort, ends in a PR.
 disable-model-invocation: true
-argument-hint: "[briefs/<id>.md | SPEC.md | quick ask]"
+argument-hint: "[briefs/<id>.md | spec path | spec artifact URL | Linear key | quick ask]"
 model: opus
 effort: medium
 ---
 Work: $ARGUMENTS
 
-If the argument is a path, read it; it is the brief or spec. If it looks like a Linear key, read the ticket with the Linear tools, including comments and linked issues. Otherwise it is the ask, and a size-S brief in your head is enough.
+If the argument is a path, read it; it is the brief or spec. If it is a claude.ai artifact URL, read it with the Artifact tool; it is the spec. If it looks like a Linear key, read the ticket with the Linear tools, including comments and linked issues. Otherwise it is the ask, and a size-S brief in your head is enough.
 
 If the brief or spec has open questions (an "Open questions" section, or items marked open, TBD or unresolved), ask the user each one with the AskUserQuestion tool before you start any other step. Ask up to 4 per call, with the recommended answer as the first option, marked "(Recommended)". Treat each answer as part of the spec. Start the plan only when every open question has an answer or the user defers it.
 
-Work in a git worktree. If you are not in one, use the existing worktree for this work, or create one in `.worktrees/` at the repo root. Run `git fetch` first and create a new worktree from the remote default branch (`origin/main`). In an existing worktree, pull its branch, and merge the default branch if it has commits from more than 3 hours ago that the branch lacks. A worktree location in the prompt or in the repo's `CLAUDE.md` replaces this default.
+Work in a git worktree. If you are not in one, use the existing worktree for this work, or create one in `.worktrees/` at the repo root. Run `git fetch` first and create a new worktree from the remote default branch (`git rev-parse --abbrev-ref origin/HEAD`, called `<default>` below). In an existing worktree, pull its branch, and merge the default branch if it has commits from more than 3 hours ago that the branch lacks. A worktree location in the prompt or in the repo's `CLAUDE.md` replaces this default.
 
 ## Plan
 
@@ -39,14 +39,14 @@ A worker that reports a failing check gets one relaunch with the failure text ad
 
 A worker that has not reported by its time box, or says it is waiting on its own background work, gets one message asking for its report now.
 
-When a unit's checks pass, commit it on the feature branch in the repo's convention, one commit per unit, so Prove sees the work in `main...HEAD`.
+When a unit's checks pass, commit it on the feature branch in the repo's convention, one commit per unit, so Prove sees the work in `<default>...HEAD`.
 
 ## Prove
 
 1. For a large or complex change, run the `at:code-review` skill once, as `at:code-review <default branch> <the brief or spec path or URL>` when the work has one, and wait for its report. Fix the `Against the spec` list too. Skip it for trivial work. If its first line counts fewer files than the diff has, review the missing files yourself. Fix each finding in this session; do not relaunch workers for review findings. Commit the fixes. Do not review again after the fixes.
-2. Run the stability check from the `at:tests` skill once, for every test spec file added or edited in `main...HEAD`: the spec file alone, then 30 shuffled runs for unit and integration specs, `--repeat-each=5 --retries=0` for E2E specs, with more workers than cores. Fix each failure at its cause; never retry.
+2. Run the stability check from the `at:tests` skill once, for every test spec file added or edited in `<default>...HEAD`: the spec file alone, then 30 shuffled runs for unit and integration specs, `--repeat-each=5 --retries=0` for E2E specs, with more workers than cores. Fix each failure at its cause; never retry.
 3. Run precommit checks once until every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
-4. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report main..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
+4. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report <default>..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
 
 ## Ship
 

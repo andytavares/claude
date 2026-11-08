@@ -62,7 +62,7 @@ Do all the work I asked for before you end your turn. A stop halfway leaves the 
 
 ## Communicating with me
 
-Write each reply in as few lines as its content allows. When I ask how to fix something, the reply opens with the numbered fix steps. Reasons go after them, at most 3 lines.
+Write each reply in as few lines as its content allows. When I ask how to fix something, the reply opens with the numbered fix steps. Reasons go after them, in as few lines as they need.
 All text a person reads follows `rules/writing.md`: plain language, and the PR and ticket formats. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Detail only when I ask.
 When finished, lead with the outcome in one sentence, then the link to the PR or commit that holds the evidence. Put the evidence in chat only when I ask for it, or when I need it to understand the work. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
 Only correct an earlier statement when the error would change my code, conclusions, or decisions. State it plainly and continue.
