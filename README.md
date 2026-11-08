@@ -21,7 +21,7 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 
 | Layer | Installed to | Loaded | What it does |
 | --- | --- | --- | --- |
-| `global/CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, one PR per task, finish without stopping, short replies |
+| `global/CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, one PR per ask (one per Linear ticket), finish without stopping, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `rules/writing.md` | `~/.claude/rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
 | `rules/plugin-evals.md` | `~/.claude/rules/` | Every session | How to write plugin eval graders and what the eval sandbox denies |

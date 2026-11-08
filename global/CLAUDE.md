@@ -43,12 +43,13 @@ Pin exact versions, commit the lockfile with hashes, and install from it using t
 
 Start every task from the latest remote code. Pull the current branch first, and create new branches and worktrees from the freshly fetched default branch. On a feature branch, merge the default branch when it has commits from more than 3 hours ago that the branch lacks. The `at` plugin's SessionStart hook pulls and reports this at session start; do it yourself for a task that starts later in the session.
 
-Work in a clean worktree/feature branch for each new feature, only reuse a feature branch or worktree when specifically told to do so or if the work is directly related (use Stacked PRs here if needed). One commit per logical unit in the repo's convention, open a draft PR when done.
+Work in a clean worktree/feature branch for each new feature, only reuse a feature branch or worktree when specifically told to do so or if the work is directly related. One commit per logical unit in the repo's convention, open a draft PR when done.
 
-One task is one PR, unless I say otherwise. Extra PRs split one review and one merge into many.
-- Use a stacked PR (each PR based on the branch of the one before) when the change is large and unwieldy for a human to understand (touches many domains, very large change, work that must be sequenced to succeed, etc.).
-- Use separate PRs only when the change spans more than one repo, or when the parts must merge in a set order because merging them together would break `main`.
-- Do not split work into more PRs only to make each one smaller.
+One ask is one PR. If I ask for 10 things in one message, all 10 go in one PR.
+- Open more than one PR only when I say so in my words. Do not decide to split on your own: no stacked PRs, no PR per part, no PR per item.
+- Exception: when I give you Linear tickets, each ticket gets its own PR.
+- Exception: when the work needs a manual step between two parts, open a PR for the part before the step. Tell me the manual step to do. After I do it, open a second PR for the part that needs it.
+- A PR cannot span repos. If one ask changes two repos, open one PR per repo and say so in the summary.
 
 Every PR links exactly one ticket. One ticket can link many PRs.
 
