@@ -16,7 +16,7 @@ assert_contains() { grep -qF -- "$2" "$1" || fail "$1 lacks '$2'"; }
 
 seed_home() {
   rm -rf "$H"
-  mkdir -p "$C/skills/mine" "$C/skills/research" "$C/skills/google-review" "$C/skills/design-doc" "$C/skills/investigate-build" "$C/agents" "$C/hooks/clean-gate"
+  mkdir -p "$C/rules" "$C/skills/mine" "$C/skills/research" "$C/skills/google-review" "$C/skills/design-doc" "$C/skills/investigate-build" "$C/agents" "$C/hooks/clean-gate"
   echo "my own skill" > "$C/skills/mine/SKILL.md"
   echo "loose copy from an earlier install" > "$C/skills/research/SKILL.md"
   echo "loose copy from an earlier install" > "$C/agents/worker.md"
@@ -25,6 +25,7 @@ seed_home() {
   echo "loose skill the diagnose skill replaces" > "$C/skills/investigate-build/SKILL.md"
   echo "retired agent from an earlier install" > "$C/agents/google-code-reviewer.md"
   echo "loose copy from an earlier install" > "$C/hooks/clean-gate/gate.py"
+  echo "global rule this repo now keeps to itself" > "$C/rules/plugin-evals.md"
   printf '%s' "$ORIGINAL_CLAUDE_MD" > "$C/CLAUDE.md"
   cat > "$C/settings.json" << 'JSON'
 {"theme":"dark","hooks":{
@@ -50,7 +51,6 @@ assert_plugin_installed() {
   cmp -s "$ROOT/global/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
   assert_exists "$C/rules/clean-code.md"
   assert_exists "$C/rules/writing.md"
-  assert_exists "$C/rules/plugin-evals.md"
   assert_contains "$C/CLAUDE.md" "opens with the numbered fix steps"
   assert_contains "$C/CLAUDE.md" "do not repeat its work"
   assert_exists "$C/skills/at/.claude-plugin/plugin.json"
@@ -72,6 +72,7 @@ assert_loose_copies_removed() {
   assert_gone "$C/skills/investigate-build"
   assert_gone "$C/agents/google-code-reviewer.md"
   assert_gone "$C/hooks/clean-gate"
+  assert_gone "$C/rules/plugin-evals.md"
 }
 
 test_install() {
@@ -172,10 +173,10 @@ test_uninstall_removes_retired_radar_config() {
 test_uninstall_keeps_the_data_store() {
   seed_home
   run_install > /dev/null
-  mkdir -p "$H/at-skills-data/github.com/klaviyo/k-repo"
-  echo "term" > "$H/at-skills-data/github.com/klaviyo/k-repo/GLOSSARY.md"
+  mkdir -p "$H/at-skills-data/github.com/example-org/app"
+  echo "term" > "$H/at-skills-data/github.com/example-org/app/GLOSSARY.md"
   run_uninstall > /dev/null
-  assert_exists "$H/at-skills-data/github.com/klaviyo/k-repo/GLOSSARY.md"
+  assert_exists "$H/at-skills-data/github.com/example-org/app/GLOSSARY.md"
 }
 
 test_uninstall_rejects_unknown_option() {

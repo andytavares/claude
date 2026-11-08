@@ -20,19 +20,19 @@ make_repo() {
 path_for() { (cd "$1" && HOME="$H" bash "$SCRIPT"); }
 
 test_ssh_remote() {
-  assert_eq "$(path_for "$(make_repo a git@github.com:klaviyo/k-repo.git)")" "$H/at-skills-data/github.com/klaviyo/k-repo" "ssh remote"
+  assert_eq "$(path_for "$(make_repo a git@github.com:example-org/app.git)")" "$H/at-skills-data/github.com/example-org/app" "ssh remote"
 }
 
 test_https_remote() {
-  assert_eq "$(path_for "$(make_repo b https://github.com/klaviyo/k-repo)")" "$H/at-skills-data/github.com/klaviyo/k-repo" "https remote"
+  assert_eq "$(path_for "$(make_repo b https://github.com/example-org/app)")" "$H/at-skills-data/github.com/example-org/app" "https remote"
 }
 
 test_https_remote_with_git_suffix_and_credentials() {
-  assert_eq "$(path_for "$(make_repo c https://user@github.com/klaviyo/app.git)")" "$H/at-skills-data/github.com/klaviyo/app" "https remote with user and .git"
+  assert_eq "$(path_for "$(make_repo c https://user@github.com/example-org/web.git)")" "$H/at-skills-data/github.com/example-org/web" "https remote with user and .git"
 }
 
 test_ssh_remote_with_port() {
-  assert_eq "$(path_for "$(make_repo e ssh://git@github.com:2222/klaviyo/k-repo.git)")" "$H/at-skills-data/github.com/klaviyo/k-repo" "ssh remote with port"
+  assert_eq "$(path_for "$(make_repo e ssh://git@github.com:2222/example-org/app.git)")" "$H/at-skills-data/github.com/example-org/app" "ssh remote with port"
 }
 
 test_no_remote_uses_folder_name() {
@@ -41,10 +41,10 @@ test_no_remote_uses_folder_name() {
 
 test_worktree_shares_the_main_checkout_path() {
   local main
-  main="$(make_repo d git@github.com:klaviyo/fender.git)"
+  main="$(make_repo d git@github.com:example-org/api.git)"
   git -C "$main" -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
   git -C "$main" worktree add -q "$WORK/d-wt" -b feature
-  assert_eq "$(path_for "$WORK/d-wt")" "$H/at-skills-data/github.com/klaviyo/fender" "worktree"
+  assert_eq "$(path_for "$WORK/d-wt")" "$H/at-skills-data/github.com/example-org/api" "worktree"
 }
 
 test_outside_a_repo_fails() {

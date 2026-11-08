@@ -4,7 +4,6 @@ description: Review every file in a branch's diff for correctness bugs. Unlike t
 argument-hint: "[base branch] [spec path or artifact URL]  (default: the remote default branch, no spec)"
 context: fork
 model: opus
-effort: medium
 ---
 Input: $ARGUMENTS
 

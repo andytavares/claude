@@ -44,4 +44,4 @@ Do these steps before you write or change a test. `${CLAUDE_SKILL_DIR}/reference
 
 An `at:worker` skips step 4, because it caps repeats at 3 while other workers run checks. `/at:implement` runs step 4 once in Prove, for each spec file the branch adds or changes.
 
-Sources: Software Engineering at Google ch. 11-14, The Practical Test Pyramid, xUnit Patterns (Erratic Test), testsmells.org, Testing Library docs, Playwright best practices, terminator ADRs 070, 115, 123, 124.
+Sources: Software Engineering at Google ch. 11-14, The Practical Test Pyramid, xUnit Patterns (Erratic Test), testsmells.org, Testing Library docs, Playwright best practices.

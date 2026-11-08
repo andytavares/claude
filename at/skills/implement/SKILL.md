@@ -1,10 +1,9 @@
 ---
 name: implement
-description: Implement a brief or spec. Plans and orchestrates on Opus at medium effort, delegates the building to Opus workers at medium effort, ends in a PR.
+description: Implement a brief or spec. Plans and orchestrates, delegates the building to `at:worker` subagents, ends in a PR.
 disable-model-invocation: true
 argument-hint: "[briefs/<id>.md | spec path | spec artifact URL | Linear key | quick ask]"
 model: opus
-effort: medium
 ---
 Work: $ARGUMENTS
 
@@ -26,7 +25,7 @@ If the brief says `needs /at:interview` or a unit cannot be written without a de
 
 Before launching any worker, do the shared setup once yourself: install, build, anything every unit's checks need. Workers never rebuild or reinstall while another worker's checks are running.
 
-Delegate each unit to the `at:worker` subagent (Opus, medium effort), with the unit's text as its whole brief, the glossary directory path (get it by running the `glossary` skill) when that directory exists, plus the repo's lint and test commands, scoped to what the unit touches. Each brief ends with a time box ("report within 20 minutes with what you have").
+Delegate each unit to the `at:worker` subagent, with the unit's text as its whole brief, the glossary directory path (get it by running the `glossary` skill) when that directory exists, plus the repo's lint and test commands, scoped to what the unit touches. Each brief ends with a time box ("report within 20 minutes with what you have").
 
 Checks in a brief are targeted, never whole-suite:
 - the tests for the files the unit touches, run once;

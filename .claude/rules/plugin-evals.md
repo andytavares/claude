@@ -10,7 +10,7 @@ Docs: https://code.claude.com/docs/en/plugin-evals.md
 ## The sandbox
 - Runs never ask for permission (don't-ask mode). A tool that needs a grant you did not give is removed, so Claude cannot call it.
 - Bash, Write, Edit, WebFetch and real MCP tools are denied unless the run passes `--allow-tools`. Put the target before `--allow-tools`, because the flag takes a list.
-- A grader that needs a real `klaviyocli` or Buildkite call cannot pass in the sandbox.
+- A grader that needs a real call to an external CLI or CI service cannot pass in the sandbox.
 
 ## Before a fix
 1. Test each `regex` grader in `node` on a reply that must pass and a negated reply that must fail. Do this before the first eval run.

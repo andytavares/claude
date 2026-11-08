@@ -1,8 +1,7 @@
 ---
 name: diagnose
-description: Use when something is broken, failing, slow or surprising, and for a Buildkite build, a CI failure or a PR URL with "why did this fail", "debug this" or "why was so much built". Finds the cause with a loop that can fail, then fixes it.
+description: Use when something is broken, failing, slow or surprising, and for a CI build, a CI failure or a PR URL with "why did this fail" or "debug this". Finds the cause with a loop that can fail, then fixes it.
 model: opus
-effort: high
 ---
 Problem: $ARGUMENTS
 
@@ -10,12 +9,9 @@ Find the cause with evidence, then fix the cause. Phase 1 is a gate: make no fix
 
 Read the glossary first: run the `glossary` skill.
 
-## Phase 0: Facts for a k-repo build or PR
+## Phase 0: Facts for a CI build or PR
 
-If the input is a Buildkite URL, a build number or a k-repo PR URL, get the facts with `bk` and `gh` before you form a hypothesis. Read `${CLAUDE_SKILL_DIR}/references/k-repo-build-system.md` for the commands, the artifact formats and the target types.
-
-- **Why did it fail?** Run `bk build view <n> -p klaviyo-ci/k-repo --json`. Look only at jobs with state `failed`, `timed_out` or `expired` that are not `soft_failed`. `broken` jobs never ran. Read the log of the first failing job and quote the error and the file, test and line.
-- **Why was so much built?** Find the "Setup pipeline" job. Read its log for the three lines: top-level targets, dependents, total. Download the artifacts it names (`peek.json.gz`, `stats.jsonl`) and run `gunzip -k` on the `.gz` and the PR's changed files. Run `python3 -I "${CLAUDE_SKILL_DIR}/scripts/analyze_deps.py" <peek.json> <changed target>...`. Name the intermediate target that is the common ancestor, and show the BUILD rule that creates the dependency.
+If the input is a CI build URL, a build number or a PR URL, get the facts before you form a hypothesis: `gh pr checks` for a PR, and the CI's own CLI for the build. Look only at jobs that failed or timed out, not soft or allowed failures. Read the log of the first failing job and quote the error and the file, test and line.
 
 For any other problem, go to Phase 1.
 

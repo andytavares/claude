@@ -24,7 +24,6 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `global/CLAUDE.md` | `~/.claude/CLAUDE.md` | Every session | How to work and report: scope, evidence, done means checks pass, one PR per ask (one per Linear ticket), finish without stopping, short replies |
 | `rules/clean-code.md` | `~/.claude/rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `rules/writing.md` | `~/.claude/rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
-| `rules/plugin-evals.md` | `~/.claude/rules/` | Every session | How to write plugin eval graders and what the eval sandbox denies |
 | `at/` plugin | `~/.claude/skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, the zsh-guard hook that blocks Bash commands zsh runs differently, the pr-checks hook that stops Claude from ending a turn while a PR it opened has checks running or red, and the sync hook that pulls at session start |
 
 Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:code-review`, `/at:tests`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:postmortem`, `/at:word-salad` and `/at:cone-of-shame` run only when you type them.
@@ -46,23 +45,23 @@ flowchart TD
 
 | Skill | Use it when | Runs on | You get |
 | --- | --- | --- | --- |
-| `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus, high | A spec artifact covering what the ask didn't mention |
-| `/at:research` | You need a one-pager (`--one-pager`), PRD (`--prd`) or design doc (`--design`) | Opus, high | A shareable artifact |
-| `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus, high | An answer with file and line evidence |
-| `/at:diagnose` | Something is broken, failing or slow, or you have a Buildkite or PR URL and ask why | Opus, high | The cause with evidence, then a fix with a regression test |
-| `/at:postmortem` | The session repeated friction | Opus, high | A brief for `/at:implement` that fixes this config |
+| `/at:interview` | The ask is part of a bigger problem, or needs decisions | Opus | A spec artifact covering what the ask didn't mention |
+| `/at:research` | You need a one-pager (`--one-pager`), PRD (`--prd`) or design doc (`--design`) | Opus | A shareable artifact |
+| `/at:explain` | You want to know how something works, with `as: table \| list \| diagram \| prose \| doc` | Opus | An answer with file and line evidence |
+| `/at:diagnose` | Something is broken, failing or slow, or you have a CI build or PR URL and ask why | Opus | The cause with evidence, then a fix with a regression test |
+| `/at:postmortem` | The session repeated friction | Opus | A brief for `/at:implement` that fixes this config |
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A short reuse map |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Opus workers build | A draft PR |
-| `/at:code-review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you. Add a spec path to check the diff against it | Opus, medium, in a fork | One line per bug, a second list against the spec, and a count of the files it read |
+| `/at:code-review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you. Add a spec path to check the diff against it | Opus, in a fork | One line per bug, a second list against the spec, and a count of the files it read |
 | `/at:tests` | Before writing or changing a test; `audit [path]` to audit a whole suite | Session model | Tests that can fail, run alone and never flake; an audit brief for `/at:implement` |
-| `/at:word-salad` | A reply is too dense to read | Opus, medium | The same content in plain, short, ordered prose |
-| `/at:cone-of-shame` | A response broke the rules or was bad. Add a note on what went wrong | Opus, high | The work redone, and a draft PR that fixes the cause in this config |
+| `/at:word-salad` | A reply is too dense to read | Opus | The same content in plain, short, ordered prose |
+| `/at:cone-of-shame` | A response broke the rules or was bad. Add a note on what went wrong | Opus | The work redone, and a draft PR that fixes the cause in this config |
 
 ## Getting the best results
 
 - **Start from a file, not a paragraph.** Skills read a brief or spec by path. A small, clear ask goes straight to `/at:implement`. Anything with a design choice goes through `/at:research` or `/at:interview` first.
 - **Let size set effort, not worry.** Raise effort only after a run fails for lack of it, one level at a time. On the 5.5 models, medium already handles most multi-step coding.
-- **Survey before you build.** `/at:implement` does this for you, but for work in your own session, run `/at:survey <what you're adding>` first. On terminator, asking for a "last edited 5m ago" label showed the label already existed (`NoteList.tsx:296`) and that `relativeTime` is copied, with different output, in two other files.
+- **Survey before you build.** `/at:implement` does this for you, but for work in your own session, run `/at:survey <what you're adding>` first.
 - **Read gate findings like review comments.** Fix each one, or say why it's intended. Tune each repo with a `.clean-gate.json` (below).
 - **Judge the PR by its first two paragraphs.** Every PR opens with one paragraph on what the code does now and one on what changes, three sentences or fewer each, then "Reviewer notes" with its "Merge danger" line. If you can't follow them, ask for a rewrite before reading the code.
 - **Done means the checks ran.** The PR carries each command and its exit code. A summary that says "tests pass" without output isn't done.
@@ -83,7 +82,7 @@ At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-f
 
 ## The clean-code gate
 
-The gate runs after every edit, including in agent sessions Foundry starts, since those write code too. It sends its findings back to Claude, which fixes them before carrying on.
+The gate runs after every edit, including in agent sessions, since those write code too. It sends its findings back to Claude, which fixes them before carrying on.
 
 | Check | Rule |
 | --- | --- |
