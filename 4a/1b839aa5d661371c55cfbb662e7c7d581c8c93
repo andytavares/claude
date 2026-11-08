@@ -1,0 +1,22 @@
+global/CLAUDE.md
+  s_86ee18a1d13bce::t_04052f0eca7f25 46,48-50,52
+  s_86ee18a1d13bce::t_ae405c4ca2335a 51
+README.md
+  s_86ee18a1d13bce::t_04052f0eca7f25 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4a1b839aa5d661371c55cfbb662e7c7d581c8c93",
+  "prompts": {},
+  "sessions": {
+    "s_86ee18a1d13bce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "71f3412b-279c-49f0-b905-c719bba7af8d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
