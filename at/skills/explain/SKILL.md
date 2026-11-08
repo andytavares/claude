@@ -1,9 +1,8 @@
 ---
 name: explain
-description: Research this codebase and answer a question about it in the format asked for
+description: Research this codebase and answer a question about it, with file and line evidence, in the format asked for. Use when asked how something works, what calls or depends on a symbol, what all the instances of something are, or why the code is the way it is.
 argument-hint: "[question] [as: table | list | diagram | prose | doc]"
 model: opus
-effort: high
 ---
 Question: $ARGUMENTS
 

@@ -4,19 +4,18 @@ description: Clarify an ask until no ambiguity is left, hunting the parts of the
 disable-model-invocation: true
 argument-hint: "[ask | brief path]"
 model: opus
-effort: high
 ---
 Ask: $ARGUMENTS
 
 If the argument is a path, read it; it is the brief. Otherwise it is the ask.
 
+Run the `glossary` skill first. Use its terms in your questions.
+
 The ask is usually a view of part of the problem. Your job is the whole of it. Before asking anything, map the problem space yourself:
 
 1. Run `/at:explain` on the area the ask touches: what exists, who calls it, what depends on it, what it depends on.
 2. List every adjacent concern the ask did not mention: other callers, other platforms or entry points, data already stored in the old shape, migrations, permissions, failure and retry paths, concurrency, observability, rollback, docs, and the people who will be affected. Mark each one as covered by the ask, not covered, or unknown.
-3. If the ask depends on something external you do not know, run `/at:research` on that narrow question first.
-
-Run the `glossary` skill first. Use its terms in your questions.
+3. If the ask depends on something external you do not know, read its current documentation and cite it.
 
 Then interview with the AskUserQuestion tool, in rounds. A round is the open frontier: every decision whose earlier decisions are made, up to 4 questions per call. Only ask what the code and the research could not answer. Find facts yourself; the user makes decisions. Prioritise the not-covered and unknown items: those are the blind spots. Each question has the recommended answer as its first option, marked "(Recommended)", worded so that choosing it accepts the recommendation. Start the next round from the answers. Stop when the frontier is empty and every item on the map is covered or explicitly deferred with a reason.
 
@@ -31,6 +30,6 @@ Create a claude artifact by default with the results as a spec:
 - Open decisions, if any survived, each with the options and your recommendation.
 - An end-to-end verification step.
 
-Print the path and the number of blind spots found. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
+Print the artifact URL and the number of blind spots found. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
 
 Adapted from mattpocock/skills (MIT): https://github.com/mattpocock/skills/tree/main/skills/productivity/grilling

@@ -1,9 +1,0 @@
-[
-  {"address": "src/python/klaviyo/core:lib", "target_type": "python_sources", "dependencies": []},
-  {"address": "src/python/klaviyo/auth:lib", "target_type": "python_sources", "dependencies": ["src/python/klaviyo/core:lib"]},
-  {"address": "src/python/klaviyo/api:lib", "target_type": "python_sources", "dependencies": ["src/python/klaviyo/auth:lib"]},
-  {"address": "src/python/klaviyo/api:pex", "target_type": "pex_binary", "dependencies": ["src/python/klaviyo/api:lib"]},
-  {"address": "src/python/klaviyo/api:image", "target_type": "docker_image", "dependencies": ["src/python/klaviyo/api:pex"]},
-  {"address": "src/python/klaviyo/worker:lib", "target_type": "python_sources", "dependencies": ["src/python/klaviyo/core:lib"]},
-  {"address": "src/python/klaviyo/worker:image", "target_type": "docker_image", "dependencies": ["src/python/klaviyo/worker:lib"]}
-]

@@ -4,7 +4,6 @@ description: Audit your previous response, or the text given, against the rules.
 argument-hint: "[what went wrong | text]  (default: your previous response)"
 disable-model-invocation: true
 model: opus
-effort: high
 ---
 Input: $ARGUMENTS
 
@@ -34,7 +33,7 @@ A rule that a program can check becomes a hook, a gate or a test, not prose. A j
 
 The config is in the repo named in `~/.claude/skills/at/.source-repo`. If that file does not exist, tell the user to run `./install.sh`, and stop after Redo.
 
-Run `git fetch`, then create a worktree in `.worktrees/` from the remote default branch. For a hook, gate or script, write the failing test first. Run the checks listed in the repo's README until each exit code is 0. Commit in the repo's convention, then open a draft PR with `gh`. Use the PR format in `~/.claude/rules/writing.md`. Link the ticket the user gives. With no ticket, open the PR without the link and say so in the report.
+Run `git fetch`, then create a worktree in `.worktrees/` from the remote default branch. For a hook, gate or script, write the failing test first. Run the checks listed in the repo's README until each exit code is 0. Commit in the repo's convention, then open a draft PR with `gh`. Use the PR format in `~/.claude/rules/writing.md`. Link the ticket as `~/.claude/CLAUDE.md` says.
 
 ## Report
 

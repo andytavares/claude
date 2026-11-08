@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 HOOK = Path(__file__).parent.parent / "at/hooks/pr-checks/pr_checks.py"
-PR = "https://github.com/andytavares/terminator/pull/364"
+PR = "https://github.com/example-org/app/pull/364"
 
 
 def transcript(tmp_path, command, output):

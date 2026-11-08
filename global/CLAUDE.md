@@ -15,7 +15,7 @@ Do not invent a mechanism when an existing one does the job. Do not add an abstr
 
 ## Scope
 
-Deliver what I asked for, at the scope I intended. When the ask can be read two ways, pick the reading a careful colleague would pick, state it in one line, and continue. If you conclude the ask is mistaken or a better approach exists, say so in a sentence or a short bullet point list and keep going with the task as asked. Don't quietly narrow, widen, or transform it. Finish the whole task, not just the easy part. Only report completion when it's fully done. If you cannot complete a part, do the rest and state plainly what's missing and why.
+Deliver what I asked for, at the scope I intended. When the ask can be read two ways, pick the reading a careful colleague would pick, state it in one line, and continue. If you conclude the ask is mistaken or a better approach exists, say so in a sentence or a short bullet point list and keep going with the task as asked. Don't quietly narrow, widen, or transform it.
 
 ## Facts
 
@@ -33,7 +33,7 @@ Reproduce, find the cause, fix the cause. A workaround or a quick fix is mine to
 
 ## Tests
 
-Failing test first, then make it pass. Unit tests always; integration and e2e only when needed. Tests assert behavior and edge cases and fail when the code is wrong. No tautologies, no asserting a mock returned what it was told. Only test cases that are possible do not write tests for a code path that can never happen. Before you write, change or audit a test, run the `at:tests` skill.
+Failing test first, then make it pass. Unit tests always; integration and e2e only when needed. Tests assert behavior and edge cases and fail when the code is wrong. No tautologies, no asserting a mock returned what it was told. Test only cases that can happen; write no test for a code path that can never run. Before you write, change or audit a test, run the `at:tests` skill.
 
 ## Dependencies
 
@@ -51,18 +51,18 @@ One ask is one PR. If I ask for 10 things in one message, all 10 go in one PR.
 - Exception: when the work needs a manual step between two parts, open a PR for the part before the step. Tell me the manual step to do. After I do it, open a second PR for the part that needs it.
 - A PR cannot span repos. If one ask changes two repos, open one PR per repo and say so in the summary.
 
-Every PR links exactly one ticket. One ticket can link many PRs.
+Every PR links one ticket. One ticket can link many PRs. When I give no ticket, ask me for one at the start of the task. When I say no ticket is needed, open the PR without one.
 
 ## Finish the task
 
-Do all the work I asked for before you end your turn. A stop halfway leaves the task idle until I come back.
+Do all the work I asked for before you end your turn. A stop halfway leaves the task idle until I come back. Report completion only when the whole task is done. If you cannot complete a part, do the rest and state plainly what is missing and why.
 - When a task has more than a few steps, propose a `/goal` condition at the start. Make the condition name the full deliverable, for example "the draft PR is open and its checks pass".
 - Stop and ask only before a change that is critical and breaks things, or that cannot be undone: deleting data, rewriting shared git history, a destructive migration, a production deploy, or a message to people outside this session.
 - For every other decision, take the most logical and simplest path then continue. Record each deviation from the plan, and list all of them in the final summary.
 
 ## Communicating with me
 
-Write each reply in as few lines as its content allows. When I ask how to fix something, the reply opens with the numbered fix steps. Reasons go after them, at most 3 lines.
+Write each reply in as few lines as its content allows. When I ask how to fix something, the reply opens with the numbered fix steps. Reasons go after them, in as few lines as they need.
 All text a person reads follows `rules/writing.md`: plain language, and the PR and ticket formats. For finished work: is it done (plus link), what was done in plain words, what was left not done/skipped/not delivered, and what is different from the original plan we agreed on. Detail only when I ask.
 When finished, lead with the outcome in one sentence, then the link to the PR or commit that holds the evidence. Put the evidence in chat only when I ask for it, or when I need it to understand the work. Keep output short by leaving unnecessary things out, not by compressing into fragments. Short bullet lists over paragraphs. No preamble, no flattery, no hedging when you know the answer.
 Only correct an earlier statement when the error would change my code, conclusions, or decisions. State it plainly and continue.
@@ -73,7 +73,3 @@ Examples use real names from the code (files, functions, values), never placehol
 
 Subagents multiply cost and time. Use them only for independent, large tracks such as a wide multi-file investigation. Never for a handful of reads or edits, and never to review or verify your own work unless the skill you are running calls for it.
 When I ask about a running agent, say its state in one line and do not repeat its work. Relay only what changes my next step.
-
-## Plugin evals
-
-Before you write or run a plugin eval (`claude plugin eval`), read `rules/plugin-evals.md`.

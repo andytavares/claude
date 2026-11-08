@@ -15,4 +15,4 @@ Reuse:  existing symbols that already do part of the job, and what each does
 Shape:  the nearest existing sibling to copy (e.g. "new IPC handler → follow src/ipc/run-channels.ts")
 ```
 
-Write "none found" for an empty part, with the searches you ran. Keep the map under 20 lines. Use it while writing, and paste it into the plan and the PR body.
+Write "none found" for an empty part, with the searches you ran. Keep the map to the lines the change needs: it is pasted into worker briefs and the PR. Use it while writing, and paste it into the plan and the PR body.

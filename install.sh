@@ -66,6 +66,7 @@ remove_retired_copies() {
   remove_path "$CLAUDE/skills/investigate-build"
   remove_path "$CLAUDE/agents/google-code-reviewer.md"
   remove_path "$CLAUDE/at-radar.json"
+  remove_path "$CLAUDE/rules/plugin-evals.md"
 }
 
 remove_settings_gate_hooks() {
