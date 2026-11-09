@@ -24,10 +24,10 @@ Only these STE rules are relaxed:
 - You do not have to use only the STE dictionary. Use the everyday technical word the reader knows.
 
 ## UI and UX changes
-Every artifact or spec that changes a UI or UX shows a before and an after rendering of each changed screen or state.
+Every artifact or spec that changes something the user sees shows a before and an after rendering of each changed screen or state. This includes a web or app UI, a TUI, and CLI output.
 - Put the two renderings side by side, or one directly after the other, at the same size.
-- Before: a screenshot of the current UI. If there is no current UI, write "New screen" and show only the after.
-- After: a mockup or screenshot of the changed UI.
+- Before: a screenshot of the current UI, or the captured output of the current TUI or CLI. If there is no current UI, write "New screen" and show only the after.
+- After: a mockup or screenshot of the changed UI, or the expected TUI or CLI output.
 - Under each pair, list each change, why it is made, and what the user now sees or does differently.
 
 ## PR descriptions

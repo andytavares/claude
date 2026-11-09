@@ -22,6 +22,14 @@ Executive Summary explaining from a leadership perspective why this is needed, P
 
 Executive Summary explaining from a leadership perspective why this is needed, Context and the problem in one paragraph. Goals and non-goals. Current state, from the code, with paths. Options considered, at least two, each with tradeoffs. The decision and why. The design: components, interfaces, data, and the sequence of changes, with real file paths. Testing and verification: the commands that will prove it. Risks and mitigations. Open questions. Alternatives rejected, in one line each. When the draft is complete, have one fresh subagent read only the input and the document once, and report requirements the document misses and claims the codebase contradicts; fix those, ignore style findings.
 
+## Renderings
+
+If the document proposes a change the user sees (a web or app UI, a TUI, CLI output), it includes renderings, as `~/.claude/rules/writing.md` "UI and UX changes" describes. Put them in the section that describes the change.
+- A changed screen or state: a before and an after rendering, then the list of changes.
+- A new screen or state: write "New screen" and show only the after rendering.
+- Before: run the current code and capture it. Use the `run` skill to start the app, and take the screenshot with Playwright. For a TUI or CLI, run the command and put its exact output in a `<pre>` block. If you cannot run the current code, say so in the open questions. Do not draw a before from memory.
+- After: build the mockup in the artifact's HTML and CSS, at the same size as the before.
+
 ## Length
 
 Match the input. A two-sentence brief produces a page; a whole spec produces whatever the spec needs. No section that has nothing in it, no restated summary, no filler.
