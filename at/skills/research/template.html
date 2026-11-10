@@ -1,0 +1,75 @@
+<title>DOCUMENT NAME</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; wide tables and output blocks scroll inside their own box. */
+:root {
+  --bg: #f7f8fa; --surface: #ffffff; --fg: #1c2230; --muted: #5a6476; --rule: #dde1e8;
+  --accent: #2f5d8a; --accent-soft: #e6eef6;
+  --high: #a8322d; --high-soft: #f8e5e3; --med: #8a5a00; --med-soft: #f6ecd6; --low: #3d6b45; --low-soft: #e3efe4;
+  --code-bg: #eef1f5;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --surface: #1a1f28; --fg: #e3e7ee; --muted: #9aa4b4; --rule: #2c3442;
+  --accent: #8fb6dd; --accent-soft: #1f2d3d;
+  --high: #f0938c; --high-soft: #3a2020; --med: #e6c070; --med-soft: #352b17; --low: #93c99b; --low-soft: #1d2e20;
+  --code-bg: #222935; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a1f28; --fg: #e3e7ee; --muted: #9aa4b4; --rule: #2c3442;
+  --accent: #8fb6dd; --accent-soft: #1f2d3d;
+  --high: #f0938c; --high-soft: #3a2020; --med: #e6c070; --med-soft: #352b17; --low: #93c99b; --low-soft: #1d2e20;
+  --code-bg: #222935; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px; }
+main { max-width: 760px; margin: 0 auto; display: grid; gap: 8px; }
+header { display: grid; gap: 6px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); margin-bottom: 12px; }
+.eyebrow { font: 500 12px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+h1 { font-size: 30px; line-height: 1.2; margin: 0; font-weight: 600; text-wrap: balance; }
+h2 { font-size: 20px; margin: 32px 0 4px; font-weight: 600; text-wrap: balance; }
+h3 { font-size: 16px; margin: 20px 0 2px; font-weight: 600; }
+p, li { max-width: 68ch; }
+p { margin: 6px 0; }
+ul, ol { margin: 6px 0; padding-left: 22px; display: grid; gap: 4px; }
+.meta { color: var(--muted); font-size: 13px; }
+code { font: 13px/1.4 var(--font-mono); background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { font: 12.5px/1.5 var(--font-mono); background: var(--code-bg); padding: 12px 14px; border-radius: 6px; margin: 0; overflow-x: auto; white-space: pre; }
+pre code { background: none; padding: 0; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.scroll { overflow-x: auto; margin: 10px 0; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--rule); }
+th { font: 500 11.5px/1.3 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td code { font-size: 12px; }
+.sev { display: inline-block; font: 500 11px/1 var(--font-mono); padding: 4px 6px; border-radius: 4px; white-space: nowrap; }
+.sev.high { color: var(--high); background: var(--high-soft); }
+.sev.med { color: var(--med); background: var(--med-soft); }
+.sev.low { color: var(--low); background: var(--low-soft); }
+.counts { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+.pair > div { min-width: 0; display: grid; gap: 6px; align-content: start; }
+.pair .label { font: 500 11.5px/1 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 640px) { .pair { grid-template-columns: 1fr; } }
+.decision { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; }
+.decision p { margin: 4px 0; }
+</style>
+
+<main>
+<header>
+  <span class="eyebrow">DOCUMENT TYPE · AREA</span>
+  <h1>DOCUMENT NAME</h1>
+  <p class="meta">Repo and commit the evidence comes from. Date.</p>
+</header>
+
+<!-- Sections go here. Components in the style block:
+     .scroll > table              wide table that scrolls in its own box
+     <pre><code>                  commands and captured output
+     .sev.high / .sev.med / .sev.low   severity pills; .counts holds a row of them
+     .pair > div > .label + pre   before and after renderings, side by side
+     .decision                    the decision box
+     .meta                        small muted text -->
+</main>

@@ -8,7 +8,11 @@ Input: $ARGUMENTS
 
 If the argument is a path, read it; it is the brief or spec. Otherwise it is the prompt. Choose the format: `--one-pager`, `--prd` or `--design` if given, else One Pager when the input asks for a short pitch or summary to align on before deeper work, PRD when the input is about users, outcomes, or scope, and Design Document when it is about how to build something already decided.
 
-Run the `glossary` skill first and use its terms. Research before writing. Read the parts of this codebase the input touches. For anything external, fetch current documentation rather than relying on memory, and cite it. Every claim that could be false carries its evidence: a file path, a command and its output, or a URL. Anything you could not verify goes in the open questions, never stated as fact.
+Run the `glossary` skill first and use its terms.
+
+For a Design Document, or any input that asks for a full audit or inventory, start one subagent right after the glossary step. Its brief is the input, word for word, and one instruction: list every place in the codebase the input covers, one line each, as `path:line — what is there`. Merge its list into the draft when it reports. While it runs, read and draft. Never end a message only to wait for a subagent: draft every section that does not depend on its result.
+
+Research before writing. Read the parts of this codebase the input touches. For anything external, fetch current documentation rather than relying on memory, and cite it. Every claim that could be false carries its evidence: a file path, a command and its output, or a URL. Anything you could not verify goes in the open questions, never stated as fact.
 
 ## One Pager sections
 
@@ -20,7 +24,7 @@ Executive Summary explaining from a leadership perspective why this is needed, P
 
 ## Design Document sections
 
-Executive Summary explaining from a leadership perspective why this is needed, Context and the problem in one paragraph. Goals and non-goals. Current state, from the code, with paths. Options considered, at least two, each with tradeoffs. The decision and why. The design: components, interfaces, data, and the sequence of changes, with real file paths. Testing and verification: the commands that will prove it. Risks and mitigations. Open questions. Alternatives rejected, in one line each. When the draft is complete, have one fresh subagent read only the input and the document once, and report requirements the document misses and claims the codebase contradicts; fix those, ignore style findings.
+Executive Summary explaining from a leadership perspective why this is needed, Context and the problem in one paragraph. Goals and non-goals. Current state, from the code, with paths. Options considered, at least two, each with tradeoffs. The decision and why. The design: components, interfaces, data, and the sequence of changes, with real file paths. Testing and verification: the commands that will prove it. Risks and mitigations. Open questions. Alternatives rejected, in one line each. When the draft is complete, have one fresh subagent read only the input and the document once, and report claims the codebase contradicts: a wrong path, a wrong quote, or behavior described wrongly. The sweep at the start already covered missing items, so this check does not search for them. Fix each claim; ignore style findings.
 
 ## Renderings
 
@@ -36,7 +40,9 @@ Match the input. A two-sentence brief produces a page; a whole spec produces wha
 
 ## Output
 
-Publish the document as an artifact by default: load the `artifact-design` skill first, write the HTML, then publish with the Artifact tool, icon `document`, title the document's name.
+Before you publish, run `uv run --script "${CLAUDE_SKILL_DIR}/check_refs.py" <document>` from the repo root. It exits 1 and lists each `path:line` that does not exist, and each quote right after a reference that is not on the cited line. Fix each one, then run it again until it exits 0.
+
+Publish through the publish capability in `rules/environment.md`. For an HTML page, copy `${CLAUDE_SKILL_DIR}/template.html` and fill in its `<title>` and `<main>`. It already holds the theme, layout and components. Write new CSS only for a component the template does not have. Publish with icon `document`, and title it with the document's name.
 
 Print the artifact URL and the file path. Then, unless another skill invoked this one, the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
 
