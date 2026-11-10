@@ -3,11 +3,11 @@ name: postmortem
 description: Read this session and list changes to the Claude config that stop repeated friction. You pick, then it writes a brief for /at:implement.
 disable-model-invocation: true
 argument-hint: "[focus]  (default: the whole session)"
-model: opus
+model: inherit
 ---
 Focus: $ARGUMENTS
 
-Find friction in this session, then propose fixes to the config in the repo named in `~/.claude/skills/at/.source-repo`. If that file does not exist, tell the user to run `./install.sh` and stop.
+Find friction in this session, then propose fixes to the config in the repo named in `${CLAUDE_PLUGIN_ROOT}/.source-repo`. If that file does not exist, ask the user for the path of their clone of this harness. If they have none, write the brief anyway; the fixes then name the installed files.
 
 ## Find friction
 
@@ -25,7 +25,7 @@ A rule that a program can check becomes a hook or a gate, not prose. Prose goes 
 
 List the fixes, most severe first. Each fix has: the friction (one line, with the prompt or tool call that shows it), the change, and the file in the source repo it changes. No fix without evidence from this session.
 
-Ask the user which fixes to keep, with AskUserQuestion, up to 4 per question.
+Ask the user which fixes to keep, through the questions capability in `rules/environment.md`, up to 4 per question.
 
 ## Brief
 

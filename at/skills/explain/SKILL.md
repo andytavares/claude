@@ -2,7 +2,7 @@
 name: explain
 description: Research this codebase and answer a question about it, with file and line evidence, in the format asked for. Use when asked how something works, what calls or depends on a symbol, what all the instances of something are, or why the code is the way it is.
 argument-hint: "[question] [as: table | list | diagram | prose | doc]"
-model: opus
+model: inherit
 ---
 Question: $ARGUMENTS
 
@@ -10,6 +10,6 @@ Run the `glossary` skill first and use its terms. Answer from the code, not from
 
 For a question wide enough that reading would fill this context, use one subagent per independent area, brief each precisely once, and merge what comes back. Do not use subagents for a few file reads.
 
-Format: if the argument names one after `as:`, use it. Otherwise match the question: a "how does X work" gets prose with paths, a "what are all the Y" gets a table, a "what calls Z" gets a list, a "how do these fit together" gets a mermaid diagram, and `doc` writes `docs/explain/<slug>.md`.
+Format: if the argument names one after `as:`, use it. Otherwise match the question: a "how does X work" gets prose with paths, a "what are all the Y" gets a table, a "what calls Z" gets a list, a "how do these fit together" gets a mermaid diagram, and `doc` writes `explain/<slug>.md` in the glossary directory (the `glossary` skill) and prints its path.
 
 Lead with the answer in one or two sentences. Evidence after, as file paths and line numbers. Say plainly what you could not determine and where you stopped. No narration of how you searched.

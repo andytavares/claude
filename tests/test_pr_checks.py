@@ -113,3 +113,16 @@ def test_blocks_when_gh_reports_no_checks_yet(tmp_path):
     answer = run_hook(transcript(tmp_path, *CREATED), env)
     assert answer["decision"] == "block"
     assert "could not read" in answer["reason"]
+
+
+def test_lets_the_stop_through_when_gh_is_not_installed(tmp_path):
+    env = {**os.environ, "PATH": str(tmp_path)}
+    assert run_hook(transcript(tmp_path, *CREATED), env) is None
+
+
+def test_checks_a_pr_on_a_github_enterprise_host(tmp_path):
+    enterprise = "https://git.example.com/example-org/app/pull/12"
+    env = fake_gh(tmp_path, [{"name": "Unit", "bucket": "fail"}])
+    path = transcript(tmp_path, "gh pr create --draft", enterprise)
+    answer = run_hook(path, env)
+    assert enterprise in answer["reason"]

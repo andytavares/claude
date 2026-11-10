@@ -15,7 +15,7 @@ Cite the rule ID when you make a choice in a PR, and on every audit finding.
 
 - **T-TIER**: Put each check in the lowest tier that can prove it. Unit: one behavior, one process, no I/O. Integration: one boundary the code owns, through a private instance. E2E: one user journey per test, a step per behavior.
 - **T-BEHAVIOR**: Test one behavior per test, through the public interface. No private methods, no internal call order.
-- **T-CAN-FAIL**: A test fails when the behavior is wrong. Delete tests with no assertion, mock-echo tests, and tests that assert a constant, that a function exists, or only `toBeDefined()`.
+- **T-CAN-FAIL**: A test fails when the behavior is wrong. Delete tests with no assertion, mock-echo tests, and tests that assert a constant, that a function exists, or only that a value is defined.
 - **T-STATE**: Assert output or state, not calls. Assert a call only when the call is the behavior, such as a request to a third party.
 - **T-NO-SNAPSHOT-ONLY**: A large snapshot is never the only assertion.
 - **T-REACHABLE**: Each case is an input that a caller or a boundary can send. Check types, boundary validation and callers (`git grep -n -w`). Do not test an unreachable branch.
@@ -25,13 +25,13 @@ Cite the rule ID when you make a choice in a PR, and on every audit finding.
 - **T-BOUNDARY**: Fake every boundary. No real host in any tier: unit runs block all sockets; integration and E2E runs allow only localhost. Use real code for everything inside the process. Unit tests never touch a DB; integration tests use a private DB that each test creates and drops.
 - **T-SAME-ENV**: Tests run in one sealed environment, the same on a laptop and in CI: pinned timezone, locale and runtime version, a scrubbed env and HOME, one test command for both.
 - **T-NO-RETRY**: No retries in any runner, config or CI step. The first run is the result. Fix a flaky test at its cause, or move its check down a tier, in the same PR. Never skip it.
-- **T-WAIT-CONDITION**: Wait on the condition you assert, never on a fixed delay. No `sleep`, `waitForTimeout` or `setTimeout` in tests. Use retrying assertions: Playwright `expect(locator)`, Testing Library `findBy*`, `expect.poll`.
-- **T-READY-TARGET**: Act only on a target that is ready. Wait for the element you act on. Before keyboard input, assert focus with `toBeFocused()`.
-- **T-AWAIT-ALL**: Await every promise a test starts. Lint tests with `@typescript-eslint/no-floating-promises`.
-- **T-CONTROL-TIME**: Fake timers in unit tests, `page.clock` in E2E. One generous hang bound per runner; no per-test tuned timeouts.
+- **T-WAIT-CONDITION**: Wait on the condition you assert, never on a fixed delay. No sleep or fixed timeout in tests. Use the runner's retrying assertions (`references/frameworks.md`).
+- **T-READY-TARGET**: Act only on a target that is ready. Wait for the element you act on. Before keyboard input, assert that the target has focus.
+- **T-AWAIT-ALL**: Await every promise or async task a test starts. Lint for unawaited calls where the language has a rule (`references/frameworks.md`).
+- **T-CONTROL-TIME**: Fake timers in unit tests, the browser tool's clock in E2E. One generous hang bound per runner; no per-test tuned timeouts.
 - **T-APP-SIGNAL**: If the app gives no signal that it is ready, add one to the app: a role, a state attribute, an event. A test never guesses.
 - **T-TEARDOWN**: Cleanup never decides a result. Per-test cleanup does not throw. Bulk cleanup runs in a global teardown.
-- **T-READABLE**: The name says the behavior and the expected result. Arrange, act, assert. No `if` or loops in a test. DAMP over DRY. Testing Library query order: role, label, text, test id last. Use `user-event`, not `fireEvent`.
+- **T-READABLE**: The name says the behavior and the expected result. Arrange, act, assert. No `if` or loops in a test. DAMP over DRY. In UI tests, query by role, then label, then text, and test id last. Simulate real user input, not raw events.
 
 ## Write mode
 
@@ -42,4 +42,4 @@ Do these steps before you write or change a test. `${CLAUDE_SKILL_DIR}/reference
 3. Check the test against every rule in the list.
 4. Make it pass.
 
-Sources: Software Engineering at Google ch. 11-14, The Practical Test Pyramid, xUnit Patterns (Erratic Test), testsmells.org, Testing Library docs, Playwright best practices.
+Sources: Software Engineering at Google ch. 11-14, The Practical Test Pyramid, xUnit Patterns (Erratic Test), testsmells.org, and the runner docs linked in `references/frameworks.md`.

@@ -7,7 +7,8 @@ git rev-parse --is-inside-work-tree > /dev/null 2>&1 || { echo "not inside a git
 
 # A worktree shares the main checkout's path through the common git directory.
 common="$(cd "$(git rev-parse --git-common-dir)" && pwd -P)"
-remote="$(git remote get-url origin 2> /dev/null || true)"
+name="$(bash "$(dirname "${BASH_SOURCE[0]}")/../../scripts/default-branch.sh" --remote || true)"
+remote="$(git remote get-url "${name:-origin}" 2> /dev/null || true)"
 
 if [ -z "$remote" ]; then
   echo "$root/local/$(basename "$(dirname "$common")")"

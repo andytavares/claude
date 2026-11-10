@@ -2,16 +2,16 @@
 name: implement
 description: Implement a brief or spec. Plans and orchestrates, delegates the building to `at:worker` subagents, ends in a PR.
 disable-model-invocation: true
-argument-hint: "[briefs/<id>.md | spec path | spec artifact URL | Linear key | quick ask]"
-model: opus
+argument-hint: "[briefs/<id>.md | spec path | spec URL | ticket key | quick ask]"
+model: inherit
 ---
 Work: $ARGUMENTS
 
-If the argument is a path, read it; it is the brief or spec. If it is a claude.ai artifact URL, read it with the Artifact tool; it is the spec. If it looks like a Linear key, read the ticket with the Linear tools, including comments and linked issues. Otherwise it is the ask, and a size-S brief in your head is enough.
+If the argument is a path, read it; it is the brief or spec. If it is a published spec URL, read it as `rules/environment.md` says; it is the spec. If it looks like a ticket key, read the ticket through the tracker capability, including comments and linked issues. Otherwise it is the ask, and a size-S brief in your head is enough.
 
-If the brief or spec has open questions (an "Open questions" section, or items marked open, TBD or unresolved), ask the user each one with the AskUserQuestion tool before you start any other step. Ask up to 4 per call, with the recommended answer as the first option, marked "(Recommended)". Treat each answer as part of the spec. Start the plan only when every open question has an answer or the user defers it.
+If the brief or spec has open questions (an "Open questions" section, or items marked open, TBD or unresolved), ask the user each one through the questions capability in `rules/environment.md` before you start any other step. Ask up to 4 per call, with the recommended answer as the first option, marked "(Recommended)". Treat each answer as part of the spec. Start the plan only when every open question has an answer or the user defers it.
 
-Work in a git worktree. If you are not in one, use the existing worktree for this work, or create one in `.worktrees/` at the repo root. Run `git fetch` first and create a new worktree from the remote default branch (`git rev-parse --abbrev-ref origin/HEAD`, called `<default>` below). In an existing worktree, pull its branch, and merge the default branch if it has commits from more than 3 hours ago that the branch lacks. A worktree location in the prompt or in the repo's `CLAUDE.md` replaces this default.
+Work in a git worktree. If you are not in one, use the existing worktree for this work, or create one as `rules/environment.md` says. Run `git fetch` first and create a new worktree from the remote default branch (from `default-branch.sh`, called `<default>` below). In an existing worktree, pull its branch, and merge the default branch if it has commits from more than 3 hours ago that the branch lacks. A worktree location in the prompt or in the repo's `CLAUDE.md` replaces this default.
 
 ## Plan
 
@@ -45,6 +45,6 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 ## Ship
 
-Commit anything Prove changed, then open a draft PR with `gh`. The body uses the PR format in `~/.claude/rules/writing.md`.
+Commit anything Prove changed, then open a draft PR through the code host (`rules/environment.md`). The body uses the PR format in `rules/writing.md`.
 
 Finish with the PR URL. Then the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.

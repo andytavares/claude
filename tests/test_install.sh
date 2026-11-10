@@ -30,6 +30,7 @@ seed_home() {
   cat > "$C/settings.json" << 'JSON'
 {"theme":"dark","hooks":{
   "PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"git-ai checkpoint"}]}],
+  "PostToolUse":[{"hooks":[{"type":"command","command":"python3 ~/tools/clean-gate/gate.py"}]}],
   "Stop":[{"hooks":[{"type":"command","command":"uv run --script \"$HOME/.claude/hooks/clean-gate/gate.py\" check --hook stop"}]}]}}
 JSON
 }
@@ -43,16 +44,17 @@ import json, sys
 d = json.load(open(sys.argv[1]))
 assert d["theme"] == "dark"
 assert d["hooks"]["PreToolUse"][0]["hooks"][0]["command"] == "git-ai checkpoint"
+assert d["hooks"]["PostToolUse"][0]["hooks"][0]["command"] == "python3 ~/tools/clean-gate/gate.py", "user hook removed"
 assert "Stop" not in d["hooks"], "old clean-gate Stop hook still in settings.json"' "$C/settings.json" \
     || fail "settings.json not as expected"
 }
 
 assert_plugin_installed() {
-  cmp -s "$ROOT/global/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
+  cmp -s "$ROOT/global/CLAUDE.md" "$C/rules/operating.md" || fail "operating rules not installed"
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "user CLAUDE.md untouched"
   assert_exists "$C/rules/clean-code.md"
   assert_exists "$C/rules/writing.md"
-  assert_contains "$C/CLAUDE.md" "opens with the numbered fix steps"
-  assert_contains "$C/CLAUDE.md" "do not repeat its work"
+  assert_exists "$C/rules/environment.md"
   assert_exists "$C/skills/at/.claude-plugin/plugin.json"
   assert_exists "$C/skills/at/hooks/hooks.json"
   assert_exists "$C/skills/at/skills/word-salad/SKILL.md"
@@ -86,17 +88,62 @@ test_install() {
   assert_contains "$WORK/out.txt" '/reload-plugins'
 }
 
-test_reinstall_keeps_first_backup() {
-  run_install > /dev/null
-  assert_plugin_installed
+test_install_into_claude_md() {
+  seed_home
+  run_install --rules-in claude-md > /dev/null
+  cmp -s "$ROOT/global/CLAUDE.md" "$C/CLAUDE.md" || fail "CLAUDE.md not installed"
+  assert_gone "$C/rules/operating.md"
+  run_install --rules-in claude-md > /dev/null
   for backup in "$C"/CLAUDE.md.bak-install-*; do assert_contains "$backup" '## Code'; done
+  run_install > /dev/null
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "CLAUDE.md restored when rules move back"
+  assert_exists "$C/rules/operating.md"
+  echo "my edit after the restore" >> "$C/CLAUDE.md"
+  run_uninstall > /dev/null
+  assert_contains "$C/CLAUDE.md" "my edit after the restore"
+}
+
+test_upgrade_from_an_install_without_the_marker() {
+  seed_home
+  run_install --rules-in claude-md > /dev/null
+  rm "$C/.at-claude-md"
+  run_install > /dev/null
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "old install migrated"
+}
+
+test_restore_after_the_rules_changed() {
+  seed_home
+  run_install --rules-in claude-md > /dev/null
+  echo "rules from an older version of this repo" > "$C/CLAUDE.md"
+  run_uninstall > "$WORK/out.txt"
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "uninstall restores an older install"
+  seed_home
+  run_install --rules-in claude-md > /dev/null
+  echo "rules from an older version of this repo" > "$C/CLAUDE.md"
+  run_install > /dev/null
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "default install restores an older install"
+}
+
+test_install_honours_config_dir() {
+  seed_home
+  local other="$WORK/config"
+  rm -rf "$other"
+  HOME="$H" CLAUDE_CONFIG_DIR="$other" bash "$ROOT/install.sh" > /dev/null
+  assert_exists "$other/rules/operating.md"
+  assert_exists "$other/skills/at/.claude-plugin/plugin.json"
+  assert_gone "$C/rules/operating.md"
+  HOME="$H" CLAUDE_CONFIG_DIR="$other" bash "$ROOT/uninstall.sh" > /dev/null
+  assert_gone "$other/skills/at"
 }
 
 test_uninstall() {
+  seed_home
+  run_install --rules-in claude-md > /dev/null
   run_uninstall > "$WORK/out.txt"
   assert_gone "$C/skills/at"
   assert_gone "$C/rules/clean-code.md"
   assert_gone "$C/rules/writing.md"
+  assert_gone "$C/rules/operating.md"
   assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "CLAUDE.md restored"
   assert_eq "$(cat "$C/skills/mine/SKILL.md")" "my own skill" "unrelated skill"
 }
@@ -189,7 +236,10 @@ test_uninstall_rejects_unknown_option() {
 }
 
 test_install; echo "ok install"
-test_reinstall_keeps_first_backup; echo "ok reinstall"
+test_install_into_claude_md; echo "ok install into CLAUDE.md"
+test_install_honours_config_dir; echo "ok install honours CLAUDE_CONFIG_DIR"
+test_restore_after_the_rules_changed; echo "ok restore after the rules changed"
+test_upgrade_from_an_install_without_the_marker; echo "ok upgrade from an install without the marker"
 test_uninstall; echo "ok uninstall"
 test_missing_uv; echo "ok missing uv"
 test_install_removes_retired_radar; echo "ok install removes retired radar"

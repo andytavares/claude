@@ -134,6 +134,34 @@ def test_name_defined_only_in_a_spec_file_is_not_a_repeat(tmp_path):
     assert check_file(repo, "b.ts") == ""
 
 
+@pytest.mark.parametrize(
+    "test_file",
+    [
+        "PriceTest.java",
+        "price_spec.rb",
+        "price_test.rs",
+        "PriceTests.cs",
+    ],
+)
+def test_name_defined_only_in_another_language_test_file_is_not_a_repeat(
+    tmp_path, test_file
+):
+    body = "def formatTotal(a):\n    return a\n"
+    (tmp_path / "spec").mkdir()
+    repo = make_repo(tmp_path, {test_file: body})
+    write(repo, {"b.py": body})
+    assert check_file(repo, "b.py") == ""
+
+
+def test_name_in_a_spec_directory_is_still_a_repeat(tmp_path):
+    (tmp_path / "spec").mkdir()
+    repo = make_repo(tmp_path, {"spec/openapi.py": func("py", "formatTotal", 3)})
+    write(repo, {"b.py": func("py", "formatTotal", 3)})
+    assert "formatTotal is already defined at spec/openapi.py:1" in check_file(
+        repo, "b.py"
+    )
+
+
 def test_helper_under_tests_directory_is_not_a_repeat(tmp_path):
     repo = make_repo(tmp_path, {"b.ts": func("ts", "formatTotal", 3)})
     (repo / "tests").mkdir()

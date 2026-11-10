@@ -1,7 +1,7 @@
 ---
 name: diagnose
 description: Use when something is broken, failing, slow or surprising, and for a CI build, a CI failure or a PR URL with "why did this fail" or "debug this". Finds the cause with a loop that can fail, then fixes it.
-model: opus
+model: inherit
 ---
 Problem: $ARGUMENTS
 
@@ -11,7 +11,7 @@ Read the glossary first: run the `glossary` skill.
 
 ## Phase 0: Facts for a CI build or PR
 
-If the input is a CI build URL, a build number or a PR URL, get the facts before you form a hypothesis: `gh pr checks` for a PR, and the CI's own CLI for the build. Look only at jobs that failed or timed out, not soft or allowed failures. Read the log of the first failing job and quote the error and the file, test and line.
+If the input is a CI build URL, a build number or a PR URL, get the facts before you form a hypothesis, through the CI capability in `rules/environment.md`. Look only at jobs that failed or timed out, not soft or allowed failures. Read the log of the first failing job and quote the error and the file, test and line.
 
 For any other problem, go to Phase 1.
 
@@ -24,7 +24,7 @@ This is the skill. Make one command that:
 - you can run without help, and
 - you have already run.
 
-Pick the cheapest that works: a failing test; a `curl` or CLI call with fixtures; a replay of a saved trace or log; a throwaway script; a fuzz loop; `git bisect run` over a range; a differential run (good against bad); a script that asks the user to do one step and read back the result. For a CI failure, rerun only the failing job's command locally or with `bk`.
+Pick the cheapest that works: a failing test; a `curl` or CLI call with fixtures; a replay of a saved trace or log; a throwaway script; a fuzz loop; `git bisect run` over a range; a differential run (good against bad); a script that asks the user to do one step and read back the result. For a CI failure, rerun only the failing job's command locally.
 
 Done when the command exists and you ran it and saw it fail. With no such command, do not go on. Tell the user what blocks it.
 

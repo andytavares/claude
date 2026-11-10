@@ -2,10 +2,11 @@
 
 import json
 import re
+import shutil
 import subprocess
 import sys
 
-PR_URL = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/pull/\d+")
+PR_URL = re.compile(r"https://[\w.-]+(?::\d+)?/[\w.-]+/[\w.-]+/pull/\d+")
 NOT_GREEN = {"pending": "running", "fail": "failed", "cancel": "failed"}
 
 
@@ -67,6 +68,9 @@ def main():
     hook = json.load(sys.stdin)
     # The second stop in a row goes through: Claude has been told, and a block cannot loop.
     if hook.get("stop_hook_active"):
+        return
+    # Without gh the checks cannot be read, so the hook has nothing to enforce.
+    if shutil.which("gh") is None:
         return
     found = [
         line for pr in opened_prs(hook["transcript_path"]) for line in problems(pr)

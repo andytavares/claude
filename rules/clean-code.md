@@ -3,7 +3,7 @@
 Readability decides every tie. A reader must be able to follow any change from its entry point to its end without asking the author anything.
 
 ## Reuse first
-Before adding a function, type or constant, search for one that already does the job: `git grep -w` on the likely name and on a key literal, and the LSP's workspace symbols. Use it, or extend it if it is close. Private copies drift: three `relativeTime()` helpers in one repo each ended up with a different output.
+Before adding a function, type or constant, search for one that already does the job: the code search capability in `rules/environment.md`, on the likely name and on a key literal. Use it, or extend it if it is close. Private copies drift: three copies of one date-format helper end up with three different outputs.
 
 ## Match the neighbours
 Find the closest existing example of what you are adding and copy its shape: file layout, naming, error handling, test style.
