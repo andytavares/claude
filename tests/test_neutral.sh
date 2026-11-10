@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-NAMES='Linear|Context7|codegraph|`bk`|PagerDuty|incident\.io|gh pr|with `gh`|origin/HEAD|AskUserQuestion|Artifact tool|claude artifact|artifact-design|LSP|~/\.claude/|\$HOME/\.claude|model: opus|src/ipc|relativeTime'
+NAMES='Linear|Context7|codegraph|`bk`|PagerDuty|incident\.io|gh pr|with `gh`|origin/HEAD|AskUserQuestion|Artifact tool|claude artifact|artifact-design|LSP|(^|[^-])(~|\$HOME)/\.claude|model: opus|src/ipc|relativeTime'
 PLACES=(global rules at/skills at/agents README.md)
 ALLOWED=(':!rules/environment.md')
 RUNNER_NAMES='Playwright|Testing Library|typescript-eslint|toBeDefined|page\.clock|fireEvent|user-event'
