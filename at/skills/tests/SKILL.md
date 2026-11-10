@@ -40,8 +40,6 @@ Do these steps before you write or change a test. `${CLAUDE_SKILL_DIR}/reference
 1. Pick the tier with T-TIER.
 2. Write the test. Run it against the current code. Show that it fails on its assertion, not on an error.
 3. Check the test against every rule in the list.
-4. Make it pass. Then prove it is stable: run the spec file alone, then 30 shuffled runs for a unit or integration spec. For an E2E spec, run `--repeat-each=5 --retries=0`. Use more workers than cores. A test that fails 10% of the time passes 30 runs 4.2% of the time (0.9^30).
-
-An `at:worker` skips step 4, because it caps repeats at 3 while other workers run checks. `/at:implement` runs step 4 once in Prove, for each spec file the branch adds or changes.
+4. Make it pass.
 
 Sources: Software Engineering at Google ch. 11-14, The Practical Test Pyramid, xUnit Patterns (Erratic Test), testsmells.org, Testing Library docs, Playwright best practices.
