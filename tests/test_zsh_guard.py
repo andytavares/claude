@@ -9,14 +9,18 @@ import pytest
 GUARD = Path(__file__).parent.parent / "at/hooks/zsh-guard/guard.py"
 
 
-def run_guard(command, tool_name="Bash", shell="/bin/zsh"):
+def run_guard(command, tool_name="Bash", shell="/bin/zsh", code_shell=None):
     hook = json.dumps({"tool_name": tool_name, "tool_input": {"command": command}})
     return subprocess.run(
         [sys.executable, str(GUARD)],
         input=hook,
         capture_output=True,
         text=True,
-        env={**os.environ, "SHELL": shell},
+        env={
+            **{k: v for k, v in os.environ.items() if k != "CLAUDE_CODE_SHELL"},
+            "SHELL": shell,
+            **({"CLAUDE_CODE_SHELL": code_shell} if code_shell else {}),
+        },
         check=False,
     )
 
@@ -86,3 +90,14 @@ def test_bash_users_are_not_blocked():
     done = run_guard("$cmd --help", shell="/bin/bash")
     assert done.returncode == 0
     assert done.stderr == ""
+
+
+def test_claude_code_shell_overrides_shell():
+    assert (
+        run_guard("$cmd --help", shell="/bin/zsh", code_shell="/bin/bash").returncode
+        == 0
+    )
+    assert (
+        run_guard("$cmd --help", shell="/bin/bash", code_shell="/bin/zsh").returncode
+        == 2
+    )

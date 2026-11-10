@@ -49,7 +49,9 @@ def problem(command):
 
 def main():
     hook = json.load(sys.stdin)
-    in_zsh = os.environ.get("SHELL", "").endswith("zsh")
+    # The Bash tool runs CLAUDE_CODE_SHELL when set, else $SHELL.
+    shell = os.environ.get("CLAUDE_CODE_SHELL") or os.environ.get("SHELL", "")
+    in_zsh = shell.endswith("zsh")
     if hook.get("tool_name") != "Bash" or not in_zsh:
         return 0
     message = problem(hook.get("tool_input", {}).get("command", ""))
