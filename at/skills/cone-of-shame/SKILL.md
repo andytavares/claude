@@ -3,7 +3,7 @@ name: cone-of-shame
 description: Audit your previous response, or the text given, against the rules. Redo the work that broke them, then fix the cause in the Claude config so the same class of mistake cannot repeat.
 argument-hint: "[what went wrong | text]  (default: your previous response)"
 disable-model-invocation: true
-model: opus
+model: inherit
 ---
 Input: $ARGUMENTS
 
@@ -13,7 +13,7 @@ The input is a note on what went wrong, text to audit, or both. If it is empty, 
 
 ## Audit
 
-Read `~/.claude/CLAUDE.md`, each file in `~/.claude/rules/`, and the SKILL.md of each skill that ran in the turn. List each violation, most severe first: what you did, quoted from the response or a tool call, and the rule it broke as `path:line`, or "no rule". The note names at least one violation. Find the others too.
+Read `CLAUDE.md` and each file in `rules/` in the config directory (`rules/environment.md`), and the SKILL.md of each skill that ran in the turn. List each violation, most severe first: what you did, quoted from the response or a tool call, and the rule it broke as `path:line`, or "no rule". The note names at least one violation. Find the others too.
 
 ## Redo
 
@@ -31,9 +31,9 @@ A rule that a program can check becomes a hook, a gate or a test, not prose. A j
 
 ## Fix
 
-The config is in the repo named in `~/.claude/skills/at/.source-repo`. If that file does not exist, tell the user to run `./install.sh`, and stop after Redo.
+The config is in the repo named in `${CLAUDE_PLUGIN_ROOT}/.source-repo`. If that file does not exist, ask the user for the path of their clone of this harness. If they have none, write the fix as a brief to the glossary directory, print its path, and stop.
 
-Run `git fetch`, then create a worktree in `.worktrees/` from the remote default branch. For a hook, gate or script, write the failing test first. Run the checks listed in the repo's README until each exit code is 0. Commit in the repo's convention, then open a draft PR with `gh`. Use the PR format in `~/.claude/rules/writing.md`. Link the ticket as `~/.claude/CLAUDE.md` says.
+Run `git fetch`, then create a worktree from the remote default branch, as `rules/environment.md` says. For a hook, gate or script, write the failing test first. Run the checks listed in the repo's README until each exit code is 0. Commit in the repo's convention, then open a draft PR through the code host (`rules/environment.md`). Use the PR format in `rules/writing.md`. Link the ticket as the operating rules say.
 
 ## Report
 

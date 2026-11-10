@@ -3,7 +3,7 @@ name: word-salad
 description: Rewrite a wall of text so a person can read it in one pass. Plain words, short sentences, one line of thought, simple examples. Takes text or a file path; with no argument, rewrites your previous response.
 argument-hint: "[text | file path]  (default: your previous response)"
 disable-model-invocation: true
-model: opus
+model: inherit
 ---
 Input: $ARGUMENTS
 
@@ -11,7 +11,7 @@ If the input is a file path, rewrite that file's text. If it is text, rewrite it
 
 Write for a reader who is smart, busy and new to the topic. Keep every fact, decision, number, path, command and link that matters. Drop everything else.
 
-`~/.claude/rules/writing.md` is the main source of truth for all written output. The sections below add to it.
+`rules/writing.md` is the main source of truth for all written output. The sections below add to it.
 
 ## Lead with the point
 Decide in one sentence what the reader needs to know or do. Open with that. Everything after it supports it, in the order the reader needs it.

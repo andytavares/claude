@@ -2,7 +2,7 @@
 name: research
 description: Turn a brief, spec, or prompt into a formatted One Pager, PRD, or Design Document, published as a shareable artifact by default
 argument-hint: "[brief path | spec path | prompt] [--one-pager | --prd | --design]"
-model: opus
+model: inherit
 ---
 Input: $ARGUMENTS
 
@@ -24,10 +24,10 @@ Executive Summary explaining from a leadership perspective why this is needed, C
 
 ## Renderings
 
-If the document proposes a change the user sees (a web or app UI, a TUI, CLI output), it includes renderings, as `~/.claude/rules/writing.md` "UI and UX changes" describes. Put them in the section that describes the change.
+If the document proposes a change the user sees (a web or app UI, a TUI, CLI output), it includes renderings, as `rules/writing.md` "UI and UX changes" describes. Put them in the section that describes the change.
 - A changed screen or state: a before and an after rendering, then the list of changes.
 - A new screen or state: write "New screen" and show only the after rendering.
-- Before: run the current code and capture it. Use the `run` skill to start the app, and take the screenshot with Playwright. For a TUI or CLI, run the command and put its exact output in a `<pre>` block. If you cannot run the current code, say so in the open questions. Do not draw a before from memory.
+- Before: run the current code and capture it. Start and capture the app through the run-and-capture capability in `rules/environment.md`. For a TUI or CLI, run the command and put its exact output in a `<pre>` block. If you cannot run the current code, say so in the open questions. Do not draw a before from memory.
 - After: build the mockup in the artifact's HTML and CSS, at the same size as the before.
 
 ## Length
@@ -40,4 +40,4 @@ Publish the document as an artifact by default: load the `artifact-design` skill
 
 Print the artifact URL and the file path. Then, unless another skill invoked this one, the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
 
-All output must follow the writing guidelines in `~/.claude/rules/writing.md`.
+All output must follow the writing guidelines in `rules/writing.md`.

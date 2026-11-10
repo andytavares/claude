@@ -8,7 +8,7 @@ Read the installed version of each tool before you set an option (`npm ls <name>
 - **Network block** (T-BOUNDARY): pytest-socket. Unit: `pytest --disable-socket`. Integration and E2E: `pytest --disable-socket --allow-hosts=127.0.0.1`. Put the flags in `addopts` in `pytest.ini` or `pyproject.toml`. `--force-enable-socket` and `@pytest.mark.enable_socket` undo the block; find them in the audit. https://github.com/miketheman/pytest-socket
 - **Mock and env restore** (T-CLEAN-SLATE): the `monkeypatch` fixture undoes `setattr`, `setenv` and `delenv` after each test. Use `tmp_path` for files. https://docs.pytest.org/en/stable/how-to/monkeypatch.html
 - **Fake time** (T-CONTROL-TIME): no core fixture. Use the project's library, such as `time-machine` or `freezegun`. [UNVERIFIED] options not checked.
-- **Retries off** (T-NO-RETRY): find `--reruns` and `@pytest.mark.flaky` (pytest-rerunfailures) in config and CI. [UNVERIFIED] flag names not checked in Context7.
+- **Retries off** (T-NO-RETRY): find `--reruns` and `@pytest.mark.flaky` (pytest-rerunfailures) in config and CI. [UNVERIFIED] flag names not checked in the official docs.
 - **Lint** (T-READABLE, T-CAN-FAIL): ruff `[tool.ruff.lint] select = ["PT"]`. Rules include PT009, PT011, PT012, PT015, PT016, PT018, PT027. https://docs.astral.sh/ruff/rules/
 
 ## Vitest
@@ -25,7 +25,7 @@ Read the installed version of each tool before you set an option (`npm ls <name>
 - **Shuffle and seed replay** (T-ALONE): `jest --randomize --seed=<n>`. `--randomize` prints the seed. Config: `randomize: true` in the root config only. jest-circus runner only. https://jestjs.io/docs/cli#--randomize
 - **Mock restore** (T-CLEAN-SLATE): `restoreMocks: true` in config, or `--restoreMocks`. https://jestjs.io/docs/cli#--restoremocks
 - **Fake timers** (T-CONTROL-TIME): `fakeTimers: { enableGlobally: true }` in config. https://jestjs.io/docs/configuration#faketimers-object
-- **Retries off** (T-NO-RETRY): find `jest.retryTimes` in tests and setup files. [UNVERIFIED] not checked in Context7.
+- **Retries off** (T-NO-RETRY): find `jest.retryTimes` in tests and setup files. [UNVERIFIED] not checked in the official docs.
 
 ## Testing Library
 
@@ -53,6 +53,31 @@ Read the installed version of each tool before you set an option (`npm ls <name>
   `"no-restricted-syntax": ["error", { "selector": "CallExpression[callee.property.name='waitForTimeout']", "message": "Wait on a condition (T-WAIT-CONDITION)." }, { "selector": "CallExpression[callee.name='setTimeout']", "message": "Use fake timers or a retrying assertion (T-WAIT-CONDITION)." }]`.
   https://eslint.org/docs/latest/rules/no-restricted-syntax
 - **Floating promises** (T-AWAIT-ALL): `"@typescript-eslint/no-floating-promises": "error"`. It needs type information: `parserOptions: { projectService: true }`. https://typescript-eslint.io/getting-started/typed-linting
+
+## Pattern lists
+
+For JavaScript, TypeScript and Python suites, set `TESTS` to a shell array of the test pathspecs, then pass it as `"${TESTS[@]}"`. This works in bash and zsh. The patterns use POSIX classes, because `git grep -E` on macOS does not support `\b` or `\s`. Each hit is a lead to read, not a finding.
+
+```sh
+TESTS=(tests '*.test.*' '*.spec.*' 'test_*.py')
+git grep -L -E '(expect|assert)' -- "${TESTS[@]}"                                       # T-CAN-FAIL: file with no assertion
+git grep -n -E 'mockReturnValue|mockResolvedValue|return_value[[:space:]]*=' -- "${TESTS[@]}"   # T-CAN-FAIL: possible mock-echo test
+git grep -n -E 'toBeDefined\(\)|toBeTruthy\(\)|is not None$' -- "${TESTS[@]}"            # T-CAN-FAIL: weak assertion
+git grep -n -E 'toHaveBeenCalled|assert_called|assert_any_call' -- "${TESTS[@]}"         # T-STATE: call assertion
+git grep -n -E 'toMatchSnapshot|toMatchInlineSnapshot|snapshot' -- "${TESTS[@]}"         # T-NO-SNAPSHOT-ONLY
+git grep -n -E '(^|[^[:alnum:]_])sleep\(|waitForTimeout|setTimeout\(' -- "${TESTS[@]}"   # T-WAIT-CONDITION
+git grep -n -E 'waitFor\(.*getBy' -- "${TESTS[@]}"                                       # T-READY-TARGET: use findBy
+git grep -n -E '\.(skip|only|fixme)\(|(^|[^[:alnum:]_])x(it|describe)\(|mark\.(skip|xfail)' -- "${TESTS[@]}"   # skipped or focused tests
+git grep -n -E '^[[:space:]]+(if|for|while)[[:space:](]|\.forEach\(' -- "${TESTS[@]}"     # T-READABLE: logic in a test
+git grep -n -E 'fireEvent\.|getByTestId' -- "${TESTS[@]}"                                # T-READABLE: query order, user-event
+git grep -n -E 'https?://' -- "${TESTS[@]}" | grep -v -E 'localhost|127\.0\.0\.1'        # T-BOUNDARY: real host
+git grep -n -E '\.setTimeout\(|timeout:[[:space:]]*[0-9]|mark\.timeout' -- "${TESTS[@]}"  # T-CONTROL-TIME: per-test timeout
+git grep -n -i -E 'retries|retry|retryTimes|reruns' -- '*.config.*' pyproject.toml setup.cfg pytest.ini <CI config dirs>   # T-NO-RETRY
+```
+
+## CI history
+
+- **GitHub Actions** (T-NO-RETRY, flaky tests): `gh run list --limit 100 --json headSha,workflowName,conclusion --jq 'group_by([.headSha, .workflowName])[] | select((map(.conclusion) | index("success")) and (map(.conclusion) | index("failure"))) | "\(.[0].headSha) \(.[0].workflowName)"'`
 
 ## Other runners
 
