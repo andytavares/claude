@@ -1,0 +1,23 @@
+at/agents/worker.md
+  s_fbbae36a36a3d6::t_ad77affe4cab5b 8,12
+at/skills/implement/SKILL.md
+  s_fbbae36a36a3d6::t_e511d03f098129 32,45-46
+at/skills/tests/SKILL.md
+  s_fbbae36a36a3d6::t_5e71e07854f03c 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "283c60ae76d1b676e45c1f22ce90f3904c5cc244",
+  "prompts": {},
+  "sessions": {
+    "s_fbbae36a36a3d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2091ac6e-9af7-4c47-902f-0a99aa5db36c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
