@@ -2,14 +2,29 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE="$HOME/.claude"
+CLAUDE="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 PLUGIN="$CLAUDE/skills/at"
+RULES_IN=rules
+
+usage() {
+  echo "usage: install.sh [--rules-in rules|claude-md]" >&2
+  exit 1
+}
 
 parse_args() {
-  if [ "$#" -gt 0 ]; then
-    echo "unknown option: $1" >&2
-    exit 1
-  fi
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --rules-in)
+        [ "${2:-}" = rules ] || [ "${2:-}" = claude-md ] || usage
+        RULES_IN="$2"
+        shift 2
+        ;;
+      *)
+        echo "unknown option: $1" >&2
+        usage
+        ;;
+    esac
+  done
 }
 
 require_tools() {
@@ -20,6 +35,10 @@ require_tools() {
     echo "missing required tools: ${missing[*]}" >&2
     exit 1
   fi
+}
+
+first_backup() {
+  find "$CLAUDE" -maxdepth 1 -name "$(basename "$1").bak-install-*" | sort | head -n 1
 }
 
 # Only the first backup holds the pre-install file; later ones would hold installed copies.
@@ -76,7 +95,7 @@ remove_settings_gate_hooks() {
 import json, sys
 path = sys.argv[1]
 def is_gate(entry):
-    return any("clean-gate/gate.py" in h.get("command", "") for h in entry.get("hooks", []))
+    return any(".claude/hooks/clean-gate/gate.py" in h.get("command", "") for h in entry.get("hooks", []))
 data = json.load(open(path))
 hooks = data.get("hooks", {})
 for event in list(hooks):
@@ -88,8 +107,30 @@ open(path, "a").write("\n")
 PY
 }
 
+# The operating rules go to rules/operating.md by default, which loads in every session
+# like CLAUDE.md does, so the user's own CLAUDE.md stays theirs.
+install_operating_rules() {
+  if [ "$RULES_IN" = claude-md ]; then
+    backup "$CLAUDE/CLAUDE.md"
+    remove_path "$CLAUDE/rules/operating.md"
+    install_path "$REPO/global/CLAUDE.md" "$CLAUDE/CLAUDE.md"
+    return
+  fi
+  restore_claude_md_if_installed
+  install_path "$REPO/global/CLAUDE.md" "$CLAUDE/rules/operating.md"
+}
+
+restore_claude_md_if_installed() {
+  local first
+  cmp -s "$REPO/global/CLAUDE.md" "$CLAUDE/CLAUDE.md" || return 0
+  first="$(first_backup "$CLAUDE/CLAUDE.md")"
+  [ -n "$first" ] || return 0
+  cp "$first" "$CLAUDE/CLAUDE.md"
+  echo "restored $CLAUDE/CLAUDE.md from $first"
+}
+
 install_repo_files() {
-  install_path "$REPO/global/CLAUDE.md" "$CLAUDE/CLAUDE.md"
+  install_operating_rules
   for rule in "$REPO"/rules/*.md; do install_path "$rule" "$CLAUDE/rules/$(basename "$rule")"; done
   install_path "$REPO/at" "$PLUGIN"
   chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
@@ -102,7 +143,6 @@ main() {
   require_tools
   mkdir -p "$CLAUDE"
   backup "$CLAUDE/settings.json"
-  backup "$CLAUDE/CLAUDE.md"
   remove_loose_copies
   install_repo_files
   echo "Installed. Run /reload-plugins in open Claude Code sessions, or start a new one; skills run as /at:<skill>."

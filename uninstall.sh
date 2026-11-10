@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CLAUDE="$HOME/.claude"
+CLAUDE="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 
 remove_path() {
   [ -e "$1" ] || return 0
@@ -12,6 +12,7 @@ remove_path() {
 
 restore_claude_md() {
   local first
+  cmp -s "$REPO/global/CLAUDE.md" "$CLAUDE/CLAUDE.md" || return 0
   first="$(find "$CLAUDE" -maxdepth 1 -name 'CLAUDE.md.bak-install-*' | sort | head -n 1)"
   if [ -z "$first" ]; then
     echo "no CLAUDE.md backup found; left $CLAUDE/CLAUDE.md as is"
@@ -24,6 +25,7 @@ restore_claude_md() {
 uninstall_everything() {
   remove_path "$CLAUDE/skills/at"
   for rule in "$REPO"/rules/*.md; do remove_path "$CLAUDE/rules/$(basename "$rule")"; done
+  remove_path "$CLAUDE/rules/operating.md"
   remove_path "$CLAUDE/at-radar.json"
   restore_claude_md
   echo "Uninstalled."
