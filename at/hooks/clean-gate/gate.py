@@ -144,7 +144,7 @@ def is_checkable_name(name, config):
     )
 
 
-TEST_DIRECTORIES = {"test", "tests", "__tests__", "spec"}
+TEST_DIRECTORIES = {"test", "tests", "__tests__"}
 TEST_FILE_PATTERNS = ["*.spec.*", "*.test.*", "test_*.*", "*_test.*", "*_spec.*"]
 TEST_FILE_PATTERNS += ["*Test.*", "*Tests.*"]
 

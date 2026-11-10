@@ -19,5 +19,5 @@ Use what the user's environment has. Never assume that a tool, plugin, skill or 
 - **PR**: a pull request or merge request on the code host.
 - **Ticket**: an item in the user's tracker. Never write a tracker's product name in a PR or commit unless the user does.
 - **Config directory**: `$CLAUDE_CONFIG_DIR`, default `~/.claude`. The user's `CLAUDE.md` and `rules/` are there.
-- **Default branch**: run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/default-branch.sh"`. It prints `<remote> <remote>/<branch>`, for example `origin origin/main`. With `--remote` it prints only the remote. Never assume a remote named `origin` or a branch named `main`.
+- **Default branch**: run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/default-branch.sh"`. It prints `<remote> <remote>/<branch>`, for example `origin origin/main`. It picks `origin`, then the branch's upstream remote, then the only remote. With `--remote` it prints only the remote. Never assume a remote named `origin` or a branch named `main`.
 - **Worktree**: create it in `.claude/worktrees/<name>` at the repo root. First add `.claude/worktrees/` to `.git/info/exclude` if it is not there, so the worktree never shows as untracked.

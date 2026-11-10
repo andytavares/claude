@@ -141,7 +141,6 @@ def test_name_defined_only_in_a_spec_file_is_not_a_repeat(tmp_path):
         "price_spec.rb",
         "price_test.rs",
         "PriceTests.cs",
-        "spec/price.rb",
     ],
 )
 def test_name_defined_only_in_another_language_test_file_is_not_a_repeat(
@@ -152,6 +151,15 @@ def test_name_defined_only_in_another_language_test_file_is_not_a_repeat(
     repo = make_repo(tmp_path, {test_file: body})
     write(repo, {"b.py": body})
     assert check_file(repo, "b.py") == ""
+
+
+def test_name_in_a_spec_directory_is_still_a_repeat(tmp_path):
+    (tmp_path / "spec").mkdir()
+    repo = make_repo(tmp_path, {"spec/openapi.py": func("py", "formatTotal", 3)})
+    write(repo, {"b.py": func("py", "formatTotal", 3)})
+    assert "formatTotal is already defined at spec/openapi.py:1" in check_file(
+        repo, "b.py"
+    )
 
 
 def test_helper_under_tests_directory_is_not_a_repeat(tmp_path):

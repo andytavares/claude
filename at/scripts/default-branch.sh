@@ -5,12 +5,13 @@ set -uo pipefail
 
 git rev-parse --is-inside-work-tree > /dev/null 2>&1 || exit 1
 
+# origin first, so a branch that tracks a fork still finds the main repo.
 pick_remote() {
   local upstream remotes
-  upstream="$(git rev-parse --abbrev-ref '@{u}' 2> /dev/null)"
-  [ -n "$upstream" ] && echo "${upstream%%/*}" && return
   remotes="$(git remote)"
   grep -qx origin <<< "$remotes" && echo origin && return
+  upstream="$(git rev-parse --abbrev-ref '@{u}' 2> /dev/null)"
+  [ -n "$upstream" ] && echo "${upstream%%/*}" && return
   [ "$(grep -c . <<< "$remotes")" -eq 1 ] && echo "$remotes"
 }
 

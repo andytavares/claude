@@ -69,3 +69,16 @@ test_remote_not_named_origin() {
   assert_eq "$(path_for "$dir")" "$H/at-skills-data/github.com/example-org/lib" "remote named upstream"
 }
 test_remote_not_named_origin; echo "ok remote not named origin"
+
+test_origin_wins_over_a_fork_upstream() {
+  local dir
+  dir="$(make_repo g git@github.com:example-org/app.git)"
+  git -C "$dir" remote add fork git@github.com:contributor/app.git
+  git -C "$dir" -c user.name=t -c user.email=t@t commit -q --allow-empty -m init
+  local branch
+  branch="$(git -C "$dir" branch --show-current)"
+  git -C "$dir" config "branch.$branch.remote" fork
+  git -C "$dir" config "branch.$branch.merge" "refs/heads/$branch"
+  assert_eq "$(path_for "$dir")" "$H/at-skills-data/github.com/example-org/app" "branch tracking a fork"
+}
+test_origin_wins_over_a_fork_upstream; echo "ok origin wins over a fork upstream"

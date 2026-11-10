@@ -9,8 +9,9 @@ git rev-parse --is-inside-work-tree > /dev/null 2>&1 || exit 0
 branch="$(git branch --show-current)"
 [ -n "$branch" ] || exit 0
 upstream="$(git rev-parse --abbrev-ref '@{u}' 2> /dev/null)"
-read -r remote default < <(bash "$(dirname "${BASH_SOURCE[0]}")/../../scripts/default-branch.sh")
-[ -n "${remote:-}" ] || exit 0
+SCRIPT="$(dirname "${BASH_SOURCE[0]}")/../../scripts/default-branch.sh"
+remote="$(bash "$SCRIPT" --remote)" || exit 0
+default="$(bash "$SCRIPT" | cut -d' ' -f2)"
 
 if ! git fetch --quiet "$remote" 2> /dev/null; then
   echo "sync: git fetch $remote failed, so $branch can be out of date. Pull before you start work."

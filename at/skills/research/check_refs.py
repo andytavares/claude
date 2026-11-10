@@ -10,14 +10,35 @@ Run it from the repo root. Exit 1 and print one line per broken reference.
 
 import html
 import re
+import subprocess
 import sys
 from pathlib import Path
 
-REFERENCE = re.compile(r"([\w./-]+\.[\w]+|[\w./-]*/[\w.-]+):(\d+(?:[-,]\d+)*)")
+# A reference is a code span, in HTML or Markdown, that holds only path:lines.
+SPAN = r"(?:<code>|`)"
+END = r"(?:</code>|`)"
+PATH = r"(?P<path>~?[\w.-]*(?:/[\w.-]+)*\.\w+|~?[\w.-]*(?:/[\w.-]+)+)"
+LINES = r"(?P<spec>\d+(?:[-,]\d+)*)"
+REFERENCE = re.compile(SPAN + PATH + ":" + LINES + END)
 QUOTE = re.compile(
-    r"<code>(?P<path>[\w./-]+):(?P<spec>\d+(?:[-,]\d+)*)</code>\s*(?:→|->|says|:)?\s*"
-    r"[\"“]?<code>(?P<quote>[^<]+)</code>"
+    SPAN + PATH + ":" + LINES + END + r"\s*(?:→|->|says|:)?\s*[\"“]?"
+    r"(?:<code>|`)(?P<quote>[^<`]+)(?:</code>|`)"
 )
+
+
+def repo_files():
+    done = subprocess.run(
+        ["git", "ls-files"], capture_output=True, text=True, check=False
+    )
+    return done.stdout.split()
+
+
+def bare_name_problem(path, spec, files):
+    """A name with no directory is a reference only when the repo has a file by that name."""
+    matches = [f for f in files if Path(f).name == path]
+    if not matches or path in files:
+        return None
+    return f"{path}:{spec}  give the path: {', '.join(matches)}"
 
 
 def cited_lines(spec):
@@ -28,22 +49,24 @@ def cited_lines(spec):
     return lines
 
 
-def reference_problem(path, spec):
-    file = Path(path)
+def reference_problem(path, spec, files):
+    if "/" not in path:
+        found = bare_name_problem(path, spec, files)
+        if found or path not in files:
+            return found
+    file = Path(path).expanduser()
     if not file.is_file():
         return f"{path}:{spec}  file not found"
     count = len(file.read_text(errors="replace").splitlines())
     past = [n for n in cited_lines(spec) if n > count]
-    return (
-        f"{path}:{spec}  line {past[0]} is past the end ({count} lines)"
-        if past
-        else None
-    )
+    if not past:
+        return None
+    return f"{path}:{spec}  line {past[0]} is past the end ({count} lines)"
 
 
 def quote_problem(path, spec, quote):
     """A code span right after a reference quotes the cited line, so it must be on it."""
-    file = Path(path)
+    file = Path(path).expanduser()
     if not file.is_file():
         return None
     text = file.read_text(errors="replace").splitlines()
@@ -54,12 +77,12 @@ def quote_problem(path, spec, quote):
 
 
 def broken_references(document):
-    found = [
-        reference_problem(path, spec) for path, spec in REFERENCE.findall(document)
-    ]
-    quotes = (m.groupdict() for m in QUOTE.finditer(document))
+    files = repo_files()
+    refs = REFERENCE.finditer(document)
+    found = [reference_problem(m["path"], m["spec"], files) for m in refs]
+    quotes = QUOTE.finditer(document)
     found += [
-        quote_problem(q["path"], q["spec"], html.unescape(q["quote"])) for q in quotes
+        quote_problem(m["path"], m["spec"], html.unescape(m["quote"])) for m in quotes
     ]
     return sorted({p for p in found if p})
 

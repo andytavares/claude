@@ -98,6 +98,30 @@ test_install_into_claude_md() {
   run_install > /dev/null
   assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "CLAUDE.md restored when rules move back"
   assert_exists "$C/rules/operating.md"
+  echo "my edit after the restore" >> "$C/CLAUDE.md"
+  run_uninstall > /dev/null
+  assert_contains "$C/CLAUDE.md" "my edit after the restore"
+}
+
+test_upgrade_from_an_install_without_the_marker() {
+  seed_home
+  run_install --rules-in claude-md > /dev/null
+  rm "$C/.at-claude-md"
+  run_install > /dev/null
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "old install migrated"
+}
+
+test_restore_after_the_rules_changed() {
+  seed_home
+  run_install --rules-in claude-md > /dev/null
+  echo "rules from an older version of this repo" > "$C/CLAUDE.md"
+  run_uninstall > "$WORK/out.txt"
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "uninstall restores an older install"
+  seed_home
+  run_install --rules-in claude-md > /dev/null
+  echo "rules from an older version of this repo" > "$C/CLAUDE.md"
+  run_install > /dev/null
+  assert_eq "$(cat "$C/CLAUDE.md")" "$(printf '%s' "$ORIGINAL_CLAUDE_MD")" "default install restores an older install"
 }
 
 test_install_honours_config_dir() {
@@ -214,6 +238,8 @@ test_uninstall_rejects_unknown_option() {
 test_install; echo "ok install"
 test_install_into_claude_md; echo "ok install into CLAUDE.md"
 test_install_honours_config_dir; echo "ok install honours CLAUDE_CONFIG_DIR"
+test_restore_after_the_rules_changed; echo "ok restore after the rules changed"
+test_upgrade_from_an_install_without_the_marker; echo "ok upgrade from an install without the marker"
 test_uninstall; echo "ok uninstall"
 test_missing_uv; echo "ok missing uv"
 test_install_removes_retired_radar; echo "ok install removes retired radar"

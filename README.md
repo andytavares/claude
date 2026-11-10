@@ -82,7 +82,7 @@ The `at/hooks/pr-checks/pr_checks.py` Stop hook works with the GitHub CLI. It re
 
 ## Start from the latest code
 
-At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-forwards the current branch. `at/scripts/default-branch.sh` finds the remote and its default branch, so a remote need not be named `origin`. On a feature branch, it also tells Claude to merge the default branch when that branch has commits from more than 3 hours ago that the feature branch lacks. It never merges or overwrites work itself: a branch that cannot fast-forward is reported, not changed.
+At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-forwards the current branch. `at/scripts/default-branch.sh` finds the remote (`origin`, then the branch's upstream remote, then the only remote) and its default branch. On a feature branch, it also tells Claude to merge the default branch when that branch has commits from more than 3 hours ago that the feature branch lacks. It never merges or overwrites work itself: a branch that cannot fast-forward is reported, not changed.
 
 ## The clean-code gate
 

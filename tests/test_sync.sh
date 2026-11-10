@@ -90,7 +90,23 @@ test_outside_a_repo_is_silent() {
   assert_eq "$(run_sync "$WORK/plain")" "" "output outside a repo"
 }
 
+test_branch_is_pulled_without_a_default_branch() {
+  rm -rf "$WORK/remote.git" "$WORK/work" "$WORK/other"
+  git init -q --bare -b develop "$WORK/remote.git"
+  git clone -q "$WORK/remote.git" "$WORK/other" 2> /dev/null
+  git -C "$WORK/other" commit -q --allow-empty -m first
+  git -C "$WORK/other" push -q origin develop
+  git clone -q "$WORK/remote.git" "$WORK/work"
+  git -C "$WORK/work" remote set-head origin -d
+  git -C "$WORK/other" commit -q --allow-empty -m second
+  git -C "$WORK/other" push -q origin develop
+  local out
+  out="$(run_sync "$WORK/work")"
+  assert_contains "$out" "pulled 1 commit(s) from origin/develop"
+}
+
 test_main_is_pulled; echo "ok main is pulled"
+test_branch_is_pulled_without_a_default_branch; echo "ok pulled without a default branch"
 test_feature_branch_is_pulled; echo "ok feature branch is pulled"
 test_stale_main_asks_for_merge; echo "ok stale main asks for merge"
 test_fresh_main_does_not_ask_for_merge; echo "ok fresh main does not ask for merge"

@@ -114,18 +114,26 @@ install_operating_rules() {
     backup "$CLAUDE/CLAUDE.md"
     remove_path "$CLAUDE/rules/operating.md"
     install_path "$REPO/global/CLAUDE.md" "$CLAUDE/CLAUDE.md"
+    touch "$CLAUDE/.at-claude-md"
     return
   fi
-  restore_claude_md_if_installed
+  restore_claude_md
   install_path "$REPO/global/CLAUDE.md" "$CLAUDE/rules/operating.md"
 }
 
-restore_claude_md_if_installed() {
+# CLAUDE.md holds installed rules when the marker or a backup exists: installs before the
+# marker always replaced CLAUDE.md. A restore uses up the backup, so it cannot run twice.
+restore_claude_md() {
   local first
-  cmp -s "$REPO/global/CLAUDE.md" "$CLAUDE/CLAUDE.md" || return 0
-  first="$(first_backup "$CLAUDE/CLAUDE.md")"
-  [ -n "$first" ] || return 0
-  cp "$first" "$CLAUDE/CLAUDE.md"
+  first="$(find "$CLAUDE" -maxdepth 1 -name 'CLAUDE.md.bak-install-*' | sort | head -n 1)"
+  [ -e "$CLAUDE/.at-claude-md" ] || [ -n "$first" ] || return 0
+  rm -f "$CLAUDE/.at-claude-md"
+  if [ -z "$first" ]; then
+    rm -f "$CLAUDE/CLAUDE.md"
+    echo "removed $CLAUDE/CLAUDE.md; it held only the installed rules"
+    return 0
+  fi
+  mv "$first" "$CLAUDE/CLAUDE.md"
   echo "restored $CLAUDE/CLAUDE.md from $first"
 }
 

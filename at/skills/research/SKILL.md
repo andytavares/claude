@@ -10,7 +10,7 @@ If the argument is a path, read it; it is the brief or spec. Otherwise it is the
 
 Run the `glossary` skill first and use its terms.
 
-For a Design Document, or any input that asks for a full audit or inventory, start one subagent right after the glossary step. Its brief is the input, word for word, and one instruction: list every place in the codebase the input covers, one line each, as `path:line — what is there`. Merge its list into the draft when it reports. While it runs, read and draft. Never end a message only to wait for a subagent: draft every section that does not depend on its result.
+Start one subagent right after the glossary step. Its brief is the input, word for word, and one instruction: list every place in the codebase the input covers, one line each, as `path:line — what is there`. Merge its list into the draft when it reports. While it runs, read and draft. Never end a message only to wait for a subagent: draft every section that does not depend on its result.
 
 Research before writing. Read the parts of this codebase the input touches. For anything external, fetch current documentation rather than relying on memory, and cite it. Every claim that could be false carries its evidence: a file path, a command and its output, or a URL. Anything you could not verify goes in the open questions, never stated as fact.
 
@@ -40,9 +40,9 @@ Match the input. A two-sentence brief produces a page; a whole spec produces wha
 
 ## Output
 
-Before you publish, run `uv run --script "${CLAUDE_SKILL_DIR}/check_refs.py" <document>` from the repo root. It exits 1 and lists each `path:line` that does not exist, and each quote right after a reference that is not on the cited line. Fix each one, then run it again until it exits 0.
+Before you publish, run `uv run --script "${CLAUDE_SKILL_DIR}/check_refs.py" <document>` from the repo root. It checks each `path:line` written as a code span, in HTML or Markdown. It exits 1 and lists each one that does not exist, each bare file name that needs its path, and each quote right after a reference that is not on the cited line. Fix each one, then run it again until it exits 0.
 
-Publish through the publish capability in `rules/environment.md`. For an HTML page, copy `${CLAUDE_SKILL_DIR}/template.html` and fill in its `<title>` and `<main>`. It already holds the theme, layout and components. Write new CSS only for a component the template does not have. Publish with icon `document`, and title it with the document's name.
+Publish through the publish capability in `rules/environment.md`. When the publish provider is the `Artifact` tool, load its design guidance first, as the tool requires. For an HTML page, copy `${CLAUDE_SKILL_DIR}/template.html` and fill in its `<title>` and `<main>`. It already holds the theme, layout and components. Write new CSS only for a component the template does not have. Publish with icon `document`, and title it with the document's name.
 
 Print the artifact URL and the file path. Then, unless another skill invoked this one, the short report CLAUDE.md asks for: what was done, what was skipped, what differs from the plan.
 
