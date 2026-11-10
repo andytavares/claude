@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -8,13 +9,14 @@ import pytest
 GUARD = Path(__file__).parent.parent / "at/hooks/zsh-guard/guard.py"
 
 
-def run_guard(command, tool_name="Bash"):
+def run_guard(command, tool_name="Bash", shell="/bin/zsh"):
     hook = json.dumps({"tool_name": tool_name, "tool_input": {"command": command}})
     return subprocess.run(
         [sys.executable, str(GUARD)],
         input=hook,
         capture_output=True,
         text=True,
+        env={**os.environ, "SHELL": shell},
         check=False,
     )
 
@@ -78,3 +80,9 @@ def test_code_after_heredoc_is_still_checked():
 
 def test_non_bash_input_passes():
     assert run_guard("$c", tool_name="Read").returncode == 0
+
+
+def test_bash_users_are_not_blocked():
+    done = run_guard("$cmd --help", shell="/bin/bash")
+    assert done.returncode == 0
+    assert done.stderr == ""

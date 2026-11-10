@@ -144,8 +144,9 @@ def is_checkable_name(name, config):
     )
 
 
-TEST_DIRECTORIES = {"test", "tests", "__tests__"}
-TEST_FILE_PATTERNS = ["*.spec.*", "*.test.*", "test_*.py", "*_test.go"]
+TEST_DIRECTORIES = {"test", "tests", "__tests__", "spec"}
+TEST_FILE_PATTERNS = ["*.spec.*", "*.test.*", "test_*.*", "*_test.*", "*_spec.*"]
+TEST_FILE_PATTERNS += ["*Test.*", "*Tests.*"]
 
 
 def is_test_path(path):
