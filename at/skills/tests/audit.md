@@ -12,12 +12,10 @@ Apply the rule list in `${CLAUDE_SKILL_DIR}/SKILL.md` to an existing suite. Scop
 
 1. **Inventory.** Find each runner and its config, and the test commands in README, `package.json`, `pyproject.toml` and CI files. Read the project's test rules (CLAUDE.md, CONTRIBUTING, ADRs). Count tests per tier, and record the command that counts them.
 2. **Baseline.** Run the whole suite once. Record the exit code, the time and the failures. A red baseline is a finding; continue the audit.
-3. **Config check.** Find: retries in any config or CI step (T-NO-RETRY); shuffle off (T-ALONE); mock, env or global restore off (T-CLEAN-SLATE); network open in any tier (T-BOUNDARY); timezone, locale or runtime version not pinned, or CI runs a different command than local (T-SAME-ENV); per-test timeouts (T-CONTROL-TIME); skipped tests with no issue; no repeat run after merge that looks for flakes.
+3. **Config check.** Find: retries in any config or CI step (T-NO-RETRY); shuffle off (T-ALONE); mock, env or global restore off (T-CLEAN-SLATE); network open in any tier (T-BOUNDARY); timezone, locale or runtime version not pinned, or CI runs a different command than local (T-SAME-ENV); per-test timeouts (T-CONTROL-TIME); skipped tests with no issue.
 4. **Dynamic checks.** Use the commands in `references/frameworks.md`.
-   - Run the suite 3 times, shuffled, each with a new seed. Record each seed.
-   - Run each spec that fails when shuffled alone. A spec that passes alone and fails shuffled is order-dependent (T-ALONE).
+   - Run each spec that fails in the baseline alone. A spec that passes alone and fails in the suite is order-dependent (T-ALONE).
    - Run the unit tier with all sockets blocked. Run integration and E2E with only localhost allowed (T-BOUNDARY).
-   - Run E2E specs with `--repeat-each=5 --retries=0` and more workers than cores. Use the project's own load tool if it has one.
    - Read CI history. A commit with both a passed and a failed run of one test is a flaky test:
      `gh run list --limit 100 --json headSha,workflowName,conclusion --jq 'group_by([.headSha, .workflowName])[] | select((map(.conclusion) | index("success")) and (map(.conclusion) | index("failure"))) | "\(.[0].headSha) \(.[0].workflowName)"'`
      Each hit is a lead. Confirm in the job logs that the same test passed and failed.
@@ -25,7 +23,7 @@ Apply the rule list in `${CLAUDE_SKILL_DIR}/SKILL.md` to an existing suite. Scop
 6. **Read.** Read every test file, not only the hits. Read each test with the production code it calls and that code's callers. Give each test one action from "Actions", with the rule ID. For more than about 40 test files, start one subagent per top-level test directory, at most 8. Give each subagent the rule list, its hit list and the finding format.
 7. **Unreachable code.** For each branch that no caller or boundary can reach (T-REACHABLE), ask the user with AskUserQuestion: "delete branch and test", "delete test only" or "keep". Deleting production code is destructive, so never decide alone.
 8. **Mutation guard.** Where Stryker or mutmut runs on the project, run it on the modules whose tests the findings delete or merge. Record the killed-mutant count before the change. If it cannot run, write "not measured" and the reason.
-9. **Guards.** For each rule a program can check that the project does not enforce, propose a guard in the project: `retries: 0`, shuffle on, mock and env restore on, a network block per tier, pinned timezone and locale, an eslint `no-restricted-syntax` rule for `waitForTimeout` and `setTimeout` in tests, `@typescript-eslint/no-floating-promises`, ruff `PT` rules, and a nightly CI job that repeats the suite and reports tests that both pass and fail on one commit. Each guard is a finding with the action "add guard".
+9. **Guards.** For each rule a program can check that the project does not enforce, propose a guard in the project: `retries: 0`, shuffle on, mock and env restore on, a network block per tier, pinned timezone and locale, an eslint `no-restricted-syntax` rule for `waitForTimeout` and `setTimeout` in tests, `@typescript-eslint/no-floating-promises` and ruff `PT` rules. Each guard is a finding with the action "add guard".
 10. **Pick and brief.** Show the count per action. Ask the user which actions to apply with AskUserQuestion, up to 4 options per question. Write the brief (format below).
 
 ## Pattern list
@@ -73,7 +71,6 @@ The brief has:
 - The conflicts with project rules.
 - Acceptance criteria, each with the command that checks it:
   - The suite is green: `<test command>` exits 0.
-  - 3 shuffled runs with new seeds are green: `<shuffle command>`.
   - The network-blocked runs per tier are green: `<block command>`.
   - The killed-mutant count is not lower than `<count before>`: `<mutation command>`. Or "not measured" and the reason.
 
