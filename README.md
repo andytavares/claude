@@ -53,7 +53,7 @@ flowchart TD
 | `/at:survey` | Before writing code: what exists, what to reuse, what to copy | Session model | A short reuse map |
 | `/at:implement` | A brief or spec is ready to build | Opus plans, Opus workers build | A draft PR |
 | `/at:code-review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you. Add a spec path to check the diff against it | Opus, in a fork | One line per bug, a second list against the spec, and a count of the files it read |
-| `/at:tests` | Before writing or changing a test; `audit [path]` to audit a whole suite | Session model | Tests that can fail, run alone and never flake; an audit brief for `/at:implement` |
+| `/at:tests` | Before writing or changing a test; `audit [path]` to audit a whole suite | Session model | Tests that can fail and run alone; an audit brief for `/at:implement` |
 | `/at:word-salad` | A reply is too dense to read | Opus | The same content in plain, short, ordered prose |
 | `/at:cone-of-shame` | A response broke the rules or was bad. Add a note on what went wrong | Opus | The work redone, and a draft PR that fixes the cause in this config |
 

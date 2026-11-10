@@ -27,10 +27,7 @@ Before launching any worker, do the shared setup once yourself: install, build, 
 
 Delegate each unit to the `at:worker` subagent, with the unit's text as its whole brief, the glossary directory path (get it by running the `glossary` skill) when that directory exists, plus the repo's lint and test commands, scoped to what the unit touches. Each brief ends with a time box ("report within 20 minutes with what you have").
 
-Checks in a brief are targeted, never whole-suite:
-- the tests for the files the unit touches, run once;
-- anything the unit made or changed that must be stable, repeated at most 3 times;
-- never a loop that runs every test on its own, and never the full suite repeated. Those belong to Prove, once.
+Checks in a brief are targeted, never whole-suite: the tests for the files the unit touches, run once. Never a loop that runs every test on its own, and never a repeated run.
 
 Launch independent units in one message so they run concurrently; launch dependent ones after their dependency reports back. Brief each worker precisely the first time. When a worker reports, take its result; do not redo its work.
 
@@ -43,9 +40,8 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 ## Prove
 
 1. For a large or complex change, run the `at:code-review` skill once, as `at:code-review <default branch> <the brief or spec path or URL>` when the work has one, and wait for its report. Fix the `Against the spec` list too. Skip it for trivial work. If its first line counts fewer files than the diff has, review the missing files yourself. Fix each finding in this session; do not relaunch workers for review findings. Commit the fixes. Do not review again after the fixes.
-2. Run the stability check from the `at:tests` skill once, for every test spec file added or edited in `<default>...HEAD`: the spec file alone, then 30 shuffled runs for unit and integration specs, `--repeat-each=5 --retries=0` for E2E specs, with more workers than cores. Fix each failure at its cause; never retry.
-3. Run precommit checks once until every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
-4. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report <default>..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
+2. Run precommit checks once until every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
+3. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report <default>..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
 
 ## Ship
 

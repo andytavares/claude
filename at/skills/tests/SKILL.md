@@ -20,7 +20,7 @@ Cite the rule ID when you make a choice in a PR, and on every audit finding.
 - **T-NO-SNAPSHOT-ONLY**: A large snapshot is never the only assertion.
 - **T-REACHABLE**: Each case is an input that a caller or a boundary can send. Check types, boundary validation and callers (`git grep -n -w`). Do not test an unreachable branch.
 - **T-NO-DUPLICATE**: Two tests that fail for the same defect become one test or one parametrized test.
-- **T-ALONE**: Each test passes alone, in any order, and beside copies of itself. Every run shuffles and prints the seed.
+- **T-ALONE**: Each test passes alone and in any order. Every run shuffles and prints the seed.
 - **T-CLEAN-SLATE**: Each test makes its own data, temp dir, DB and mock state. Restore mocks, timers, env and globals after each test. No mutable module-level state.
 - **T-BOUNDARY**: Fake every boundary. No real host in any tier: unit runs block all sockets; integration and E2E runs allow only localhost. Use real code for everything inside the process. Unit tests never touch a DB; integration tests use a private DB that each test creates and drops.
 - **T-SAME-ENV**: Tests run in one sealed environment, the same on a laptop and in CI: pinned timezone, locale and runtime version, a scrubbed env and HOME, one test command for both.
@@ -40,8 +40,6 @@ Do these steps before you write or change a test. `${CLAUDE_SKILL_DIR}/reference
 1. Pick the tier with T-TIER.
 2. Write the test. Run it against the current code. Show that it fails on its assertion, not on an error.
 3. Check the test against every rule in the list.
-4. Make it pass. Then prove it is stable: run the spec file alone, then 30 shuffled runs for a unit or integration spec. For an E2E spec, run `--repeat-each=5 --retries=0`. Use more workers than cores. A test that fails 10% of the time passes 30 runs 4.2% of the time (0.9^30).
-
-An `at:worker` skips step 4, because it caps repeats at 3 while other workers run checks. `/at:implement` runs step 4 once in Prove, for each spec file the branch adds or changes.
+4. Make it pass.
 
 Sources: Software Engineering at Google ch. 11-14, The Practical Test Pyramid, xUnit Patterns (Erratic Test), testsmells.org, Testing Library docs, Playwright best practices.
