@@ -9,9 +9,8 @@ git rev-parse --is-inside-work-tree > /dev/null 2>&1 || exit 0
 branch="$(git branch --show-current)"
 [ -n "$branch" ] || exit 0
 upstream="$(git rev-parse --abbrev-ref '@{u}' 2> /dev/null)"
-remote="${upstream%%/*}"
-remote="${remote:-origin}"
-git remote get-url "$remote" > /dev/null 2>&1 || exit 0
+read -r remote default < <(bash "$(dirname "${BASH_SOURCE[0]}")/../../scripts/default-branch.sh")
+[ -n "${remote:-}" ] || exit 0
 
 if ! git fetch --quiet "$remote" 2> /dev/null; then
   echo "sync: git fetch $remote failed, so $branch can be out of date. Pull before you start work."
@@ -30,17 +29,9 @@ pull_upstream() {
   fi
 }
 
-default_branch() {
-  git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD" 2> /dev/null && return
-  for name in main master; do
-    git rev-parse --verify --quiet "$remote/$name" > /dev/null && echo "$remote/$name" && return
-  done
-}
-
 # First-parent commit time is when a change landed on the default branch, not when it was written.
 check_default_branch() {
-  local default oldest
-  default="$(default_branch)"
+  local oldest
   [ -n "$default" ] && [ "$default" != "$upstream" ] && [ "$default" != "$remote/$branch" ] || return 0
   oldest="$(git log --first-parent --reverse --format=%ct "HEAD..$default" | head -1)"
   [ -n "$oldest" ] && [ $(($(date +%s) - oldest)) -gt "$STALE_SECONDS" ] || return 0

@@ -61,3 +61,11 @@ test_no_remote_uses_folder_name; echo "ok no remote"
 test_worktree_shares_the_main_checkout_path; echo "ok worktree"
 test_outside_a_repo_fails; echo "ok outside a repo"
 echo "All glossary path tests passed."
+
+test_remote_not_named_origin() {
+  local dir
+  dir="$(make_repo f)"
+  git -C "$dir" remote add upstream git@github.com:example-org/lib.git
+  assert_eq "$(path_for "$dir")" "$H/at-skills-data/github.com/example-org/lib" "remote named upstream"
+}
+test_remote_not_named_origin; echo "ok remote not named origin"
