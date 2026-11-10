@@ -10,7 +10,7 @@ Read `GLOSSARY.md` and `adr/*.md` there first, if they exist. Use the terms in t
 
 ## Write
 
-Create files only when you have something to write. On the first write, run `git init -q` in `~/at-skills-data` if it has no `.git`. After each write, run `git -C ~/at-skills-data add -A && git -C ~/at-skills-data commit -q -m "glossary(<org>/<repo>): <what changed>"`. This store has no remote. Do not add one.
+Create files only when you have something to write. On the first write, run `git init -q` in `~/at-skills-data` if it has no `.git`. After each write, run `git -C ~/at-skills-data add -A && git -C ~/at-skills-data commit -q -m "glossary(<org>/<repo>): <what changed>"`. If `git config user.email` prints nothing, add `-c user.name=at -c user.email=at@localhost` after `git -C ~/at-skills-data` in the commit, so the commit works without a git identity. This store has no remote. Do not add one.
 
 `GLOSSARY.md`: one entry per term, in this form. No file paths, no code, no how it works inside.
 
