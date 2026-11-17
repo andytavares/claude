@@ -35,6 +35,7 @@ require_tools() {
     echo "missing required tools: ${missing[*]}" >&2
     exit 1
   fi
+  command -v npx > /dev/null || echo "npx not found: the harness copies check will report 'not measured' until Node is installed"
 }
 
 first_backup() {
@@ -86,6 +87,9 @@ remove_retired_copies() {
   remove_path "$CLAUDE/agents/google-code-reviewer.md"
   remove_path "$CLAUDE/at-radar.json"
   remove_path "$CLAUDE/rules/plugin-evals.md"
+  # A standalone harness from the first tutorial; the plugin's hooks/harness replaces it.
+  [ -f "$CLAUDE/harness/hooks/rules_gate.py" ] && remove_path "$CLAUDE/harness"
+  return 0
 }
 
 remove_settings_gate_hooks() {
@@ -94,8 +98,9 @@ remove_settings_gate_hooks() {
   python3 - "$settings" << 'PY'
 import json, sys
 path = sys.argv[1]
+RETIRED = (".claude/hooks/clean-gate/gate.py", ".claude/harness/hooks/")
 def is_gate(entry):
-    return any(".claude/hooks/clean-gate/gate.py" in h.get("command", "") for h in entry.get("hooks", []))
+    return any(r in h.get("command", "") for h in entry.get("hooks", []) for r in RETIRED)
 data = json.load(open(path))
 hooks = data.get("hooks", {})
 for event in list(hooks):
@@ -141,7 +146,7 @@ install_repo_files() {
   install_operating_rules
   for rule in "$REPO"/rules/*.md; do install_path "$rule" "$CLAUDE/rules/$(basename "$rule")"; done
   install_path "$REPO/at" "$PLUGIN"
-  chmod +x "$PLUGIN/hooks/clean-gate/gate.py"
+  chmod +x "$PLUGIN/hooks/clean-gate/gate.py" "$PLUGIN/hooks/harness/harness.py"
   # /at:postmortem reads this to find the repo it changes.
   echo "$REPO" > "$PLUGIN/.source-repo"
 }

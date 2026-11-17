@@ -31,9 +31,14 @@ SHOWN = 5
 
 
 def sh(command, **options):
-    return subprocess.run(
-        command, capture_output=True, text=True, check=False, **options
-    )
+    try:
+        return subprocess.run(
+            command, capture_output=True, text=True, check=False, **options
+        )
+    except FileNotFoundError as missing:
+        return subprocess.CompletedProcess(
+            command, 127, "", f"not found: {missing.filename}"
+        )
 
 
 WARNINGS = []

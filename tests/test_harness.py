@@ -176,3 +176,23 @@ def test_every_check_skips_a_repeat_stop(tmp_path):
             ).stdout
             == ""
         )
+
+
+def test_copies_reports_not_measured_without_npx(tmp_path):
+    repo = make_repo(tmp_path)
+    env = {"HOME": str(tmp_path), "PATH": "/usr/bin:/bin"}
+    call = json.dumps({"hook_event_name": "Stop"})
+    done = subprocess.run(
+        [sys.executable, str(HARNESS), "copies"],
+        cwd=repo,
+        input=call,
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+    )
+    assert done.returncode == 0
+    assert (
+        "copies not measured: jscpd failed: not found: npx"
+        in json.loads(done.stdout)["systemMessage"]
+    )
