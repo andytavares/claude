@@ -26,12 +26,15 @@ seed_home() {
   echo "retired agent from an earlier install" > "$C/agents/google-code-reviewer.md"
   echo "loose copy from an earlier install" > "$C/hooks/clean-gate/gate.py"
   echo "global rule this repo now keeps to itself" > "$C/rules/plugin-evals.md"
+  mkdir -p "$C/harness/hooks"
+  echo "standalone harness from the first tutorial" > "$C/harness/hooks/rules_gate.py"
   printf '%s' "$ORIGINAL_CLAUDE_MD" > "$C/CLAUDE.md"
   cat > "$C/settings.json" << 'JSON'
 {"theme":"dark","hooks":{
   "PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"git-ai checkpoint"}]}],
   "PostToolUse":[{"hooks":[{"type":"command","command":"python3 ~/tools/clean-gate/gate.py"}]}],
-  "Stop":[{"hooks":[{"type":"command","command":"uv run --script \"$HOME/.claude/hooks/clean-gate/gate.py\" check --hook stop"}]}]}}
+  "Stop":[{"hooks":[{"type":"command","command":"uv run --script \"$HOME/.claude/hooks/clean-gate/gate.py\" check --hook stop"}]},
+          {"hooks":[{"type":"command","command":"bash ~/.claude/harness/hooks/dup_gate.sh"}]}]}}
 JSON
 }
 
@@ -64,6 +67,11 @@ assert_plugin_installed() {
   assert_eq "$(cat "$C/skills/at/.source-repo")" "$ROOT" "recorded source repo"
   [ -x "$C/skills/at/hooks/clean-gate/gate.py" ] || fail "gate.py not executable"
   assert_exists "$C/skills/at/hooks/clean-gate/gate.py.lock"
+  [ -x "$C/skills/at/hooks/harness/harness.py" ] || fail "harness.py not executable"
+  assert_exists "$C/skills/at/hooks/shared/hunks.py"
+  assert_exists "$C/skills/at/hooks/harness/vale.ini"
+  assert_exists "$C/skills/at/skills/harness-setup/SKILL.md"
+  assert_contains "$C/skills/at/hooks/hooks.json" 'hooks/harness/harness.py\" can-fail'
 }
 
 assert_loose_copies_removed() {
@@ -75,6 +83,7 @@ assert_loose_copies_removed() {
   assert_gone "$C/agents/google-code-reviewer.md"
   assert_gone "$C/hooks/clean-gate"
   assert_gone "$C/rules/plugin-evals.md"
+  assert_gone "$C/harness"
 }
 
 test_install() {

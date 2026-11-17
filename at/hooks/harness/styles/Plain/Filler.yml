@@ -1,0 +1,18 @@
+extends: existence
+message: "Cut or replace '%s'."
+level: error
+ignorecase: true
+tokens:
+  - leverage
+  - robust
+  - seamless(ly)?
+  - comprehensive
+  - utilize
+  - essentially
+  - it's worth noting
+  - in order to
+  - delve
+  - holistic
+  - straightforward
+  - powerful
+  - this changes everything

@@ -9,6 +9,24 @@
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/zsh-guard/guard.py\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" rules"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose"
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -40,6 +58,26 @@
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/pr-checks/pr_checks.py\"",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" copies",
+            "timeout": 120
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail",
+            "timeout": 900
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose",
+            "timeout": 60
+          },
+          {
+            "type": "agent",
+            "prompt": "You review a code change for needless complexity. You did not write it. Hook input: $ARGUMENTS\n\nIf stop_hook_active is true, return {\"ok\": true}.\nFind the base: the merge-base of HEAD and the remote default branch (git symbolic-ref refs/remotes/<remote>/HEAD). Read git diff <base> and the untracked files. If there is no base, read git diff HEAD.\nFor each change ask one question: can the same behavior ship with less code? Look for a new function or type with one caller, a wrapper that only forwards, an option nobody passes, a helper that already exists in the repo (search for it), and handling for input that cannot occur.\nReturn {\"ok\": true} if you find nothing. Otherwise return {\"ok\": false, \"reason\": \"...\"}: at most 5 lines, each path:line - what to delete or reuse - why.",
+            "timeout": 300
           }
         ]
       }
