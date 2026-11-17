@@ -196,3 +196,40 @@ def test_copies_reports_not_measured_without_npx(tmp_path):
         "copies not measured: jscpd failed: not found: npx"
         in json.loads(done.stdout)["systemMessage"]
     )
+
+
+def test_can_fail_copies_ignored_files_the_tests_need(tmp_path):
+    repo = make_repo(tmp_path)
+    configure(
+        tmp_path,
+        repo,
+        'test = "test -f local.env && python3 checks/pricing_check.py"\n'
+        'tests = ["checks/*"]\ncopy_ignored = ["local.env"]\n',
+    )
+    (repo / ".gitignore").write_text("local.env\n")
+    (repo / "local.env").write_text("KEY=1\n")
+    (repo / "checks").mkdir()
+    (repo / "pricing.py").write_text(SOURCE)
+    (repo / "checks/pricing_check.py").write_text(
+        "import sys; sys.path.insert(0, '.')\n" + STRONG
+    )
+    done = run("can-fail", repo, {"hook_event_name": "Stop"})
+    assert (done.returncode, done.stdout) == (0, "")
+
+
+def test_gates_write_no_file_into_the_repo(tmp_path):
+    repo = make_repo(tmp_path)
+    configure(
+        tmp_path,
+        repo,
+        'test = "python3 checks/pricing_check.py"\ntests = ["checks/*"]\n',
+    )
+    (repo / "checks").mkdir()
+    (repo / "pricing.py").write_text(SOURCE)
+    (repo / "checks/pricing_check.py").write_text(
+        "import sys; sys.path.insert(0, '.')\n" + WEAK
+    )
+    before = git(repo, "status", "--short", "--ignored")
+    for check in ("copies", "can-fail"):
+        run(check, repo, {"hook_event_name": "Stop"})
+    assert git(repo, "status", "--short", "--ignored") == before

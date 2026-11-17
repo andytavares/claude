@@ -142,16 +142,20 @@ def added_line_numbers(base, path):
     return sorted(changed_lines(sh(["git", "diff", "-U0", base, "--", path]).stdout))
 
 
-def snapshot(base):
+def ignored_files(patterns):
+    """Ignored files that match `copy_ignored` patterns (gitignore syntax), such as a local env file."""
+    if not patterns:
+        return []
+    excludes = [f"--exclude={pattern}" for pattern in patterns]
+    found = sh(["git", "ls-files", "--others", "--ignored", *excludes])
+    return [path for path in found.stdout.split("\n") if path and Path(path).is_file()]
+
+
+def snapshot(base, settings):
     """A private worktree of the current tree, so mutants never touch files other hooks read."""
     copy = Path(tempfile.mkdtemp(prefix="harness-tree-")) / "tree"
     sh(["git", "worktree", "add", "--detach", "--quiet", str(copy), "HEAD"])
-    extra = sh(
-        ["git", "ls-files", "--others", "--ignored", "--exclude-from=.worktreeinclude"]
-    ).stdout.split("\n")
-    for path in changed_files(base) + [
-        p for p in extra if p and Path(".worktreeinclude").is_file()
-    ]:
+    for path in changed_files(base) + ignored_files(settings.get("copy_ignored", [])):
         (copy / path).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(path, copy / path)
     return copy
@@ -234,7 +238,7 @@ def unready(settings, path):
     if not (settings.get("test") and settings.get("tests")):
         return f"can-fail not measured: set test and tests in {path}"
     if sh(settings["test"], shell=True).returncode != 0:
-        return f"can-fail not measured: `{settings['test']}` fails in a fresh worktree. List the ignored files it needs in .worktreeinclude"
+        return f"can-fail not measured: `{settings['test']}` fails in a fresh worktree. Add the ignored files it needs to copy_ignored in {path}"
     return None
 
 
@@ -242,7 +246,7 @@ def can_fail(call, settings, path):
     base = base_ref(settings)
     if not base:
         return warn(f"can-fail not measured: no base branch. Set base in {path}")
-    copy = snapshot(base)
+    copy = snapshot(base, settings)
     home = os.getcwd()
     try:
         os.chdir(copy)

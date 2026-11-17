@@ -87,7 +87,7 @@ At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-f
 
 ## Quality gates
 
-`at/hooks/harness/harness.py` checks Claude's work at the moment it happens and sends each failure back as Claude's next instruction. It knows no language, tool, layout or branch name. Each repo states its own facts in `harness.toml`, kept in the repo's glossary directory (`~/at-skills-data/<host>/<org>/<repo>/`), so no repo holds it. Run `/at:harness-setup` in a repo to write it from the repo's own evidence.
+`at/hooks/harness/harness.py` checks Claude's work at the moment it happens and sends each failure back as Claude's next instruction. It knows no language, tool, layout or branch name. Each repo's facts live in `harness.toml` in your home directory, at `~/at-skills-data/<host>/<org>/<repo>/`, found from the git remote. The gates need no configuration file in the repo and write no file to it. Run `/at:harness-setup` in a repo to write it from the repo's own evidence.
 
 | Gate | Hook | Fails when |
 | --- | --- | --- |
@@ -97,7 +97,7 @@ At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-f
 | can-fail | Stop | A bug planted by universalmutator on an added line passes the repo's `test` command |
 | reviewer | Stop (agent hook) | A second Claude finds code the change does not need |
 
-A gate that lacks a setting, a tool or a base branch shows "not measured" and the reason. It never passes by guessing. The can-fail gate runs in a private git worktree, so the other gates never read a planted bug; it copies the ignored files that `.worktreeinclude` lists. Each stop gate blocks once per stop, so it cannot loop.
+A gate that lacks a setting, a tool or a base branch shows "not measured" and the reason. It never passes by guessing. The can-fail gate runs in a private git worktree, so the other gates never read a planted bug; it copies the ignored files that `copy_ignored` names in `harness.toml`. Each stop gate blocks once per stop, so it cannot loop.
 
 Tools: `npx` runs jscpd 5.4.3, and `uvx` runs universalmutator 1.14.1 and Vale 3.27.0, each at a pinned version.
 
