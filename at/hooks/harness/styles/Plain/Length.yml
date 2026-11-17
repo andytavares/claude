@@ -1,0 +1,5 @@
+extends: metric
+message: "%s words. Cut to 150 or fewer. Put detail behind a question, not in the reply."
+level: error
+formula: words
+condition: "> 150.0"
