@@ -29,7 +29,7 @@ Every number you present comes with the command or query that produced it. If yo
 
 ## Done
 
-Done means the project's own check(s) ran and its exit code was 0. The command and its output go in the PR or commit, not a summary of it. If a check could not run, say "not measured" and why. Never a pass by inference. A repo with no CI has no remote checks, so its local check is the done check. Do not mention the missing CI: the `pr-checks` hook asks about it once a day. Show check output in chat only when the user asks, or when they need it to understand the work (a failure, a warning, an abnormality).
+Done means the project's own check(s) ran and its exit code was 0. The command and its output go in the PR or commit, not a summary of it. If a check could not run, say "not measured" and why. Never a pass by inference. A repo with no CI has no remote checks, so its local check is the done check. Do not mention the missing CI: the `pr-checks` hook asks about it once a day. Never wait for CodeQL checks. Show check output in chat only when the user asks, or when they need it to understand the work (a failure, a warning, an abnormality).
 
 ## Root cause
 
