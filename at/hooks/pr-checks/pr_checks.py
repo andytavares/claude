@@ -11,6 +11,7 @@ from pathlib import Path
 
 PR_URL = re.compile(r"https://([\w.-]+(?::\d+)?)/([\w.-]+/[\w.-]+)/pull/\d+")
 ASK_EVERY_SECONDS = 24 * 3600
+GITHUB_APPS = {"github-actions", "github-advanced-security"}
 NOT_GREEN = {"pending": "running", "fail": "failed", "cancel": "failed"}
 
 
@@ -53,27 +54,35 @@ def gh_json(*args):
         return done, None
 
 
+def is_codeql(check):
+    return "CodeQL" in (check["name"], check.get("workflow"))
+
+
+def api_field(host, path, field):
+    """The field of a `gh api` answer, or None when gh cannot read it."""
+    answer = gh_json("api", "--hostname", host, path)[1]
+    return answer.get(field) if isinstance(answer, dict) else None
+
+
 def has_ci(host, repo):
-    """True when the repo has an Actions workflow, or any check or status on its default branch."""
-    api = ["api", "--hostname", host]
-    _, about = gh_json(*api, f"repos/{repo}")
-    branch = (about or {}).get("default_branch")
-    paths = [f"repos/{repo}/actions/workflows"]
-    if branch:
-        paths += [
-            f"repos/{repo}/commits/{branch}/check-runs",
-            f"repos/{repo}/commits/{branch}/status",
-        ]
+    """True when the repo has CI other than CodeQL and other GitHub-managed workflows."""
+    branch = api_field(host, f"repos/{repo}", "default_branch")
+    workflows = api_field(host, f"repos/{repo}/actions/workflows", "workflows")
+    runs = api_field(host, f"repos/{repo}/commits/{branch}/check-runs", "check_runs")
+    statuses = api_field(host, f"repos/{repo}/commits/{branch}/status", "total_count")
     # An answer gh cannot read counts as CI, so the hook keeps waiting on the PR.
-    return any(
-        (gh_json(*api, path)[1] or {"total_count": 1}).get("total_count")
-        for path in paths
-    )
+    if None in (workflows, runs, statuses):
+        return True
+    # GitHub-managed workflows, such as CodeQL default setup, have a path under dynamic/.
+    own = [w for w in workflows if not w["path"].startswith("dynamic/")]
+    # Runs from these apps belong to Actions workflows or CodeQL, counted above.
+    external = [r for r in runs if r["app"]["slug"] not in GITHUB_APPS]
+    return bool(own or external or statuses)
 
 
 def problems(pr):
     """One line per check that is not green, or why the checks could not be read; None without CI."""
-    done, checks = gh_json("pr", "checks", pr, "--json", "name,bucket")
+    done, checks = gh_json("pr", "checks", pr, "--json", "name,bucket,workflow")
     if done.returncode != 0 and not checks:
         if not has_ci(*PR_URL.match(pr).groups()):
             return None
@@ -83,7 +92,7 @@ def problems(pr):
     return [
         f"{pr}: {c['name']} {NOT_GREEN[c['bucket']]}"
         for c in checks
-        if c["bucket"] in NOT_GREEN
+        if c["bucket"] in NOT_GREEN and not is_codeql(c)
     ]
 
 
@@ -131,8 +140,9 @@ def main():
         reason = (
             "A PR you opened is not green, so the task is not done:\n"
             + "\n".join(found)
-            + "\nWait with `gh pr checks <url> --watch`, then find and fix the cause of each "
-            "failure. Report done only when every check passes."
+            + "\nWait for only these checks with `gh run watch <run-id>`, never with "
+            "`gh pr checks --watch`, which also waits for CodeQL. Then find and fix the cause "
+            "of each failure. Report done only when every check passes."
         )
         print(json.dumps({"decision": "block", "reason": reason}))
     elif due := ask_about_ci(dict.fromkeys(no_ci)):
