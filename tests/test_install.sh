@@ -73,6 +73,7 @@ assert_plugin_installed() {
   assert_exists "$C/skills/at/hooks/shared/hunks.py"
   assert_exists "$C/skills/at/hooks/harness/vale.ini"
   assert_exists "$C/skills/at/skills/harness-setup/SKILL.md"
+  # shellcheck disable=SC2016 # the literal ${CLAUDE_PLUGIN_ROOT} is what hooks.json holds
   assert_contains "$C/skills/at/hooks/hooks.json" 'bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail'
   [ -x "$AT_RUNTIME_DIR/uv/0.11.2/uv" ] || fail "install did not download the plugin uv"
 }

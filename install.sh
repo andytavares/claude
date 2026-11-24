@@ -44,7 +44,7 @@ first_backup() {
 backup() {
   local file="$1"
   [ -f "$file" ] || return 0
-  if compgen -G "$file.bak-install-*" > /dev/null; then
+  if [ -n "$(first_backup "$file")" ]; then
     echo "kept existing backup of $file"
     return 0
   fi
