@@ -6,7 +6,6 @@
 import argparse
 import fnmatch
 import json
-import re
 import subprocess
 import sys
 from collections import Counter
@@ -14,6 +13,9 @@ from pathlib import Path
 from typing import NamedTuple
 
 import lizard
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "shared"))
+from hunks import changed_lines
 
 DEFAULT_CONFIG = {
     "limits": {"nloc": 30, "ccn": 10, "params": 3, "commentRun": 3},
@@ -31,7 +33,6 @@ COMMENT_PREFIXES = {
     **{ext: ("--",) for ext in ["lua", "sql"]},
 }
 VERDICT = "Fix these before moving on, or say why one is intended."
-HUNK = re.compile(r"^@@ -\S+ \+(\d+)(?:,(\d+))? @@", re.MULTILINE)
 
 
 class Change(NamedTuple):
@@ -75,13 +76,6 @@ def load_config(root):
 
 def functions_of(path, text):
     return lizard.analyze_file.analyze_source_code(str(path), text).function_list
-
-
-def changed_lines(diff_text):
-    lines = set()
-    for start, count in HUNK.findall(diff_text or ""):
-        lines.update(range(int(start), int(start) + int(count or 1)))
-    return lines
 
 
 def overlaps(function, changed):

@@ -1,0 +1,5 @@
+extends: metric
+message: "Reading grade is %s. Rewrite for grade 9: short sentences, common words."
+level: error
+formula: flesch_kincaid
+condition: "> 9.0"

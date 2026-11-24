@@ -28,9 +28,9 @@ If your repos need gitignored files such as `.env` to build, list them in a `.wo
 | `rules/environment.md` | `rules/` | Every session | Which tool provides each capability, and the fallback when none is present |
 | `rules/clean-code.md` | `rules/` | Every session | How to write code: reuse first, match the neighbours, small units, plain names, few comments |
 | `rules/writing.md` | `rules/` | Every session | How to write text: Simplified Technical English, no extra words, the PR and ticket formats |
-| `at/` plugin | `skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, the zsh-guard hook that blocks Bash commands zsh runs differently, the pr-checks hook that stops Claude from ending a turn while a PR it opened has checks running or red, and the sync hook that pulls at session start |
+| `at/` plugin | `skills/at/` | Skills on demand; hooks always | The skills below, the `at:worker` agent, the clean-gate hooks that check every edit, the quality gates in `hooks/harness` (rules, copies, can-fail, prose and a reviewer), the zsh-guard hook that blocks Bash commands zsh runs differently, the pr-checks hook that stops Claude from ending a turn while a PR it opened has checks running or red, and the sync hook that pulls at session start |
 
-Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:code-review`, `/at:tests`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:postmortem`, `/at:word-salad` and `/at:cone-of-shame` run only when you type them.
+Claude can start `/at:survey`, `/at:diagnose`, `/at:explain`, `/at:code-review`, `/at:tests`, `/at:research` and `at:glossary` on its own when they fit. They are the skills other skills call, and a skill that has `disable-model-invocation` cannot be called by another skill. `/at:implement`, `/at:interview`, `/at:postmortem`, `/at:word-salad`, `/at:harness-setup` and `/at:cone-of-shame` run only when you type them.
 
 ## Pick the skill
 
@@ -59,6 +59,7 @@ flowchart TD
 | `/at:code-review` | A branch needs a bug review of its whole diff; `/at:implement` runs it for you. Add a spec path to check the diff against it | One line per bug, a second list against the spec, and a count of the files it read |
 | `/at:tests` | Before writing or changing a test; `audit [path]` to audit a whole suite | Tests that can fail and run alone; an audit brief for `/at:implement` |
 | `/at:word-salad` | A reply is too dense to read | The same content in plain, short, ordered prose |
+| `/at:harness-setup` | A gate says "not measured" in a repo | A confirmed `harness.toml` with the repo's test command and test paths |
 | `/at:cone-of-shame` | A response broke the rules or was bad. Add a note on what went wrong | The work redone, and a draft PR that fixes the cause in this config |
 
 ## Getting the best results
@@ -83,6 +84,22 @@ The `at/hooks/pr-checks/pr_checks.py` Stop hook works with the GitHub CLI. It re
 ## Start from the latest code
 
 At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-forwards the current branch. `at/scripts/default-branch.sh` finds the remote (`origin`, then the branch's upstream remote, then the only remote) and its default branch. On a feature branch, it also tells Claude to merge the default branch when that branch has commits from more than 3 hours ago that the feature branch lacks. It never merges or overwrites work itself: a branch that cannot fast-forward is reported, not changed.
+
+## Quality gates
+
+`at/hooks/harness/harness.py` checks Claude's work at the moment it happens and sends each failure back as Claude's next instruction. It knows no language, tool, layout or branch name. Each repo's facts live in `harness.toml` in your home directory, at `~/at-skills-data/<host>/<org>/<repo>/`, found from the git remote. The gates need no configuration file in the repo and write no file to it. Run `/at:harness-setup` in a repo to write it from the repo's own evidence.
+
+| Gate | Hook | Fails when |
+| --- | --- | --- |
+| rules | Before Edit, Write, MultiEdit and NotebookEdit | The added text matches a `[[rule]]` in `harness.toml` |
+| prose | Before any tool, and at stop when `check_replies = true` | A string of 25 or more words fails the Vale style in `hooks/harness/styles` |
+| copies | Stop | `jscpd --baseline-from-ref <base>` finds a clone that the branch adds |
+| can-fail | Stop | A bug planted by universalmutator on an added line passes the repo's `test` command |
+| reviewer | Stop (agent hook) | A second Claude finds code the change does not need |
+
+A gate that lacks a setting, a tool or a base branch shows "not measured" and the reason. It never passes by guessing. The can-fail gate runs in a private git worktree, so the other gates never read a planted bug; it copies the ignored files that `copy_ignored` names in `harness.toml`. Each stop gate blocks once per stop, so it cannot loop.
+
+Tools: `npx` runs jscpd 5.4.3, and `uvx` runs universalmutator 1.14.1 and Vale 3.27.0, each at a pinned version.
 
 ## The clean-code gate
 
