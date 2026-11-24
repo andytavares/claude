@@ -91,6 +91,36 @@ def test_prose_in_ignores_a_long_shell_command_with_no_quoted_prose():
     assert harness.prose_in({"command": command}, 25) == []
 
 
+def test_prose_in_ignores_a_quoted_jq_filter():
+    command = (
+        'bk api "/builds/$b" | jq -r \'.web_url, (.jobs[] | select(.type=="script" '
+        'and .state=="failed" and .soft_failed==false and .retried==false) '
+        '| "\\(.step_key) \\(.name) \\(.state) \\(.exit_status) \\(.agent.name) '
+        "\\(.started_at) \\(.finished_at) \\(.web_url) \\(.log_url) \\(.id)\")'"
+    )
+    assert harness.prose_in({"command": command}, 25) == []
+
+
+def test_prose_in_ignores_a_python_heredoc():
+    script = (
+        "from pathlib import Path\n"
+        'path = Path("tests/test_harness.py")\n'
+        "text = path.read_text()\n"
+        'anchor = "def test_prose_in_ignores_a_shell_command_it_cannot_parse():"\n'
+        "path.write_text(text.replace(anchor, new_tests + anchor))\n"
+        "print(len(text), len(new_tests), path.name, anchor.split()[1])\n"
+    )
+    command = f"python3 - <<'EOF'\n{script}EOF"
+    assert harness.prose_in({"command": command}, 25) == []
+
+
+def test_prose_in_still_checks_prose_with_markdown_links():
+    body = f"{WORDY} See [the gate](https://example.com/gate) and [the test](https://example.com/test)."
+    assert harness.prose_in(
+        {"command": f"gh pr create --body {json.dumps(body)}"}, 25
+    ) == [body]
+
+
 def test_prose_in_ignores_a_shell_command_it_cannot_parse():
     assert harness.prose_in({"command": "echo 'unclosed " + WORDY}, 25) == []
 

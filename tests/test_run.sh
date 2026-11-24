@@ -85,7 +85,18 @@ test_repo_command_gets_the_caller_environment() {
   assert_eq "$out" "3.10||kept" "environment of the repo's command"
 }
 
+# Some bash builds, such as the one Nix installs, have no compgen builtin.
+test_clears_caller_settings_without_compgen() {
+  local out
+  printf '# /// script\n# dependencies = []\n# ///\n%s\n' \
+    'import os; print(os.environ.get("UV_PYTHON"), os.environ.get("PIP_INDEX_URL"))' > "$WORK/settings.py"
+  # shellcheck disable=SC2016 # $0 and $@ expand in the inner bash
+  out="$(UV_PYTHON=3.10 PIP_INDEX_URL=https://nowhere.invalid bash -c 'enable -n compgen 2> /dev/null; . "$0" "$@"' "$SCRIPT" "$WORK/settings.py" 2>&1)"
+  assert_eq "$out" "None None" "caller settings in a bash without compgen"
+}
+
 setup_hostile
+test_clears_caller_settings_without_compgen; echo "ok no compgen"
 test_runs_plugin_python_and_node; echo "ok plugin python and node"
 test_writes_nothing_into_the_repo; echo "ok repo untouched"
 test_no_args_is_a_usage_error; echo "ok usage error"

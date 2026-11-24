@@ -320,6 +320,16 @@ def shell_pieces(command):
         return []
 
 
+CODE_SYMBOLS = re.compile(r"[(){}\[\]|=$\\;<>_]")
+MARKUP = re.compile(r"\]\([^)]*\)|`[^`]*`|https?://\S+")
+
+
+def is_code(text):
+    """Code such as a jq filter or a Python script: one in 20 characters or more is a code symbol. Prose scores near zero."""
+    plain = MARKUP.sub("", text)
+    return len(CODE_SYMBOLS.findall(plain)) > 0.05 * len(re.sub(r"\s", "", plain))
+
+
 def prose_in(value, minimum):
     command = value.get("command") if isinstance(value, dict) else None
     rest = {key: item for key, item in value.items() if key != "command"}
@@ -327,7 +337,9 @@ def prose_in(value, minimum):
         shell_pieces(command) if isinstance(command, str) else []
     )
     return [
-        piece for piece in pieces if len(re.findall(r"[^\W\d_]{2,}", piece)) >= minimum
+        piece
+        for piece in pieces
+        if len(re.findall(r"[^\W\d_]{2,}", piece)) >= minimum and not is_code(piece)
     ]
 
 

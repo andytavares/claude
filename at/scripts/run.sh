@@ -16,12 +16,14 @@ LOCK="$HOME_DIR/uv.lock.d"
 
 # The repo's own commands, such as the can-fail test command, get AT_CALLER_ENV back (hooks/shared/caller.py).
 clear_environment() {
-  local name
+  local entry name
   AT_CALLER_ENV="$(env -0 | base64 | tr -d '\n')"
   export AT_CALLER_ENV
-  for name in $(compgen -e); do
+  # Not compgen: some bash builds, such as Nix's, leave it out.
+  while IFS= read -r -d '' entry; do
+    name="${entry%%=*}"
     case "$name" in UV_* | VIRTUAL_ENV | CONDA_PREFIX | CONDA_DEFAULT_ENV | PYTHON* | PYENV_VERSION | PIP_*) unset "$name" ;; esac
-  done
+  done < <(env -0)
   export UV_CACHE_DIR="$HOME_DIR/cache" UV_PYTHON_INSTALL_DIR="$HOME_DIR/python" UV_TOOL_DIR="$HOME_DIR/tools"
   export AT_UV="$UV" AT_PYTHON="$PYTHON_VERSION" AT_NODE_PACKAGE="$NODE_PACKAGE"
 }
