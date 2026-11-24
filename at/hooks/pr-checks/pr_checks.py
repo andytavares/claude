@@ -1,12 +1,16 @@
 """Stop hook: do not end a turn while a PR opened in this session has checks running or red."""
 
 import json
+import os
 import re
 import shutil
 import subprocess
 import sys
+import time
+from pathlib import Path
 
-PR_URL = re.compile(r"https://[\w.-]+(?::\d+)?/[\w.-]+/[\w.-]+/pull/\d+")
+PR_URL = re.compile(r"https://([\w.-]+(?::\d+)?)/([\w.-]+/[\w.-]+)/pull/\d+")
+ASK_EVERY_SECONDS = 24 * 3600
 NOT_GREEN = {"pending": "running", "fail": "failed", "cancel": "failed"}
 
 
@@ -34,26 +38,45 @@ def opened_prs(path):
             creates.add(block.get("id"))
         elif block.get("type") == "tool_result" and block.get("tool_use_id") in creates:
             prs += [
-                url
-                for url in PR_URL.findall(text_of(block.get("content")))
-                if url not in prs
+                match.group(0)
+                for match in PR_URL.finditer(text_of(block.get("content")))
+                if match.group(0) not in prs
             ]
     return prs
 
 
-def problems(pr):
-    """One line per check that is not green, or why the checks could not be read."""
-    done = subprocess.run(
-        ["gh", "pr", "checks", pr, "--json", "name,bucket"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+def gh_json(*args):
+    done = subprocess.run(["gh", *args], capture_output=True, text=True, check=False)
     try:
-        checks = json.loads(done.stdout)
+        return done, json.loads(done.stdout)
     except json.JSONDecodeError:
-        checks = None
+        return done, None
+
+
+def has_ci(host, repo):
+    """True when the repo has an Actions workflow, or any check or status on its default branch."""
+    api = ["api", "--hostname", host]
+    _, about = gh_json(*api, f"repos/{repo}")
+    branch = (about or {}).get("default_branch")
+    paths = [f"repos/{repo}/actions/workflows"]
+    if branch:
+        paths += [
+            f"repos/{repo}/commits/{branch}/check-runs",
+            f"repos/{repo}/commits/{branch}/status",
+        ]
+    # An answer gh cannot read counts as CI, so the hook keeps waiting on the PR.
+    return any(
+        (gh_json(*api, path)[1] or {"total_count": 1}).get("total_count")
+        for path in paths
+    )
+
+
+def problems(pr):
+    """One line per check that is not green, or why the checks could not be read; None without CI."""
+    done, checks = gh_json("pr", "checks", pr, "--json", "name,bucket")
     if done.returncode != 0 and not checks:
+        if not has_ci(*PR_URL.match(pr).groups()):
+            return None
         return [
             f"{pr}: gh could not read its checks ({done.stderr.strip() or 'none reported yet'})"
         ]
@@ -64,6 +87,31 @@ def problems(pr):
     ]
 
 
+def ask_about_ci(repos):
+    """The repos not asked about in the last day, recorded as asked now."""
+    data = os.environ.get("CLAUDE_PLUGIN_DATA")
+    # Without a data folder the hook cannot remember an ask, so it never asks.
+    if not data:
+        return []
+    record = Path(data) / "no-ci-asked.json"
+    asked = json.loads(record.read_text()) if record.exists() else {}
+    due = [
+        repo for repo in repos if time.time() - asked.get(repo, 0) > ASK_EVERY_SECONDS
+    ]
+    if due:
+        record.parent.mkdir(parents=True, exist_ok=True)
+        record.write_text(json.dumps({**asked, **dict.fromkeys(due, time.time())}))
+    return due
+
+
+def no_ci_reason(repos):
+    return (
+        "These repos have no CI, so their PRs have no checks: " + ", ".join(repos) + "."
+        "\nThe project's local check is the done check. Ask the user once whether to add CI "
+        "that runs it, in its own PR. Do not mention missing CI again."
+    )
+
+
 def main():
     hook = json.load(sys.stdin)
     # The second stop in a row goes through: Claude has been told, and a block cannot loop.
@@ -72,9 +120,13 @@ def main():
     # Without gh the checks cannot be read, so the hook has nothing to enforce.
     if shutil.which("gh") is None:
         return
-    found = [
-        line for pr in opened_prs(hook["transcript_path"]) for line in problems(pr)
-    ]
+    found, no_ci = [], []
+    for pr in opened_prs(hook["transcript_path"]):
+        lines = problems(pr)
+        if lines is None:
+            no_ci.append("/".join(PR_URL.match(pr).groups()))
+        else:
+            found += lines
     if found:
         reason = (
             "A PR you opened is not green, so the task is not done:\n"
@@ -83,6 +135,8 @@ def main():
             "failure. Report done only when every check passes."
         )
         print(json.dumps({"decision": "block", "reason": reason}))
+    elif due := ask_about_ci(dict.fromkeys(no_ci)):
+        print(json.dumps({"decision": "block", "reason": no_ci_reason(due)}))
 
 
 if __name__ == "__main__":
