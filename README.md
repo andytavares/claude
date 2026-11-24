@@ -2,11 +2,11 @@
 
 A Claude Code harness for any repo, language and toolset: operating rules, a clean-code standard, and a plugin named `at` that holds the skills, agents and the clean-code gate. Every skill runs as `/at:<skill>`, so none of them collide with other skills.
 
-It assumes only Claude Code, git, `uv` and `python3`. Every other tool is optional: `rules/environment.md` names each capability (tracker, code host, CI, docs, publish, questions, code search), the tools that can provide it, and the fallback when none is present. On Windows, install Git Bash; the scripts and hooks are bash and Python.
+It assumes only Claude Code, git, bash and curl. Every other tool is optional: `rules/environment.md` names each capability (tracker, code host, CI, docs, publish, questions, code search), the tools that can provide it, and the fallback when none is present. On Windows, install Git Bash; the scripts and hooks are bash and Python.
 
 ## Install, update, remove
 
-Requires `uv` and `python3`.
+Requires bash and curl. The plugin brings its own uv 0.11.2, Python 3.12 and Node 22.20.0. `at/scripts/run.sh` downloads them once into `at-runtime` in the config directory, and starts every Python hook and script with them. No uv, Python or Node on your PATH, and no `UV_*` variable, venv, `.python-version`, `uv.toml` or `pyproject.toml` in the shell or the repo, changes what a hook gets. `install.sh` does the download, so the first hook does not wait for it.
 
 The gate is a uv script. It pins its dependencies exactly and has a lockfile beside it (`gate.py.lock`) with the hash of every package. After changing its dependencies, run `uv lock --script at/hooks/clean-gate/gate.py` and commit the lockfile.
 
@@ -103,7 +103,7 @@ At session start, the `at/hooks/sync/sync.sh` hook fetches the remote and fast-f
 
 A gate that lacks a setting, a tool or a base branch shows "not measured" and the reason. It never passes by guessing. The can-fail gate runs in a private git worktree, so the other gates never read a planted bug; it copies the ignored files that `copy_ignored` names in `harness.toml`. Each stop gate blocks once per stop, so it cannot loop.
 
-Tools: `npx` runs jscpd 5.4.3, and `uvx` runs universalmutator 1.14.1 and Vale 3.27.0, each at a pinned version.
+Tools: the plugin's Node runs jscpd 5.4.3, and the plugin's uv runs universalmutator 1.14.1 and Vale 3.27.0, each at a pinned version.
 
 ## The clean-code gate
 
@@ -128,7 +128,7 @@ An optional `.clean-gate.json` at a repo root changes the defaults for that repo
 }
 ```
 
-To measure a branch, including files edited through Bash, which the edit hook does not see: `uv run --script "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/at/hooks/clean-gate/gate.py" report <default branch>..HEAD`
+To measure a branch, including files edited through Bash, which the edit hook does not see: `bash "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/at/scripts/run.sh" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/at/hooks/clean-gate/gate.py" report <default branch>..HEAD`
 
 ## Tests
 
@@ -138,8 +138,9 @@ bash tests/test_install.sh
 bash tests/test_glossary_path.sh
 bash tests/test_sync.sh
 bash tests/test_default_branch.sh
+bash tests/test_run.sh
 bash tests/test_neutral.sh
 uvx ruff@0.16.10 check at tests && uvx ruff@0.16.10 format --check at tests
 claude plugin validate at
-shellcheck -x install.sh uninstall.sh at/hooks/sync/sync.sh at/skills/glossary/path.sh at/scripts/default-branch.sh tests/test_install.sh tests/test_sync.sh tests/test_glossary_path.sh tests/test_default_branch.sh tests/test_neutral.sh
+shellcheck -x install.sh uninstall.sh at/hooks/sync/sync.sh at/skills/glossary/path.sh at/scripts/default-branch.sh at/scripts/run.sh tests/test_install.sh tests/test_sync.sh tests/test_glossary_path.sh tests/test_default_branch.sh tests/test_run.sh tests/test_neutral.sh
 ```

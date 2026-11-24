@@ -28,14 +28,12 @@ parse_args() {
 }
 
 require_tools() {
-  local missing=()
-  command -v uv > /dev/null || missing+=(uv)
-  command -v python3 > /dev/null || missing+=(python3)
-  if [ "${#missing[@]}" -gt 0 ]; then
-    echo "missing required tools: ${missing[*]}" >&2
-    exit 1
-  fi
-  command -v npx > /dev/null || echo "npx not found: the harness copies check will report 'not measured' until Node is installed"
+  command -v curl > /dev/null || { echo "missing required tool: curl" >&2; exit 1; }
+}
+
+# Download the plugin's uv, Python and Node now, so the first hook does not wait for them.
+download_runtime() {
+  bash "$REPO/at/scripts/run.sh" "$REPO/at/scripts/warm.py" || { echo "could not download the plugin runtime" >&2; exit 1; }
 }
 
 first_backup() {
@@ -95,21 +93,7 @@ remove_retired_copies() {
 remove_settings_gate_hooks() {
   local settings="$CLAUDE/settings.json"
   [ -f "$settings" ] || return 0
-  python3 - "$settings" << 'PY'
-import json, sys
-path = sys.argv[1]
-RETIRED = (".claude/hooks/clean-gate/gate.py", ".claude/harness/hooks/")
-def is_gate(entry):
-    return any(r in h.get("command", "") for h in entry.get("hooks", []) for r in RETIRED)
-data = json.load(open(path))
-hooks = data.get("hooks", {})
-for event in list(hooks):
-    hooks[event] = [e for e in hooks[event] if not is_gate(e)]
-    if not hooks[event]:
-        del hooks[event]
-json.dump(data, open(path, "w"), indent=2)
-open(path, "a").write("\n")
-PY
+  bash "$REPO/at/scripts/run.sh" "$REPO/at/scripts/remove_gate_hooks.py" "$settings"
 }
 
 # The operating rules go to rules/operating.md by default, which loads in every session
@@ -154,6 +138,7 @@ install_repo_files() {
 main() {
   parse_args "$@"
   require_tools
+  download_runtime
   mkdir -p "$CLAUDE"
   backup "$CLAUDE/settings.json"
   remove_loose_copies
