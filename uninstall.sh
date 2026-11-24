@@ -31,6 +31,7 @@ uninstall_everything() {
   for rule in "$REPO"/rules/*.md; do remove_path "$CLAUDE/rules/$(basename "$rule")"; done
   remove_path "$CLAUDE/rules/operating.md"
   remove_path "$CLAUDE/at-radar.json"
+  remove_path "${AT_RUNTIME_DIR:-$CLAUDE/at-runtime}"
   restore_claude_md
   echo "Uninstalled."
 }

@@ -41,7 +41,7 @@ When a unit's checks pass, commit it on the feature branch in the repo's convent
 
 1. For a large or complex change, run the `at:code-review` skill once, as `at:code-review <default branch> <the brief or spec path or URL>` when the work has one, and wait for its report. Fix the `Against the spec` list too. Skip it for trivial work. If its first line counts fewer files than the diff has, review the missing files yourself. Fix each finding in this session; do not relaunch workers for review findings. Commit the fixes. Do not review again after the fixes.
 2. Run precommit checks once until every exit code 0, or fix until it is. After a fix, rerun only what the fix touches, then the full command once more.
-3. Run `uv run --script "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report <default>..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
+3. Run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/run.sh" "${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py" report <default>..HEAD` once and fix what it lists. It also covers files edited through Bash, which the edit hook does not see.
 
 ## Ship
 

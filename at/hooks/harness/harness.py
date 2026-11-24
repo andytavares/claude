@@ -110,23 +110,20 @@ def copies(call, settings, path):
     base = base_ref(settings)
     if not base:
         return warn(f"copies not measured: no base branch. Set base in {path}")
-    found = sh(
-        [
-            "npx",
-            "-y",
-            JSCPD,
-            ".",
-            "--baseline-from-ref",
-            base,
-            "--fail-on-new-clones",
-            "-r",
-            "ai",
-            "--no-tips",
-            "--min-tokens",
-            str(settings.get("min_tokens", 30)),
-            "--min-lines",
-            str(settings.get("min_lines", 4)),
-        ]
+    found = npx(
+        "-y",
+        JSCPD,
+        ".",
+        "--baseline-from-ref",
+        base,
+        "--fail-on-new-clones",
+        "-r",
+        "ai",
+        "--no-tips",
+        "--min-tokens",
+        settings.get("min_tokens", 30),
+        "--min-lines",
+        settings.get("min_lines", 4),
     )
     if found.returncode == 0:
         return None
@@ -171,7 +168,15 @@ def drop(copy):
 
 
 def uvx(package, *args, **options):
-    return sh(["uvx", "--from", package, *map(str, args)], **options)
+    uv = os.environ.get("AT_UV", "uv")
+    return sh([uv, "tool", "run", "--from", package, *map(str, args)], **options)
+
+
+def npx(*args):
+    node = os.environ.get("AT_NODE_PACKAGE")
+    if node:
+        return uvx(node, "npx", *args)
+    return sh(["npx", *map(str, args)])
 
 
 def mutate(path, work):
@@ -284,37 +289,42 @@ def strings_in(value):
     return [value] if isinstance(value, str) else []
 
 
-def pieces_of(text):
-    """A string, plus its heredoc bodies or shell words, so prose inside a command is found."""
+def shell_pieces(command):
+    """The heredoc bodies or the shell words of a command: the parts a person reads, never the command itself."""
     heredocs = [
         body
         for _, body in re.findall(
-            r"<<-?\s*['\"]?(\w+)['\"]?\n(.*?)\n\1", text, re.DOTALL
+            r"<<-?\s*['\"]?(\w+)['\"]?\n(.*?)\n\1", command, re.DOTALL
         )
     ]
     if heredocs:
         return heredocs
     try:
-        return [text, *shlex.split(text)]
+        return shlex.split(command)
     except ValueError:
-        return [text]
+        return []
 
 
 def prose_in(value, minimum):
-    pieces = [piece for text in strings_in(value) for piece in pieces_of(text)]
+    command = value.get("command") if isinstance(value, dict) else None
+    rest = {key: item for key, item in value.items() if key != "command"}
+    pieces = strings_in(rest) + (
+        shell_pieces(command) if isinstance(command, str) else []
+    )
     return [
         piece for piece in pieces if len(re.findall(r"[^\W\d_]{2,}", piece)) >= minimum
     ]
 
 
-EDIT_TOOLS = ["Write", "Edit", "MultiEdit", "NotebookEdit"]
+# WebFetch prompts go to a model, not a person.
+NO_PROSE_TOOLS = ["Write", "Edit", "MultiEdit", "NotebookEdit", "WebFetch"]
 
 
 def texts_to_check(call, settings):
     if call.get("hook_event_name") == "Stop":
         wanted = settings.get("check_replies")
         return [call.get("last_assistant_message", "")] if wanted else []
-    if call.get("tool_name") in settings.get("prose_skip_tools", EDIT_TOOLS):
+    if call.get("tool_name") in settings.get("prose_skip_tools", NO_PROSE_TOOLS):
         return []
     return prose_in(call.get("tool_input", {}), settings.get("prose_min_words", 25))
 

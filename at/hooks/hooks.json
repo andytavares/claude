@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/zsh-guard/guard.py\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/zsh-guard/guard.py\""
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" rules"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" rules"
           }
         ]
       },
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose"
           }
         ]
       }
@@ -35,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py\" check --hook post-tool-use"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/clean-gate/gate.py\" check --hook post-tool-use"
           }
         ]
       }
@@ -56,22 +56,22 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/pr-checks/pr_checks.py\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/pr-checks/pr_checks.py\"",
             "timeout": 60
           },
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" copies",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" copies",
             "timeout": 120
           },
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail",
             "timeout": 900
           },
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose",
             "timeout": 60
           },
           {

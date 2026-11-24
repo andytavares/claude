@@ -40,7 +40,7 @@ Match the input. A two-sentence brief produces a page; a whole spec produces wha
 
 ## Output
 
-Before you publish, run `uv run --script "${CLAUDE_SKILL_DIR}/check_refs.py" <document>` from the repo root. It checks each `path:line` written as a code span, in HTML or Markdown. It exits 1 and lists each one that does not exist, each bare file name that needs its path, and each quote right after a reference that is not on the cited line. Fix each one, then run it again until it exits 0.
+Before you publish, run `bash "${CLAUDE_PLUGIN_ROOT}/scripts/run.sh" "${CLAUDE_SKILL_DIR}/check_refs.py" <document>` from the repo root. It checks each `path:line` written as a code span, in HTML or Markdown. It exits 1 and lists each one that does not exist, each bare file name that needs its path, and each quote right after a reference that is not on the cited line. Fix each one, then run it again until it exits 0.
 
 Publish through the publish capability in `rules/environment.md`. When the publish provider is the `Artifact` tool, load its design guidance first, as the tool requires. For an HTML page, copy `${CLAUDE_SKILL_DIR}/template.html` and fill in its `<title>` and `<main>`. It already holds the theme, layout and components. Write new CSS only for a component the template does not have. Publish with icon `document`, and title it with the document's name.
 

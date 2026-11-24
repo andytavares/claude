@@ -38,8 +38,11 @@ seed_home() {
 JSON
 }
 
+# One runtime folder for every install, so uv, Python and Node download once.
+export AT_RUNTIME_DIR="${AT_TEST_PLUGIN_DATA:-$HOME/.cache/at-test-plugin-data}"
 run_install() { HOME="$H" bash "$ROOT/install.sh" "$@"; }
-run_uninstall() { HOME="$H" bash "$ROOT/uninstall.sh" "$@"; }
+# Uninstall then removes the temp home's runtime folder, never the shared download.
+run_uninstall() { HOME="$H" AT_RUNTIME_DIR='' bash "$ROOT/uninstall.sh" "$@"; }
 
 assert_settings_kept_without_old_gate() {
   python3 -c '
@@ -71,7 +74,8 @@ assert_plugin_installed() {
   assert_exists "$C/skills/at/hooks/shared/hunks.py"
   assert_exists "$C/skills/at/hooks/harness/vale.ini"
   assert_exists "$C/skills/at/skills/harness-setup/SKILL.md"
-  assert_contains "$C/skills/at/hooks/hooks.json" 'uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail'
+  assert_contains "$C/skills/at/hooks/hooks.json" 'bash \"${CLAUDE_PLUGIN_ROOT}/scripts/run.sh\" \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail'
+  [ -x "$AT_RUNTIME_DIR/uv/0.11.2/uv" ] || fail "install did not download the plugin uv"
 }
 
 assert_loose_copies_removed() {
@@ -141,7 +145,7 @@ test_install_honours_config_dir() {
   assert_exists "$other/rules/operating.md"
   assert_exists "$other/skills/at/.claude-plugin/plugin.json"
   assert_gone "$C/rules/operating.md"
-  HOME="$H" CLAUDE_CONFIG_DIR="$other" bash "$ROOT/uninstall.sh" > /dev/null
+  HOME="$H" CLAUDE_CONFIG_DIR="$other" AT_RUNTIME_DIR='' bash "$ROOT/uninstall.sh" > /dev/null
   assert_gone "$other/skills/at"
 }
 
@@ -157,15 +161,27 @@ test_uninstall() {
   assert_eq "$(cat "$C/skills/mine/SKILL.md")" "my own skill" "unrelated skill"
 }
 
-test_missing_uv() {
+test_install_with_broken_uv_and_python_on_path() {
   seed_home
-  local bin="$WORK/bin" status=0
+  local bin="$WORK/bin"
   mkdir -p "$bin"
-  ln -sf "$(command -v python3)" "$bin/python3"
-  if PATH="/bin:/usr/bin" command -v uv > /dev/null; then echo "skip: uv in /usr/bin"; return; fi
-  HOME="$H" PATH="$bin:/bin:/usr/bin" /bin/bash "$ROOT/install.sh" > "$WORK/out.txt" 2>&1 || status=$?
-  assert_eq "$status" 1 "exit status without uv"
-  assert_contains "$WORK/out.txt" 'uv'
+  for tool in uv uvx python3 python; do
+    printf '#!/bin/sh\necho broken >&2\nexit 1\n' > "$bin/$tool"
+    chmod +x "$bin/$tool"
+  done
+  HOME="$H" PATH="$bin:/bin:/usr/bin" /bin/bash "$ROOT/install.sh" > "$WORK/out.txt" 2>&1 \
+    || fail "install failed with broken uv and python3 on PATH: $(cat "$WORK/out.txt")"
+  ! grep -q broken "$WORK/out.txt" || fail "install used a uv or python3 from PATH"
+  assert_settings_kept_without_old_gate
+}
+
+test_uninstall_removes_the_runtime() {
+  seed_home
+  run_install > /dev/null
+  mkdir -p "$C/at-runtime/cache"
+  run_uninstall > /dev/null
+  assert_gone "$C/at-runtime"
+  assert_exists "$AT_RUNTIME_DIR/uv/0.11.2/uv"
 }
 
 seed_radar_install() {
@@ -250,7 +266,8 @@ test_install_honours_config_dir; echo "ok install honours CLAUDE_CONFIG_DIR"
 test_restore_after_the_rules_changed; echo "ok restore after the rules changed"
 test_upgrade_from_an_install_without_the_marker; echo "ok upgrade from an install without the marker"
 test_uninstall; echo "ok uninstall"
-test_missing_uv; echo "ok missing uv"
+test_install_with_broken_uv_and_python_on_path; echo "ok install ignores uv and python3 on PATH"
+test_uninstall_removes_the_runtime; echo "ok uninstall removes the runtime"
 test_install_removes_retired_radar; echo "ok install removes retired radar"
 test_install_replaces_renamed_skills; echo "ok install replaces renamed skills"
 test_install_rejects_the_retired_radar_flag; echo "ok install rejects the retired radar flag"
