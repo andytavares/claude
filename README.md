@@ -81,6 +81,8 @@ The `glossary` skill keeps a glossary and decision records for each repo in `~/a
 
 The `at/hooks/pr-checks/pr_checks.py` Stop hook works with the GitHub CLI. It reads the session transcript for PR links that the CLI's create command printed. Before Claude ends a turn, it reads the checks of each one. If a check is running, failed or was cancelled, the hook blocks the stop and names the checks, so Claude waits and fixes the cause. It blocks once in a row: the next stop goes through, so it cannot loop. Without the GitHub CLI on PATH, the hook does nothing.
 
+When the branch rules require checks, the hook reads only those. A check that is not required cannot block the merge, so it cannot block the stop. An example is a Spacelift preview for a stack whose directory the PR deletes.
+
 The hook never waits for CodeQL checks. A repo with no CI has no Actions workflow of its own and no check or status on its default branch, other than CodeQL. There, the local check is the done check. The hook blocks the stop once a day for each such repo, so Claude asks once whether to add CI. It is silent on the other stops. It keeps the time of each ask in `no-ci-asked.json` in the plugin's data folder (`CLAUDE_PLUGIN_DATA`).
 
 ## Start from the latest code
