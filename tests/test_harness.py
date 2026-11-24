@@ -82,6 +82,28 @@ def test_prose_in_finds_quoted_argument_in_any_command():
     )
 
 
+def test_prose_in_ignores_a_long_shell_command_with_no_quoted_prose():
+    command = (
+        "cd /repo && git pull -q; git ls-files | head -100; echo ---; "
+        "grep -n 'requires-python' at/hooks/*/*.py at/skills/*/*.py; "
+        "uv --version; which -a python3; python3 --version; ls ~/.local/share/uv/python"
+    )
+    assert harness.prose_in({"command": command}, 25) == []
+
+
+def test_prose_in_ignores_a_shell_command_it_cannot_parse():
+    assert harness.prose_in({"command": "echo 'unclosed " + WORDY}, 25) == []
+
+
+def test_prose_in_checks_the_whole_text_of_a_prompt():
+    assert harness.prose_in({"prompt": WORDY}, 25) == [WORDY]
+
+
+def test_prose_skips_web_fetch_prompts():
+    call = {"tool_name": "WebFetch", "tool_input": {"prompt": WORDY}}
+    assert harness.texts_to_check(call, {}) == []
+
+
 def test_rules_block_matching_edit(tmp_path):
     repo = make_repo(tmp_path)
     configure(
