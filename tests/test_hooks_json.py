@@ -10,6 +10,15 @@ CALL = {
     "tool_input": {"command": "ls", "file_path": "README.md", "content": "# repo\n"},
     "stop_hook_active": False,
 }
+WORDY = (
+    "In order to comprehensively address the underlying architectural considerations "
+    "that you raised, it is worth noting that the implementation leverages a robust, "
+    "holistic abstraction layer which seamlessly encapsulates the persistence semantics."
+)
+# One runtime folder for the whole run, so uv, Python and Node download once.
+SHARED_RUNTIME = Path(
+    os.environ.get("AT_TEST_PLUGIN_DATA", Path.home() / ".cache/at-test-plugin-data")
+)
 
 
 def python_hook_commands():
@@ -23,65 +32,10 @@ def python_hook_commands():
     ]
 
 
-def path_with_old_python3(tmp_path):
-    found = subprocess.run(
-        [
-            "uv",
-            "run",
-            "--no-project",
-            "--python",
-            "3.10",
-            "python",
-            "-c",
-            "import sys; print(sys.executable)",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    bin_dir = tmp_path / "bin"
-    bin_dir.mkdir()
-    (bin_dir / "python3").symlink_to(found.stdout.strip())
-    return f"{bin_dir}{os.pathsep}{os.environ['PATH']}"
-
-
-def test_python_hooks_run_when_the_repo_python3_is_3_10(tmp_path):
-    repo = tmp_path / "repo"
-    repo.mkdir()
-    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
-    (repo / "README.md").write_text("# repo\n")
-    transcript = tmp_path / "transcript.jsonl"
-    transcript.write_text("")
-    call = {**CALL, "transcript_path": str(transcript)}
-    env = {**os.environ, "HOME": str(tmp_path), "PATH": path_with_old_python3(tmp_path)}
-    assert subprocess.run(
-        ["python3", "--version"], capture_output=True, text=True, env=env, check=True
-    ).stdout.startswith("Python 3.10")
-    for command in python_hook_commands():
-        done = subprocess.run(
-            ["bash", "-c", command],
-            cwd=repo,
-            input=json.dumps(call),
-            capture_output=True,
-            text=True,
-            env=env,
-            check=False,
-            timeout=300,
-        )
-        assert "Traceback" not in done.stderr, f"{command}\n{done.stderr}"
-        assert done.returncode in (0, 2), f"{command}\n{done.stderr}"
-
-
-def test_no_hook_runs_uv_from_path():
-    for command in python_hook_commands():
-        assert command.startswith("bash "), command
-        assert "/scripts/run.sh" in command, command
-
-
 def hostile_repo(tmp_path):
     """A repo whose every setting asks uv for Python 3.10 or the system Python."""
     repo = tmp_path / "repo"
-    repo.mkdir()
+    repo.mkdir(parents=True)
     subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
     (repo / "README.md").write_text("# repo\n")
     (repo / ".python-version").write_text("3.10\n")
@@ -93,8 +47,9 @@ def hostile_repo(tmp_path):
 
 
 def hostile_env(tmp_path):
+    """A shell whose uv, Python and Node on PATH are broken, and whose settings ask for 3.10."""
     bin_dir = tmp_path / "fake-bin"
-    bin_dir.mkdir()
+    bin_dir.mkdir(parents=True)
     for tool in ("uv", "uvx", "python3", "python", "node", "npx"):
         (bin_dir / tool).write_text("#!/bin/sh\necho broken >&2\nexit 1\n")
         (bin_dir / tool).chmod(0o755)
@@ -106,33 +61,35 @@ def hostile_env(tmp_path):
         "UV_PYTHON_PREFERENCE": "only-system",
         "VIRTUAL_ENV": str(tmp_path / "no-venv"),
         "PYTHONPATH": str(tmp_path / "no-path"),
-        "AT_RUNTIME_DIR": str(SHARED_DATA),
+        "AT_RUNTIME_DIR": str(SHARED_RUNTIME),
     }
 
 
-# One plugin data folder for the whole run, so uv, Python and Node download once.
-SHARED_DATA = Path(
-    os.environ.get("AT_TEST_PLUGIN_DATA", Path.home() / ".cache/at-test-plugin-data")
-)
+def run_hook(command, tmp_path, call):
+    return subprocess.run(
+        ["bash", "-c", command],
+        cwd=hostile_repo(tmp_path),
+        input=json.dumps(call),
+        capture_output=True,
+        text=True,
+        env=hostile_env(tmp_path),
+        check=False,
+        timeout=600,
+    )
+
+
+def test_no_hook_runs_uv_from_path():
+    for command in python_hook_commands():
+        assert command.startswith("bash "), command
+        assert "/scripts/run.sh" in command, command
 
 
 def test_python_hooks_ignore_every_repo_and_shell_setting(tmp_path):
-    repo = hostile_repo(tmp_path)
-    env = hostile_env(tmp_path)
     transcript = tmp_path / "transcript.jsonl"
     transcript.write_text("")
     call = {**CALL, "transcript_path": str(transcript)}
-    for command in python_hook_commands():
-        done = subprocess.run(
-            ["bash", "-c", command],
-            cwd=repo,
-            input=json.dumps(call),
-            capture_output=True,
-            text=True,
-            env=env,
-            check=False,
-            timeout=600,
-        )
+    for index, command in enumerate(python_hook_commands()):
+        done = run_hook(command, tmp_path / str(index), call)
         output = done.stdout + done.stderr
         assert "incompatible" not in output, f"{command}\n{output}"
         assert "Traceback" not in output, f"{command}\n{output}"
@@ -140,15 +97,7 @@ def test_python_hooks_ignore_every_repo_and_shell_setting(tmp_path):
         assert done.returncode in (0, 2), f"{command}\n{output}"
 
 
-WORDY = (
-    "In order to comprehensively address the underlying architectural considerations "
-    "that you raised, it is worth noting that the implementation leverages a robust, "
-    "holistic abstraction layer which seamlessly encapsulates the persistence semantics."
-)
-
-
 def test_prose_hook_runs_vale_on_the_plugin_tools_in_a_hostile_repo(tmp_path):
-    repo = hostile_repo(tmp_path)
     prose = next(
         command for command in python_hook_commands() if command.endswith(" prose")
     )
@@ -157,15 +106,6 @@ def test_prose_hook_runs_vale_on_the_plugin_tools_in_a_hostile_repo(tmp_path):
         "tool_name": "Bash",
         "tool_input": {"command": f"git commit -m {json.dumps(WORDY)}"},
     }
-    done = subprocess.run(
-        ["bash", "-c", prose],
-        cwd=repo,
-        input=json.dumps(call),
-        capture_output=True,
-        text=True,
-        env=hostile_env(tmp_path),
-        check=False,
-        timeout=600,
-    )
+    done = run_hook(prose, tmp_path, call)
     assert done.returncode == 2, done.stdout + done.stderr
     assert "plain-prose check" in done.stderr

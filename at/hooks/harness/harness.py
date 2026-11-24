@@ -169,7 +169,21 @@ def drop(copy):
 
 def uvx(package, *args, **options):
     uv = os.environ.get("AT_UV", "uv")
-    return sh([uv, "tool", "run", "--from", package, *map(str, args)], **options)
+    isolation = [
+        "--no-config",
+        "--managed-python",
+        "--python",
+        os.environ.get("AT_PYTHON", "3.12"),
+    ]
+    return sh(
+        [uv, "tool", "run", *isolation, "--from", package, *map(str, args)], **options
+    )
+
+
+def as_caller(command):
+    """The repo's own command, run in the environment the hook started with, not the plugin's."""
+    caller = Path(__file__).resolve().parents[1] / "shared/caller.py"
+    return shlex.join([sys.executable, str(caller), command])
 
 
 def npx(*args):
@@ -216,7 +230,8 @@ def survivors(path, lines, settings):
     (work / "ignore.txt").write_text("\n".join(settings.get("mutation_ignore", [])))
     original = Path(path).read_bytes()
     try:
-        return passing(path, settings["test"], work) if mutate(path, work) else None
+        test = as_caller(settings["test"])
+        return passing(path, test, work) if mutate(path, work) else None
     finally:
         Path(path).write_bytes(original)
         shutil.rmtree(work, ignore_errors=True)
@@ -246,7 +261,7 @@ def survivor_report(found, test):
 def unready(settings, path):
     if not (settings.get("test") and settings.get("tests")):
         return f"can-fail not measured: set test and tests in {path}"
-    if sh(settings["test"], shell=True).returncode != 0:
+    if sh(as_caller(settings["test"]), shell=True).returncode != 0:
         return f"can-fail not measured: `{settings['test']}` fails in a fresh worktree. Add the ignored files it needs to copy_ignored in {path}"
     return None
 

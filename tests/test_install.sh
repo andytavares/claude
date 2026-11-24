@@ -41,8 +41,7 @@ JSON
 # One runtime folder for every install, so uv, Python and Node download once.
 export AT_RUNTIME_DIR="${AT_TEST_PLUGIN_DATA:-$HOME/.cache/at-test-plugin-data}"
 run_install() { HOME="$H" bash "$ROOT/install.sh" "$@"; }
-# Uninstall then removes the temp home's runtime folder, never the shared download.
-run_uninstall() { HOME="$H" AT_RUNTIME_DIR='' bash "$ROOT/uninstall.sh" "$@"; }
+run_uninstall() { HOME="$H" bash "$ROOT/uninstall.sh" "$@"; }
 
 assert_settings_kept_without_old_gate() {
   python3 -c '
@@ -145,7 +144,7 @@ test_install_honours_config_dir() {
   assert_exists "$other/rules/operating.md"
   assert_exists "$other/skills/at/.claude-plugin/plugin.json"
   assert_gone "$C/rules/operating.md"
-  HOME="$H" CLAUDE_CONFIG_DIR="$other" AT_RUNTIME_DIR='' bash "$ROOT/uninstall.sh" > /dev/null
+  HOME="$H" CLAUDE_CONFIG_DIR="$other" bash "$ROOT/uninstall.sh" > /dev/null
   assert_gone "$other/skills/at"
 }
 
@@ -182,6 +181,19 @@ test_uninstall_removes_the_runtime() {
   run_uninstall > /dev/null
   assert_gone "$C/at-runtime"
   assert_exists "$AT_RUNTIME_DIR/uv/0.11.2/uv"
+}
+
+test_install_fails_when_the_runtime_cannot_download() {
+  seed_home
+  local bin="$WORK/no-net" status=0
+  mkdir -p "$bin"
+  printf '#!/bin/sh\nexit 1\n' > "$bin/curl"
+  chmod +x "$bin/curl"
+  HOME="$H" AT_RUNTIME_DIR="$WORK/empty-runtime" PATH="$bin:/bin:/usr/bin" \
+    bash "$ROOT/install.sh" > "$WORK/out.txt" 2>&1 || status=$?
+  assert_eq "$status" 1 "exit status when the runtime cannot download"
+  assert_contains "$WORK/out.txt" "could not download"
+  assert_gone "$C/skills/at"
 }
 
 seed_radar_install() {
@@ -268,6 +280,7 @@ test_upgrade_from_an_install_without_the_marker; echo "ok upgrade from an instal
 test_uninstall; echo "ok uninstall"
 test_install_with_broken_uv_and_python_on_path; echo "ok install ignores uv and python3 on PATH"
 test_uninstall_removes_the_runtime; echo "ok uninstall removes the runtime"
+test_install_fails_when_the_runtime_cannot_download; echo "ok install fails without the runtime"
 test_install_removes_retired_radar; echo "ok install removes retired radar"
 test_install_replaces_renamed_skills; echo "ok install replaces renamed skills"
 test_install_rejects_the_retired_radar_flag; echo "ok install rejects the retired radar flag"

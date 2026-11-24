@@ -48,18 +48,47 @@ test_no_args_is_a_usage_error() {
   assert_eq "$status" 64 "exit status with no script"
 }
 
-test_failed_download_is_not_measured() {
+test_failed_download_fails() {
   local out status=0
   printf '#!/bin/sh\nexit 1\n' > "$WORK/bin/curl"
   chmod +x "$WORK/bin/curl"
-  out="$(AT_RUNTIME_DIR="$WORK/empty-data" PATH="$WORK/bin:/usr/bin:/bin" bash "$SCRIPT" "$WORK/probe.py")" || status=$?
+  out="$(AT_RUNTIME_DIR="$WORK/empty-data" PATH="$WORK/bin:/usr/bin:/bin" bash "$SCRIPT" "$WORK/probe.py" 2>&1)" || status=$?
   rm "$WORK/bin/curl"
-  assert_eq "$status" 0 "exit status when uv cannot download"
-  assert_contains "$out" "not measured: could not download uv" "message when uv cannot download"
+  assert_eq "$status" 1 "exit status when uv cannot download"
+  assert_contains "$out" "could not download uv" "message when uv cannot download"
+}
+
+test_stale_lock_is_taken_over() {
+  local data="$WORK/stale-data"
+  mkdir -p "$data/uv.lock.d"
+  cp -R "$AT_RUNTIME_DIR/uv" "$data/uv"
+  rm "$data/uv/0.11.2/uv"
+  cp "$AT_RUNTIME_DIR/uv/0.11.2/uv" "$WORK/real-uv"
+  echo 999999 > "$data/uv.lock.d/pid"
+  # shellcheck disable=SC2016 # the fake installer expands $UV_UNMANAGED_INSTALL when run.sh pipes it to sh
+  printf '#!/bin/sh\ncp %s "$UV_UNMANAGED_INSTALL/uv"\n' "$WORK/real-uv" > "$WORK/fake-installer"
+  printf '#!/bin/sh\ncat %s\n' "$WORK/fake-installer" > "$WORK/bin/curl"
+  chmod +x "$WORK/bin/curl"
+  SECONDS=0
+  AT_RUNTIME_DIR="$data" PATH="$WORK/bin:/usr/bin:/bin" bash "$SCRIPT" "$WORK/caller.py" > /dev/null 2>&1 \
+    || { rm "$WORK/bin/curl"; fail "stale lock blocked the run"; }
+  rm "$WORK/bin/curl"
+  [ "$SECONDS" -lt 10 ] || fail "stale lock wait took $SECONDS seconds"
+}
+
+test_repo_command_gets_the_caller_environment() {
+  local out
+  printf '# /// script\n# dependencies = []\n# ///\n%s\n' \
+    "import subprocess, sys; from pathlib import Path; sys.path.insert(0, '$ROOT/at/hooks/harness'); import harness; print(subprocess.run(harness.as_caller('echo \"\$UV_PYTHON|\$UV_NO_CONFIG|\$AT_PROBE\"'), shell=True, capture_output=True, text=True).stdout.strip())" \
+    > "$WORK/caller.py"
+  out="$(cd "$WORK/repo" && UV_PYTHON=3.10 AT_PROBE=kept bash "$SCRIPT" "$WORK/caller.py" 2>&1)"
+  assert_eq "$out" "3.10||kept" "environment of the repo's command"
 }
 
 setup_hostile
 test_runs_plugin_python_and_node; echo "ok plugin python and node"
 test_writes_nothing_into_the_repo; echo "ok repo untouched"
 test_no_args_is_a_usage_error; echo "ok usage error"
-test_failed_download_is_not_measured; echo "ok failed download"
+test_failed_download_fails; echo "ok failed download"
+test_repo_command_gets_the_caller_environment; echo "ok caller environment"
+test_stale_lock_is_taken_over; echo "ok stale lock"
