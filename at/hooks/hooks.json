@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/zsh-guard/guard.py\""
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/zsh-guard/guard.py\""
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" rules"
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" rules"
           }
         ]
       },
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose"
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose"
           }
         ]
       }
@@ -56,22 +56,22 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/pr-checks/pr_checks.py\"",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/pr-checks/pr_checks.py\"",
             "timeout": 60
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" copies",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" copies",
             "timeout": 120
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail",
             "timeout": 900
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" prose",
             "timeout": 60
           },
           {

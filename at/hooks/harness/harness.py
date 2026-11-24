@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = []
+# ///
 """Quality gates for Claude Code hooks. Knows no language, tool or layout.
 
 Everything repo-specific comes from harness.toml in the repo's data directory
