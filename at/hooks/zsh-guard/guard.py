@@ -1,3 +1,8 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.9"
+# dependencies = []
+# ///
 """PreToolUse hook: block Bash commands that zsh runs differently from bash."""
 
 import json

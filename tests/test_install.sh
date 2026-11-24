@@ -71,7 +71,7 @@ assert_plugin_installed() {
   assert_exists "$C/skills/at/hooks/shared/hunks.py"
   assert_exists "$C/skills/at/hooks/harness/vale.ini"
   assert_exists "$C/skills/at/skills/harness-setup/SKILL.md"
-  assert_contains "$C/skills/at/hooks/hooks.json" 'hooks/harness/harness.py\" can-fail'
+  assert_contains "$C/skills/at/hooks/hooks.json" 'uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/harness/harness.py\" can-fail'
 }
 
 assert_loose_copies_removed() {
