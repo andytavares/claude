@@ -40,28 +40,33 @@ def transcript(tmp_path, command, output):
 
 
 def fake_gh(tmp_path, checks, exit_code=0, ci=None):
-    """A fake gh: `checks` for `gh pr checks`, and the `ci` counts for `gh api`."""
-    ci = ci or {"workflows": 0, "check-runs": 0, "status": 0}
+    """A fake gh: `checks` for `gh pr checks`, and the repo's `ci` for `gh api`."""
+    ci = {"workflows": [], "check-runs": [], "status": 0, **(ci or {})}
     repo = "repos/example-org/app"
+    routes = {
+        "'pr checks'*": checks,
+        f"*{repo}/actions/workflows": {
+            "workflows": [{"path": p} for p in ci["workflows"]]
+        },
+        f"*{repo}/commits/main/check-runs": {
+            "check_runs": [{"app": {"slug": app}} for app in ci["check-runs"]]
+        },
+        f"*{repo}/commits/main/status": {"total_count": ci["status"]},
+        f"*{repo}": {"default_branch": "main"},
+    }
+    cases = ""
+    for index, (pattern, answer) in enumerate(routes.items()):
+        (tmp_path / f"answer-{index}.json").write_text(json.dumps(answer))
+        cases += f"  {pattern}) cat '{tmp_path}/answer-{index}.json' ;;\n"
     script = tmp_path / "bin/gh"
     script.parent.mkdir()
     script.write_text(
-        "#!/bin/sh\n"
-        f'echo "$@" >> "{tmp_path}/gh-calls"\n'
-        'case "$*" in\n'
-        f"  'pr checks'*) printf '%s' '{json.dumps(checks)}'; exit {exit_code} ;;\n"
-        f"  *{repo}/actions/workflows) echo '{{\"total_count\": {ci['workflows']}}}' ;;\n"
-        f"  *{repo}/commits/main/check-runs) echo '{{\"total_count\": {ci['check-runs']}}}' ;;\n"
-        f"  *{repo}/commits/main/status) echo '{{\"total_count\": {ci['status']}}}' ;;\n"
-        f'  *{repo}) echo \'{{"default_branch": "main"}}\' ;;\n'
-        "esac\n"
+        f'#!/bin/sh\necho "$@" >> "{tmp_path}/gh-calls"\ncase "$*" in\n{cases}esac\n'
+        f'case "$*" in pr*) exit {exit_code} ;; esac\n'
     )
     script.chmod(0o755)
-    return {
-        **os.environ,
-        "PATH": f"{script.parent}:{os.environ['PATH']}",
-        "CLAUDE_PLUGIN_DATA": str(tmp_path / "data"),
-    }
+    env = {**os.environ, "PATH": f"{script.parent}:{os.environ['PATH']}"}
+    return {**env, "CLAUDE_PLUGIN_DATA": str(tmp_path / "data")}
 
 
 def run_hook(path, env, stop_hook_active=False):
@@ -120,9 +125,15 @@ def test_lets_the_second_stop_through_so_it_cannot_loop(tmp_path):
     assert run_hook(transcript(tmp_path, *CREATED), env, stop_hook_active=True) is None
 
 
-@pytest.mark.parametrize("ci_source", ["workflows", "check-runs", "status"])
-def test_blocks_when_gh_reports_no_checks_yet_in_a_repo_with_ci(tmp_path, ci_source):
-    ci = {"workflows": 0, "check-runs": 0, "status": 0, ci_source: 1}
+@pytest.mark.parametrize(
+    "ci",
+    [
+        {"workflows": [".github/workflows/ci.yml"]},
+        {"check-runs": ["buildkite"]},
+        {"status": 1},
+    ],
+)
+def test_blocks_when_gh_reports_no_checks_yet_in_a_repo_with_ci(tmp_path, ci):
     env = fake_gh(tmp_path, [], exit_code=1, ci=ci)
     answer = run_hook(transcript(tmp_path, *CREATED), env)
     assert answer["decision"] == "block"
@@ -176,3 +187,33 @@ def test_an_ask_about_another_repo_does_not_silence_this_one(tmp_path):
     env = fake_gh(tmp_path, [], exit_code=1)
     asked(env, "github.com/example-org/other", hours_ago=1)
     assert run_hook(transcript(tmp_path, *CREATED), env)["decision"] == "block"
+
+
+def test_never_waits_for_codeql(tmp_path):
+    env = fake_gh(
+        tmp_path,
+        [
+            {"name": "CodeQL", "bucket": "pending", "workflow": ""},
+            {"name": "Analyze (python)", "bucket": "pending", "workflow": "CodeQL"},
+            {"name": "Unit", "bucket": "pass", "workflow": "CI"},
+        ],
+        exit_code=8,
+    )
+    assert run_hook(transcript(tmp_path, *CREATED), env) is None
+
+
+def test_a_repo_whose_only_checks_are_codeql_counts_as_having_no_ci(tmp_path):
+    codeql_only = {
+        "workflows": ["dynamic/github-code-scanning/codeql"],
+        "check-runs": ["github-actions", "github-advanced-security"],
+    }
+    env = fake_gh(tmp_path, [], exit_code=1, ci=codeql_only)
+    answer = run_hook(transcript(tmp_path, *CREATED), env)
+    assert "no CI" in answer["reason"]
+
+
+def test_keeps_waiting_when_gh_api_cannot_read_the_repo(tmp_path):
+    env = fake_gh(tmp_path, [], exit_code=1)
+    (tmp_path / "answer-1.json").write_text('{"message": "Not Found"}')
+    answer = run_hook(transcript(tmp_path, *CREATED), env)
+    assert "could not read" in answer["reason"]
