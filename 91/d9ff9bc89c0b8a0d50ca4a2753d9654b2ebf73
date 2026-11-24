@@ -1,0 +1,27 @@
+at/hooks/pr-checks/pr_checks.py
+  s_f7b15980fae82c::t_baeceafdeb2b4d 14,57-60,62,64-67,69-81,86,96
+  s_f7b15980fae82c::t_9b44c529640d39 144-146
+README.md
+  s_f7b15980fae82c::t_813303ceb47ead 83
+tests/test_pr_checks.py
+  s_f7b15980fae82c::t_813303ceb47ead 226-232
+  s_f7b15980fae82c::t_8806be9068e035 43-57,65-74,141-149,203-225
+global/CLAUDE.md
+  s_f7b15980fae82c::t_0cc0c6f547ce06 32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "91d9ff9bc89c0b8a0d50ca4a2753d9654b2ebf73",
+  "prompts": {},
+  "sessions": {
+    "s_f7b15980fae82c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e3697b49-0d19-42a8-9e63-ccb240a3a5dd",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Andrew <andrew.tavaes87@gmail.com>"
+    }
+  }
+}
