@@ -39,11 +39,13 @@ def transcript(tmp_path, command, output):
     return path
 
 
-def fake_gh(tmp_path, checks, exit_code=0, ci=None):
-    """A fake gh: `checks` for `gh pr checks`, and the repo's `ci` for `gh api`."""
+def fake_gh(tmp_path, checks, exit_code=0, ci=None, required=None):
+    """A fake gh: `checks` for `gh pr checks`, `required` for its --required form,
+    and the repo's `ci` for `gh api`."""
     ci = {"workflows": [], "check-runs": [], "status": 0, **(ci or {})}
     repo = "repos/example-org/app"
     routes = {
+        "'pr checks'*--required*": required or [],
         "'pr checks'*": checks,
         f"*{repo}/actions/workflows": {
             "workflows": [{"path": p} for p in ci["workflows"]]
@@ -111,6 +113,26 @@ def test_lets_the_stop_through_when_every_check_passed_or_was_skipped(tmp_path):
         [{"name": "Unit", "bucket": "pass"}, {"name": "Release", "bucket": "skipping"}],
     )
     assert run_hook(transcript(tmp_path, *CREATED), env) is None
+
+
+def test_lets_the_stop_through_when_only_optional_checks_fail(tmp_path):
+    env = fake_gh(
+        tmp_path,
+        [{"name": "Build", "bucket": "pass"}, {"name": "Preview", "bucket": "fail"}],
+        required=[{"name": "Build", "bucket": "pass"}],
+    )
+    assert run_hook(transcript(tmp_path, *CREATED), env) is None
+
+
+def test_blocks_on_a_required_check_that_failed(tmp_path):
+    env = fake_gh(
+        tmp_path,
+        [{"name": "Build", "bucket": "fail"}, {"name": "Preview", "bucket": "fail"}],
+        required=[{"name": "Build", "bucket": "fail"}],
+    )
+    answer = run_hook(transcript(tmp_path, *CREATED), env)
+    assert "Build failed" in answer["reason"]
+    assert "Preview" not in answer["reason"]
 
 
 def test_ignores_pr_links_that_no_gh_pr_create_printed(tmp_path):
@@ -214,6 +236,6 @@ def test_a_repo_whose_only_checks_are_codeql_counts_as_having_no_ci(tmp_path):
 
 def test_keeps_waiting_when_gh_api_cannot_read_the_repo(tmp_path):
     env = fake_gh(tmp_path, [], exit_code=1)
-    (tmp_path / "answer-1.json").write_text('{"message": "Not Found"}')
+    (tmp_path / "answer-2.json").write_text('{"message": "Not Found"}')
     answer = run_hook(transcript(tmp_path, *CREATED), env)
     assert "could not read" in answer["reason"]

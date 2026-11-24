@@ -87,7 +87,13 @@ def has_ci(host, repo):
 
 def problems(pr):
     """One line per check that is not green, or why the checks could not be read; None without CI."""
-    done, checks = gh_json("pr", "checks", pr, "--json", "name,bucket,workflow")
+    fields = ("--json", "name,bucket,workflow")
+    # A check the branch rules do not require cannot block the merge, so it cannot block
+    # the stop. Without required checks, every check counts.
+    required = gh_json("pr", "checks", pr, "--required", *fields)[1]
+    done, checks = gh_json("pr", "checks", pr, *fields)
+    if required:
+        checks = required
     if done.returncode != 0 and not checks:
         if not has_ci(*PR_URL.match(pr).groups()):
             return None
